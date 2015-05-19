@@ -21,3 +21,4 @@ Thumbs.db
 
 # App specific ignore rules
 built/
+typings/
