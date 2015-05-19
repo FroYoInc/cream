@@ -1,5 +1,6 @@
 {
     "version": "1.5.0-alpha",
+    "compileOnSave": false,
     "compilerOptions": {
         "target": "es5",
         "module": "commonjs",
@@ -16,6 +17,8 @@
         "!./node_modules/**/*.ts"
     ],
     "files": [
-        "./server.ts"
+        "./server.ts",
+        "./typings/restify/restify.d.ts",
+        "./typings/tsd.d.ts"
     ]
 }
