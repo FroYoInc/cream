@@ -1,0 +1,23 @@
+# Node specific ignore rules
+lib-cov
+*.seed
+*.log
+*.csv
+*.dat
+*.out
+*.pid
+*.gz
+
+pids
+logs
+results
+
+npm-debug.log
+node_modules
+
+# OS X ignore rules
+.DS_Store
+Thumbs.db
+
+# App specific ignore rules
+built/

@@ -1,0 +1,32 @@
+{
+  "name": "corporate-carpooling",
+  "version": "0.0.0",
+  "description": "Corporate Carpooling API",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ianaldrighetti/corporate-carpooling.git"
+  },
+  "keywords": [
+    "carpooling"
+  ],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ianaldrighetti/corporate-carpooling/issues"
+  },
+  "homepage": "https://github.com/ianaldrighetti/corporate-carpooling",
+  "dependencies": {
+    "restify": "^3.0.2"
+  },
+  "devDependencies": {
+    "gulp": "^3.8.11",
+    "gulp-debug": "^2.0.1",
+    "gulp-sourcemaps": "^1.5.2",
+    "gulp-tslint": "^3.0.1-beta",
+    "gulp-typescript": "^2.7.3"
+  }
+}
