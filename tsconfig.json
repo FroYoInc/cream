@@ -18,6 +18,8 @@
     ],
     "files": [
         "./server.ts",
+        "./typings/bunyan/bunyan.d.ts",
+        "./typings/node/node.d.ts",
         "./typings/restify/restify.d.ts",
         "./typings/tsd.d.ts"
     ]
