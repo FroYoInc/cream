@@ -6,6 +6,7 @@
         "module": "commonjs",
         "declaration": false,
         "noImplicitAny": false,
+        "noEmitOnError": true,
         "removeComments": true,
         "noLib": false,
         "outDir": "./built/",

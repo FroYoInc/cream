@@ -6,7 +6,7 @@ var server = restify.createServer({
 });
 
 server.get('/flavors', function(req, res, next) {
-  var flavors : string[] = ['Peanut Butter', 'Cookies N Cream', 'Cake Batter']
+  var flavors : string[] = ['Peanut Butter', 'Cookies N Cream', 'Cake Batter'];
   res.send({'flavors': flavors});
   next();
 });
