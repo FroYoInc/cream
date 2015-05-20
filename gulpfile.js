@@ -26,9 +26,12 @@ gulp.task('restart-server', ['transpile-ts2js'], function() {
   return server = spawn('node', [serverPath], {stdio: 'inherit'});
 });
 
-
-gulp.task('watch-ts-files', function() {
-   gulp.watch(tsFilesGlob, ['transpile-ts2js', 'restart-server']);
+gulp.task('unit-tests', ['transpile-ts2js'], function() {
+  // Run jasmine tests
 });
 
-gulp.task('default', ['watch-ts-files', 'transpile-ts2js', 'restart-server']);
+gulp.task('watch-ts-files', function() {
+   gulp.watch(tsFilesGlob, ['restart-server','unit-tests']);
+});
+
+gulp.task('default', ['watch-ts-files']);
