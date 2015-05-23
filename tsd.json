@@ -13,6 +13,9 @@
     },
     "bunyan/bunyan.d.ts": {
       "commit": "2bb8240a01eed264c1b22bc80f666d94faaef394"
+    },
+    "jasmine/jasmine.d.ts": {
+      "commit": "2e904baa7f46d2752b63e6aeb8687ed471e7569b"
     }
   }
 }

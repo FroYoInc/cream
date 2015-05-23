@@ -4,6 +4,7 @@ var ts    = require('gulp-typescript');
 var debug = require('gulp-debug');
 var spawn = require('child_process').spawn;
 var path  = require('path');
+var jasmine = require('gulp-jasmine');
 
 var tsProject    = ts.createProject('tsconfig.json');
 var tsOutDir     = tsProject.config.compilerOptions.outDir;
@@ -29,7 +30,8 @@ gulp.task('restart-server', ['transpile-ts2js'], function() {
 });
 
 gulp.task('unit-tests', ['transpile-ts2js'], function() {
-  // Run jasmine tests
+  return gulp.src('built/test/*.js')
+    .pipe(jasmine());
 });
 
 gulp.task('watch-ts-files', function() {

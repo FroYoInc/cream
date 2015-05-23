@@ -20,7 +20,9 @@
     "initFile": "server.ts",
     "files": [
         "./server.ts",
+        "./test/serverTest.ts",
         "./typings/bunyan/bunyan.d.ts",
+        "./typings/jasmine/jasmine.d.ts",
         "./typings/node/node.d.ts",
         "./typings/restify/restify.d.ts",
         "./typings/tsd.d.ts"
