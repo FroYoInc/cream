@@ -1,7 +1,7 @@
 import restify = require('restify');
 
 var server = restify.createServer({
-  name: 'emulsion',
+  name: 'Waffle Cone',
   version: '0.0.0'
 });
 
