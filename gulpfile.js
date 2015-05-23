@@ -36,4 +36,5 @@ gulp.task('watch-ts-files', function() {
 });
 
 gulp.task('default', ['watch-ts-files']);
-gulp.task('build', ['unit-tests']);
+gulp.task('build', ['transpile-ts2js', 'unit-tests']);
+gulp.task('test', ['unit-tests']);
