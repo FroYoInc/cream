@@ -31,10 +31,9 @@ gulp.task('unit-tests', ['transpile-ts2js'], function() {
     .pipe(jasmine());
 });
 
-gulp.task('watch-ts-files', function() {
+gulp.task('default', ['unit-tests', 'restart-server'], function() {
    gulp.watch(config.tsFilesGlob, ['unit-tests', 'restart-server']);
 });
 
-gulp.task('default', ['watch-ts-files']);
 gulp.task('build', ['transpile-ts2js', 'unit-tests']);
 gulp.task('test', ['unit-tests']);
