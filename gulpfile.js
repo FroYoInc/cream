@@ -5,11 +5,12 @@ var debug = require('gulp-debug');
 var spawn = require('child_process').spawn;
 var path  = require('path');
 var jasmine = require('gulp-jasmine');
+var config = require('./config.js');
 
-var tsProject    = ts.createProject('tsconfig.json');
-var tsOutDir     = tsProject.config.compilerOptions.outDir;
-var tsFilesGlob  = tsProject.config.filesGlob;
-var initFile     = path.basename(tsProject.config.initFile, '.ts') + '.js';
+var tsProject    = ts.createProject(config.tsConfigFile);
+var tsOutDir     = config.tsconfig.compilerOptions.outDir;
+var tsFilesGlob  = config.tsconfig.filesGlob;
+var initFile     = config.initFile;
 var initFilePath = path.join(tsOutDir, initFile);
 var server       = null;
 
@@ -39,3 +40,4 @@ gulp.task('watch-ts-files', function() {
 });
 
 gulp.task('default', ['watch-ts-files']);
+gulp.task('build', ['unit-tests']);

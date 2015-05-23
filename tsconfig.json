@@ -17,7 +17,6 @@
         "./**/*.ts",
         "!./node_modules/**/*.ts"
     ],
-    "initFile": "server.ts",
     "files": [
         "./server.ts",
         "./test/serverTest.ts",
