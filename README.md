@@ -1,7 +1,10 @@
+# Waffle Cone API
+The backend API
+
 # How to develop
 1. Make sure you have `node` and `npm` installed
 2. Install `gulp` globally
-  
+
    ```sh
    $ npm install gulp -g
    ```
