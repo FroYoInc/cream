@@ -1,14 +1,23 @@
-var gulp  = require('gulp');
+var config = require('./config.js');
 var del   = require('del');
-var ts    = require('gulp-typescript');
-var debug = require('gulp-debug');
 var spawn = require('child_process').spawn;
 var path  = require('path');
+var gulp  = require('gulp');
+var debug = require('gulp-debug');
+var ts    = require('gulp-typescript');
 var jasmine = require('gulp-jasmine');
-var config = require('./config.js');
+var gutil = require('gulp-util');
 
 var tsProject    = ts.createProject(config.tsConfigFile);
 var server       = null;
+var failOnErrors = false;
+
+var handleError = function(err) {
+  if (failOnErrors) {
+    gutil.log(err.message);
+    process.exit(1);
+  }
+}
 
 gulp.task('clean-js', function(cb) {
   del(config.tsOutDir, cb);
@@ -17,6 +26,7 @@ gulp.task('clean-js', function(cb) {
 gulp.task('transpile-ts2js', ['clean-js'], function () {
   return tsProject.src()
                   .pipe(ts(tsProject))
+                  .on('error', handleError)
                   .js
                   .pipe(gulp.dest(config.tsOutDir));
 });
@@ -35,5 +45,9 @@ gulp.task('default', ['unit-tests', 'restart-server'], function() {
    gulp.watch(config.tsFilesGlob, ['unit-tests', 'restart-server']);
 });
 
-gulp.task('build', ['transpile-ts2js', 'unit-tests']);
-gulp.task('test', ['unit-tests']);
+gulp.task('test', function() {
+  failOnErrors = true;
+  gulp.start(['unit-tests']);
+});
+
+gulp.task('build', ['test']);
