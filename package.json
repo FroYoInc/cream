@@ -1,0 +1,35 @@
+{
+  "name": "wafflecone",
+  "version": "0.0.0",
+  "description": "Corporate Carpooling API",
+  "private": true,
+  "scripts": {
+    "test": "gulp test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ianaldrighetti/corporate-carpooling.git"
+  },
+  "keywords": [
+    "carpooling"
+  ],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ianaldrighetti/corporate-carpooling/issues"
+  },
+  "homepage": "https://github.com/ianaldrighetti/corporate-carpooling",
+  "dependencies": {
+    "restify": "^3.0.2"
+  },
+  "devDependencies": {
+    "del": "^1.2.0",
+    "gulp": "^3.8.11",
+    "gulp-debug": "^2.0.1",
+    "gulp-jasmine": "^2.0.1",
+    "gulp-sourcemaps": "^1.5.2",
+    "gulp-tslint": "^3.0.1-beta",
+    "gulp-typescript": "^2.7.3",
+    "gulp-util": "^3.0.4"
+  }
+}
