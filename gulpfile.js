@@ -15,7 +15,7 @@ $.ts = $.typescript;
 
 var handleError = function(err) {
   if (failOnErrors) {
-    $.gutil.log(err.message);
+    $.util.log(err.message);
     process.exit(1);
   }
 }
