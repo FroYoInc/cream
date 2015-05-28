@@ -1,10 +1,10 @@
 {
-  "name": "corporate-carpooling",
+  "name": "wafflecone",
   "version": "0.0.0",
   "description": "Corporate Carpooling API",
-  "main": "index.js",
+  "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "gulp test"
   },
   "repository": {
     "type": "git",
@@ -23,23 +23,13 @@
     "restify": "^3.0.2"
   },
   "devDependencies": {
-    "ansi-regex": "^1.1.1",
     "del": "^1.2.0",
-    "end-of-stream": "^1.1.0",
-    "glob": "^5.0.9",
-    "glob2base": "0.0.12",
-    "globule": "^0.2.0",
     "gulp": "^3.8.11",
     "gulp-debug": "^2.0.1",
+    "gulp-jasmine": "^2.0.1",
     "gulp-sourcemaps": "^1.5.2",
     "gulp-tslint": "^3.0.1-beta",
     "gulp-typescript": "^2.7.3",
-    "lodash._getnative": "^3.9.0",
-    "lodash.isarguments": "^3.0.3",
-    "lodash.isarray": "^3.0.3",
-    "minimatch": "^2.0.8",
-    "ordered-read-streams": "^0.2.0",
-    "readable-stream": "^1.0.33",
-    "unique-stream": "^2.0.2"
+    "gulp-util": "^3.0.4"
   }
 }
