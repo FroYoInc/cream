@@ -7,7 +7,7 @@ class User {
   private _isAccountActivated : boolean;
   private _salt : string;
   private _id : string;
-  private _carpools : [Carpool]
+  private _carpools : [Carpool];
 
   get firstName(): string {
     return this._firstName;
