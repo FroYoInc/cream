@@ -11,5 +11,5 @@ module.exports = {
   'tsOutDir': tsConfig.compilerOptions.outDir,
   'tsFilesGlob': tsConfig.filesGlob,
   'initFilePath': path.join(tsConfig.compilerOptions.outDir, 'server.js'),
-  'testFiles': path.join(tsConfig.compilerOptions.outDir, 'test/*.js')
+  'testFiles': path.join(tsConfig.compilerOptions.outDir, 'test/**/*.spec.js')
 }
