@@ -19,6 +19,9 @@
     ],
     "files": [
         "./server.ts",
+        "./src/models/Campus.ts",
+        "./src/models/Carpool.ts",
+        "./src/models/User.ts",
         "./test/serverTest.ts",
         "./typings/bunyan/bunyan.d.ts",
         "./typings/jasmine/jasmine.d.ts",
