@@ -1,5 +1,5 @@
 # Waffle Cone API
-[![Build Status](https://travis-ci.org/FroYoInc/wafflecone.svg?branch=develop)](https://travis-ci.org/FroYoInc/wafflecone)
+[![Build Status](https://travis-ci.org/FroYoInc/wafflecone.svg?branch=master)](https://travis-ci.org/FroYoInc/wafflecone)
 
 The backend API
 
