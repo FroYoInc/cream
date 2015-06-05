@@ -7,6 +7,7 @@ class User {
   private _isAccountActivated : boolean;
   private _salt : string;
   private _id : string;
+  private _carpools : [Carpool]
 
   get firstName(): string {
     return this._firstName;
@@ -69,6 +70,14 @@ class User {
   }
 
   set id(newID:string) {
-    this.id = newID;
+    this._id = newID;
+  }
+
+  get carPools(): [Carpool] {
+    return this._carpools;
+  }
+
+  set carPools(newCarpools: [Carpool]) {
+    this._carpools = newCarpools;
   }
 }
