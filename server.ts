@@ -1,4 +1,5 @@
 import restify = require('restify');
+import dbutils = require('./src/services/user-service');
 
 var server = restify.createServer({
   name: 'Waffle Cone',

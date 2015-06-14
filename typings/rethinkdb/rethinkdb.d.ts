@@ -5,7 +5,7 @@
 // Reference: http://www.rethinkdb.com/api/#js
 // TODO: Document manipulation and below
 
-/// <reference path="../bluebird/bluebird.d"/>
+/// <reference path="../bluebird/bluebird.d.ts"/>
 
 declare module "rethinkdb" {
 
