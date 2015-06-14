@@ -19,6 +19,7 @@
     ],
     "files": [
         "./server.ts",
+        "./src/dbutils/dbutils.ts",
         "./src/dbutils/migrator.ts",
         "./src/models/campus.ts",
         "./src/models/carpool.ts",
@@ -26,6 +27,8 @@
         "./src/services/user-service.ts",
         "./test/serverTest.ts",
         "./test/services/user-service.spec.ts",
+        "./test/typings/bluebird/bluebird.d.ts",
+        "./typings/bluebird/bluebird.d.ts",
         "./typings/bunyan/bunyan.d.ts",
         "./typings/jasmine/jasmine.d.ts",
         "./typings/node/node.d.ts",

@@ -12,9 +12,10 @@ declare module "rethinkdb" {
   export function connect(host:ConnectionOptions) : Promise<Connection>;
   export function connect(host:ConnectionOptions, cb:(err:Error, conn:Connection)=>void);
 
+  export function dbCreate(name:string):Expression<any>;
   export function dbCreate(name:string):Operation<CreateResult>;
   export function dbDrop(name:string):Operation<DropResult>;
-  export function dbList():Operation<string[]>;
+  export function dbList():Expression<any>;
 
   export function db(name:string):Db;
   export function table(name:string, options?:{useOutdated:boolean}):Table;
@@ -29,7 +30,7 @@ declare module "rethinkdb" {
   export function row(name:string):Expression<any>;
   export function expr(stuff:any):Expression<any>;
 
-  export function now():Time;
+  export function now():Expression<any>;
 
   // Control Structures
   export function branch(test:Expression<boolean>, trueBranch:Expression<any>, falseBranch:Expression<any>):Expression<any>;
@@ -224,6 +225,7 @@ declare module "rethinkdb" {
   }
 
   interface Operation<T> {
+   run(conn:Connection) : Promise<void>;
    run(conn:Connection, cb:(err:Error, result:T)=>void);
   }
 
