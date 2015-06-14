@@ -1,0 +1,11 @@
+{
+  "name": "migrator",
+  "version": "0.0.0",
+  "description": "This tool ensures RethinkDB databse is created with tables/indices that the application expect",
+  "main": "migrator.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT"
+}

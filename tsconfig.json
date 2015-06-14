@@ -23,12 +23,17 @@
         "./src/models/carpool.ts",
         "./src/models/user.ts",
         "./src/services/user-service.ts",
+        "./src/dbutils/migrator.ts",
+        "./src/models/Campus.ts",
+        "./src/models/Carpool.ts",
+        "./src/models/User.ts",
         "./test/serverTest.ts",
         "./test/services/user-service.spec.ts",
         "./typings/bunyan/bunyan.d.ts",
         "./typings/jasmine/jasmine.d.ts",
         "./typings/node/node.d.ts",
         "./typings/restify/restify.d.ts",
+        "./typings/rethinkdb/rethinkdb.d.ts",
         "./typings/tsd.d.ts"
     ]
 }

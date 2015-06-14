@@ -43,7 +43,8 @@ gulp.task('unit-tests', ['transpile-ts2js'], function() {
 });
 
 gulp.task('default', ['unit-tests', 'restart-server'], function() {
-   gulp.watch(config.tsFilesGlob, ['unit-tests', 'restart-server']);
+   var files = [config.tsFilesGlob, config.tsConfigFile];
+   gulp.watch(files, ['unit-tests', 'restart-server']);
 });
 
 gulp.task('test', function() {

@@ -20,7 +20,8 @@
   },
   "homepage": "https://github.com/ianaldrighetti/corporate-carpooling",
   "dependencies": {
-    "restify": "^3.0.2"
+    "restify": "^3.0.2",
+    "rethinkdb": "^2.0.0-1"
   },
   "devDependencies": {
     "del": "^1.2.0",
