@@ -19,6 +19,7 @@
     ],
     "files": [
         "./server.ts",
+        "./src/dbutils/migrator.ts",
         "./src/models/Campus.ts",
         "./src/models/Carpool.ts",
         "./src/models/User.ts",
@@ -27,6 +28,7 @@
         "./typings/jasmine/jasmine.d.ts",
         "./typings/node/node.d.ts",
         "./typings/restify/restify.d.ts",
+        "./typings/rethinkdb/rethinkdb.d.ts",
         "./typings/tsd.d.ts"
     ]
 }

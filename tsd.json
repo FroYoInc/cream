@@ -16,6 +16,9 @@
     },
     "jasmine/jasmine.d.ts": {
       "commit": "2e904baa7f46d2752b63e6aeb8687ed471e7569b"
+    },
+    "rethinkdb/rethinkdb.d.ts": {
+      "commit": "43861a1703feb7c6c413a4026a262c2ecb97eec0"
     }
   }
 }
