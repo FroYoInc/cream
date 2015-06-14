@@ -5,8 +5,11 @@
 // Reference: http://www.rethinkdb.com/api/#js
 // TODO: Document manipulation and below
 
+/// <reference path="../bluebird/bluebird.d"/>
+
 declare module "rethinkdb" {
 
+  export function connect(host:ConnectionOptions) : Promise<Connection>;
   export function connect(host:ConnectionOptions, cb:(err:Error, conn:Connection)=>void);
 
   export function dbCreate(name:string):Operation<CreateResult>;
@@ -139,11 +142,11 @@ declare module "rethinkdb" {
   }
 
   interface ExpressionFunction<U> {
-    (doc:Expression<any>):Expression<U>; 
+    (doc:Expression<any>):Expression<U>;
   }
 
   interface JoinFunction<U> {
-    (left:Expression<any>, right:Expression<any>):Expression<U>; 
+    (left:Expression<any>, right:Expression<any>):Expression<U>;
   }
 
   interface ReduceFunction<U> {
@@ -159,7 +162,7 @@ declare module "rethinkdb" {
   interface UpdateOptions {
     non_atomic: boolean;
     durability: string; // 'soft'
-    return_vals: boolean; // false    
+    return_vals: boolean; // false
   }
 
   interface WriteResult {
@@ -193,7 +196,7 @@ declare module "rethinkdb" {
   }
 
   interface Expression<T> extends Writeable, Operation<T> {
-      (prop:string):Expression<any>; 
+      (prop:string):Expression<any>;
       merge(query:Expression<Object>):Expression<Object>;
       append(prop:string):Expression<Object>;
       contains(prop:string):Expression<boolean>;
@@ -221,7 +224,7 @@ declare module "rethinkdb" {
   }
 
   interface Operation<T> {
-   run(conn:Connection, cb:(err:Error, result:T)=>void); 
+   run(conn:Connection, cb:(err:Error, result:T)=>void);
   }
 
   interface Aggregator {}
