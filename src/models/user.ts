@@ -65,7 +65,7 @@ class User {
     this._salt = newSalt;
   }
 
-  get id(): string{
+  get id(): string {
     return this._id;
   }
 
