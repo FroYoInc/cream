@@ -24,7 +24,12 @@ gulp.task('clean-js', function(cb) {
   $.del(config.tsOutDir, cb);
 });
 
-gulp.task('transpile-ts2js', ['clean-js'], function () {
+gulp.task('copy-config', ['clean-js'], function(cb) {
+  return gulp.src(config.appConfigFiles)
+    .pipe(gulp.dest(config.appConfigOutDir));
+});
+
+gulp.task('transpile-ts2js', ['clean-js', 'copy-config'], function () {
   return tsProject.src()
                   .pipe($.ts(tsProject))
                   .on('error', handleError)
