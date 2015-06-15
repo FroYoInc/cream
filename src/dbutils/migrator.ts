@@ -28,12 +28,10 @@ module DBUtils {
     }
 
     migrate (connOpts : r.ConnectionOptions)  {
-      var self = this;
-      r.connect(connOpts)
+      return r.connect(connOpts)
         .then(this.setConnection)
         .then(this.createDatabase)
         .then(this.closeConnection)
-        .error(console.error);
     }
   }
 }

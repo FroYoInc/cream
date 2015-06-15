@@ -53,7 +53,7 @@ declare module "rethinkdb" {
   }
 
   interface Connection {
-    close();
+    close() : Promise<any>;
     reconnect(cb:(err:Error, conn:Connection)=>void);
     use(dbName:string);
     addListener(event:string, cb:Function);

@@ -19,6 +19,7 @@
     ],
     "files": [
         "./integration/dbutils/migrator.spec.ts",
+        "./src/config.ts",
         "./src/dbutils/migrator.ts",
         "./src/models/campus.ts",
         "./src/models/carpool.ts",
