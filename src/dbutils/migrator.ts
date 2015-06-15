@@ -4,39 +4,23 @@ import r = require('rethinkdb');
 
 module DBUtils {
 
-  export interface DatabaseDescription {
-    dbname: string;
-    tables: [string];
-  }
-
   export class Migrator {
+    static dbShape = {
+      dbname: 'froyo',
+      tables: ['a']
+    }
     private _conn : r.Connection;
-    private _dbDescription : DatabaseDescription;
-
-    constructor() {
-        this._dbDescription = {
-          dbname: 'Froyp',
-          tables: ['foo']
-        }
-    }
-
-    get dbDescription() : DatabaseDescription {
-      return this._dbDescription;
-    }
 
     private setConnection(conn : r.Connection) {
-      console.log('Setting connection');
       this._conn = conn;
     }
 
     private closeConnection() {
-      console.log('Closing connection');
       return this._conn.close();
     }
 
     private createDatabase() {
-      console.log('Creating db');
-      var dbname = this._dbDescription.dbname;
+      var dbname = Migrator.dbShape.dbname;
       var test = r.dbList().contains(dbname);
       var trueBranch = r.now();
       var falseBranch = r.dbCreate(dbname);
