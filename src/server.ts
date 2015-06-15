@@ -1,6 +1,6 @@
 import r = require('rethinkdb');
 import restify = require('restify');
-import dbutils = require('./src/dbutils/migrator');
+import dbutils = require('./dbutils/migrator');
 
 var connOpts = {
   host: 'localhost',

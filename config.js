@@ -19,6 +19,7 @@ module.exports = {
   'package': package,
   'tsOutDir': tsConfig().compilerOptions.outDir,
   'tsFilesGlob': tsConfig().filesGlob,
-  'initFilePath': path.join(tsConfig().compilerOptions.outDir, 'server.js'),
+  'initFilePath': path.join(tsConfig().compilerOptions.outDir, 'src/server.js'),
+  'integrationFiles': path.join(tsConfig().compilerOptions.outDir, 'integration/**/**.spec.js'),
   'testFiles': path.join(tsConfig().compilerOptions.outDir, 'test/**/*.spec.js')
 }

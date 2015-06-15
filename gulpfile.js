@@ -42,6 +42,11 @@ gulp.task('unit-tests', ['transpile-ts2js'], function() {
     .pipe($.jasmine());
 });
 
+gulp.task('integration-tests', ['transpile-ts2js'], function() {
+  return gulp.src(config.integrationFiles)
+    .pipe($.jasmine());
+});
+
 gulp.task('default', ['unit-tests', 'restart-server'], function() {
    var files = [config.tsFilesGlob, config.tsConfigFile];
    gulp.watch(files, ['unit-tests', 'restart-server']);
