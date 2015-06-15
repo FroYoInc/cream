@@ -3,8 +3,26 @@
 import r = require('rethinkdb');
 
 module DBUtils {
+
+  export interface DatabaseDescription {
+    dbname : string,
+    tables : [string]
+  };
+
   export class Migrator {
     private _conn : r.Connection;
+    private _dbDescription : DatabaseDescription;
+
+    constructor() {
+        this._dbDescription = {
+          dbname: 'Froyp',
+          tables: ['foo']
+        };
+    }
+    
+    get dbDescription() : DatabaseDescription {
+      return this._dbDescription;
+    }
 
     private setConnection(conn : r.Connection) {
       console.log('Setting connection');
