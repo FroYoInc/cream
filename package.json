@@ -4,7 +4,7 @@
   "description": "Corporate Carpooling API",
   "private": true,
   "scripts": {
-    "test": "gulp test"
+    "test": "gulp test integrate"
   },
   "repository": {
     "type": "git",
