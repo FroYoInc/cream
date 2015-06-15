@@ -5,9 +5,9 @@ import r = require('rethinkdb');
 module DBUtils {
 
   export interface DatabaseDescription {
-    dbname : string,
-    tables : [string]
-  };
+    dbname: string;
+    tables: [string];
+  }
 
   export class Migrator {
     private _conn : r.Connection;
@@ -17,7 +17,7 @@ module DBUtils {
         this._dbDescription = {
           dbname: 'Froyp',
           tables: ['foo']
-        };
+        }
     }
 
     get dbDescription() : DatabaseDescription {
