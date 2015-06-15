@@ -19,7 +19,7 @@ module DBUtils {
           tables: ['foo']
         };
     }
-    
+
     get dbDescription() : DatabaseDescription {
       return this._dbDescription;
     }
@@ -36,9 +36,10 @@ module DBUtils {
 
     private createDatabase() {
       console.log('Creating db');
-      var test = r.dbList().contains('froyo');
+      var dbname = this._dbDescription.dbname;
+      var test = r.dbList().contains(dbname);
       var trueBranch = r.now();
-      var falseBranch = r.dbCreate('froyo');
+      var falseBranch = r.dbCreate(dbname);
       return r.branch(test, trueBranch, falseBranch).run(this._conn);
     }
 
