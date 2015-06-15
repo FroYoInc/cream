@@ -63,7 +63,7 @@ declare module "rethinkdb" {
   interface Db {
     tableCreate(name:string, options?:TableOptions):Operation<CreateResult>;
     tableDrop(name:string):Operation<DropResult>;
-    tableList():Operation<string[]>;
+    tableList():Expression<string[]>;
     table(name:string, options?:GetTableOptions):Table;
   }
 
