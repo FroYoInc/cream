@@ -23,7 +23,7 @@ describe('Database Migrator', () => {
   var testTrue = (result) => {expect(result).toBe(true);}
   var dbShape = {
     dbname: 'froyo',
-    tables: ['users']
+    tables: ['user', 'carpools']
   };
 
   it('should have database named to following', () => {
@@ -37,7 +37,7 @@ describe('Database Migrator', () => {
       .finally(done);
   });
 
-  it('should have created tables ' + dbShape.tables, (done) => {
+  it('should have created following tables: ' + dbShape.tables, (done) => {
     r.db(dbShape.dbname).tableList().contains(dbShape.tables[0]).run(conn)
       .then(testTrue)
       .error(fail)
