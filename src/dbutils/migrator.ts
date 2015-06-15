@@ -7,14 +7,17 @@ module DBUtils {
     private _conn : r.Connection;
 
     private setConnection(conn : r.Connection) {
+      console.log('Setting connection');
       this._conn = conn;
     }
 
     private closeConnection() {
+      console.log('Closing connection');
       return this._conn.close();
     }
 
     private createDatabase() {
+      console.log('Creating db');
       var test = r.dbList().contains('froyo');
       var trueBranch = r.now();
       var falseBranch = r.dbCreate('froyo');
