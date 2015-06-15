@@ -39,12 +39,14 @@ gulp.task('restart-server', ['transpile-ts2js'], function() {
 
 gulp.task('unit-tests', ['transpile-ts2js'], function() {
   return gulp.src(config.testFiles)
-    .pipe($.jasmine());
+    .pipe($.jasmine())
+    .on('error', handleError);
 });
 
 gulp.task('integration-tests', ['transpile-ts2js'], function() {
   return gulp.src(config.integrationFiles)
-    .pipe($.jasmine());
+    .pipe($.jasmine())
+    .on('error', handleError);
 });
 
 gulp.task('default', ['unit-tests', 'restart-server'], function() {
@@ -55,6 +57,11 @@ gulp.task('default', ['unit-tests', 'restart-server'], function() {
 gulp.task('test', function() {
   failOnErrors = true;
   gulp.start(['unit-tests']);
+});
+
+gulp.task('integrate', function() {
+  failOnErrors = true;
+  gulp.start(['integration-tests']);
 });
 
 gulp.task('build', ['test']);
