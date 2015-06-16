@@ -37,7 +37,7 @@ describe('Database Migrator', () => {
       .finally(done);
   });
 
-  it('should have created following tables: ' + dbShape.tables, (done) => {
+  xit('should have created following tables: ' + dbShape.tables, (done) => {
     r.db(dbShape.dbname).tableList().contains(dbShape.tables[0]).run(conn)
       .then(testTrue)
       .error(fail)
