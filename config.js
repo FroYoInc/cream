@@ -25,8 +25,6 @@ module.exports = {
   'tsconfig': tsConfig(),
   'tsd': tsd(),
   'package': package,
-  'appConfigFiles': 'src/**/*.json',
-  'appConfigOutDir': join(outDir(), 'src/'),
   'tsOutDir': outDir(),
   'tsFilesGlob': tsConfig().filesGlob,
   'initFilePath': join(outDir(), 'src/server.js'),
