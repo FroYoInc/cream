@@ -1,10 +1,11 @@
 import r = require('rethinkdb');
 import restify = require('restify');
-import dbutils = require('./dbutils/migrator');
-import config  = require('./config');
+import DBUtils = require('./dbutils/migrator');
+import Config  = require('./config');
 
-var migrator = new dbutils.Migrator();
-migrator.migrate(config.Config.db);
+var config = Config.Config;
+var migrator = new DBUtils.Migrator();
+migrator.migrate(config.db);
 
 var server = restify.createServer({
   name: 'Waffle Cone',
@@ -17,6 +18,6 @@ server.get('/flavors', function(req, res, next) {
   next();
 });
 
-server.listen(8080, function() {
+server.listen(config.app.port, function() {
   console.log('> %s listening on %s', server.name, server.url);
 });
