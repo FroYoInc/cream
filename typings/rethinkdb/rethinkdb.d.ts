@@ -5,13 +5,17 @@
 // Reference: http://www.rethinkdb.com/api/#js
 // TODO: Document manipulation and below
 
+/// <reference path="../bluebird/bluebird.d.ts"/>
+
 declare module "rethinkdb" {
 
+  export function connect(host:ConnectionOptions) : Promise<Connection>;
   export function connect(host:ConnectionOptions, cb:(err:Error, conn:Connection)=>void);
 
+  export function dbCreate(name:string):Expression<any>;
   export function dbCreate(name:string):Operation<CreateResult>;
   export function dbDrop(name:string):Operation<DropResult>;
-  export function dbList():Operation<string[]>;
+  export function dbList():Expression<any>;
 
   export function db(name:string):Db;
   export function table(name:string, options?:{useOutdated:boolean}):Table;
@@ -26,7 +30,8 @@ declare module "rethinkdb" {
   export function row(name:string):Expression<any>;
   export function expr(stuff:any):Expression<any>;
 
-  export function now():Time;
+  export function now():Expression<any>;
+  export function args(list:string[]):Expression<any>;
 
   // Control Structures
   export function branch(test:Expression<boolean>, trueBranch:Expression<any>, falseBranch:Expression<any>):Expression<any>;
@@ -49,7 +54,7 @@ declare module "rethinkdb" {
   }
 
   interface Connection {
-    close();
+    close() : Promise<any>;
     reconnect(cb:(err:Error, conn:Connection)=>void);
     use(dbName:string);
     addListener(event:string, cb:Function);
@@ -57,9 +62,9 @@ declare module "rethinkdb" {
   }
 
   interface Db {
-    tableCreate(name:string, options?:TableOptions):Operation<CreateResult>;
+    tableCreate(name:string, options?:TableOptions):Expression<any>;
     tableDrop(name:string):Operation<DropResult>;
-    tableList():Operation<string[]>;
+    tableList():Expression<string[]>;
     table(name:string, options?:GetTableOptions):Table;
   }
 
@@ -139,11 +144,11 @@ declare module "rethinkdb" {
   }
 
   interface ExpressionFunction<U> {
-    (doc:Expression<any>):Expression<U>; 
+    (doc:Expression<any>):Expression<U>;
   }
 
   interface JoinFunction<U> {
-    (left:Expression<any>, right:Expression<any>):Expression<U>; 
+    (left:Expression<any>, right:Expression<any>):Expression<U>;
   }
 
   interface ReduceFunction<U> {
@@ -159,7 +164,7 @@ declare module "rethinkdb" {
   interface UpdateOptions {
     non_atomic: boolean;
     durability: string; // 'soft'
-    return_vals: boolean; // false    
+    return_vals: boolean; // false
   }
 
   interface WriteResult {
@@ -193,10 +198,11 @@ declare module "rethinkdb" {
   }
 
   interface Expression<T> extends Writeable, Operation<T> {
-      (prop:string):Expression<any>; 
+      (prop:string):Expression<any>;
       merge(query:Expression<Object>):Expression<Object>;
       append(prop:string):Expression<Object>;
       contains(prop:string):Expression<boolean>;
+      contains(expr:Expression<any>):Expression<boolean>;
 
       and(b:boolean):Expression<boolean>;
       or(b:boolean):Expression<boolean>;
@@ -221,7 +227,8 @@ declare module "rethinkdb" {
   }
 
   interface Operation<T> {
-   run(conn:Connection, cb:(err:Error, result:T)=>void); 
+   run(conn:Connection) : Promise<void>;
+   run(conn:Connection, cb:(err:Error, result:T)=>void);
   }
 
   interface Aggregator {}
