@@ -22,6 +22,15 @@
     },
     "nodemailer/nodemailer.d.ts": {
       "commit": "faff1866df10486a4c50904236183edc62ca841e"
+    },
+    "nodemailer/nodemailer-types.d.ts": {
+      "commit": "faff1866df10486a4c50904236183edc62ca841e"
+    },
+    "nodemailer-smtp-transport/nodemailer-smtp-transport.d.ts": {
+      "commit": "faff1866df10486a4c50904236183edc62ca841e"
+    },
+    "nodemailer-direct-transport/nodemailer-direct-transport.d.ts": {
+      "commit": "faff1866df10486a4c50904236183edc62ca841e"
     }
   }
 }
