@@ -24,12 +24,17 @@ module DBUtils {
       return this._conn.close();
     }
 
+    private branch(test: r.Expression<boolean>,
+      tb: r.Expression<any>, fb: r.Expression<any>) {
+      return r.branch(test, tb, fb).run(this._conn);
+    }
+
     private createDatabase() {
       var dbname = Migrator.dbShape.dbname;
       var test = r.dbList().contains(dbname);
       var trueBranch = r.now();
       var falseBranch = r.dbCreate(dbname);
-      return r.branch(test, trueBranch, falseBranch).run(this._conn);
+      return this.branch(test, trueBranch, falseBranch);
     }
 
     private createTables() {
@@ -39,7 +44,7 @@ module DBUtils {
         var trueBranch = r.now();
         var falseBranch = r.db(Migrator.dbShape.dbname)
           .tableCreate(t.tableName);
-        return r.branch(test, trueBranch, falseBranch).run(this._conn);
+        return this.branch(test, trueBranch, falseBranch);
       }
       return p.map(Migrator.dbShape.tables, createTable);
     }
