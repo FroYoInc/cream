@@ -15,6 +15,7 @@ The backend API
 
 # How to run rethinkDB on Windows
 `Vagrant` will be used to create an Ubuntu virtual machine. RethinkDB will be installed on this virtual machine. Ports will be forwarded so that it looks like rethinkDB is installed on your local machine. You can access rethinkDB web UI on `localhost:9090`. `gulp integrate` should work out of the box. 
+
 1. Make sure you have [`VirtualBox`](https://www.virtualbox.org/wiki/Downloads) and [`Vagrant`](https://www.vagrantup.com/downloads.html) installed
 2. Run `vagrant up` inside `wafflecone/vagrant/`. (Note: the first time you run `vagrant up` it will take some time to download the ubuntu image. After that subsequent `vagrant` commands should be fast)
 3. Optional: to stop the virtual machine run `vagrant halt`. To start the virtual machine from scratch, run `vagrant destroy`. See `vagrant help` for more options
