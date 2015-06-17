@@ -20,7 +20,6 @@
     "files": [
         "./integration/dbutils/migrator.spec.ts",
         "./src/config.ts",
-        "./src/dbutils/dbutils.ts",
         "./src/dbutils/migrator.ts",
         "./src/dbutils/shapes.ts",
         "./src/models/campus.ts",
