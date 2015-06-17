@@ -10,7 +10,7 @@ module DBUtils {
     static dbShape : shapes.DBShape = {
       dbname: 'froyo',
       tables: [{
-        tableName: 'users',
+        tableName: 'user',
         indices: ['userName', 'email']
       }]
     };
