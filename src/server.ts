@@ -1,10 +1,10 @@
 import r = require('rethinkdb');
 import restify = require('restify');
 import dbutils = require('./dbutils/migrator');
-var config  = require('./config.json');
+import config  = require('./config');
 
 var migrator = new dbutils.Migrator();
-migrator.migrate(config.db);
+migrator.migrate(config.Config.db);
 
 var server = restify.createServer({
   name: 'Waffle Cone',
