@@ -24,3 +24,6 @@ built/
 
 # Webstorm
 .idea
+
+# Vagrant
+.vagrant/
