@@ -1,12 +1,12 @@
 module DBUtils {
   export interface TableShape {
     tableName: string;
-    indices: [string];
+    indices: Array<string>;
   }
 
   export interface DBShape {
     dbname: string;
-    tables: [TableShape]
+    tables: Array<TableShape>
   }
 }
 export = DBUtils;

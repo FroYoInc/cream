@@ -4,3 +4,4 @@
 /// <reference path="bunyan/bunyan.d.ts" />
 /// <reference path="jasmine/jasmine.d.ts" />
 /// <reference path="rethinkdb/rethinkdb.d.ts" />
+/// <reference path="nodemailer/nodemailer.d.ts" />

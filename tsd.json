@@ -19,6 +19,9 @@
     },
     "rethinkdb/rethinkdb.d.ts": {
       "commit": "43861a1703feb7c6c413a4026a262c2ecb97eec0"
+    },
+    "nodemailer/nodemailer.d.ts": {
+      "commit": "faff1866df10486a4c50904236183edc62ca841e"
     }
   }
 }

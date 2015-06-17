@@ -26,6 +26,7 @@
         "./src/models/carpool.ts",
         "./src/models/user.ts",
         "./src/server.ts",
+        "./src/services/email-service.ts",
         "./src/services/user-service.ts",
         "./test/serverTest.ts",
         "./test/services/user-service.spec.ts",
@@ -33,6 +34,7 @@
         "./typings/bunyan/bunyan.d.ts",
         "./typings/jasmine/jasmine.d.ts",
         "./typings/node/node.d.ts",
+        "./typings/nodemailer/nodemailer.d.ts",
         "./typings/restify/restify.d.ts",
         "./typings/rethinkdb/rethinkdb.d.ts",
         "./typings/tsd.d.ts"
