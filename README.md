@@ -14,5 +14,5 @@ The backend API
 4. Run `gulp` inside `wafflecone/`
 
 # How to run rethinkDB on Windows
-1. Make sure you have `VirtualBox` and `Vagrant` installed
+1. Make sure you have [`VirtualBox`](https://www.virtualbox.org/wiki/Downloads) and `Vagrant` installed
 2. Run `vagrant up` inside `wafflecone/vagrant/`
