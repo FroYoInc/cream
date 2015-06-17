@@ -44,8 +44,8 @@ describe('Database Migrator', () => {
       .finally(done);
   });
 
-  it('should have created following tables: ' + dbShape.tables, (done) => {
-    var tables = dbShape.tables.map((t) => {return t.tableName});
+  var tables = dbShape.tables.map((t) => {return t.tableName});
+  it('should have created following tables: ' + tables, (done) => {
     r.db(dbShape.dbname)
       .tableList()
       .contains(r.args(tables))
