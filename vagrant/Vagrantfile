@@ -23,9 +23,6 @@ Vagrant.configure(2) do |config|
   config.vm.network :forwarded_port, guest: 28015, host: 28015
   config.vm.network :forwarded_port, guest: 29015, host: 29015
 
-  # Attempt to 'guess' the default network
-  config.vm.network :public_network, bridge: 'en0: Wi-Fi (AirPort)'
-
   # Provisioning
   config.vm.provision :shell do |sh|
     sh.inline = <<-EOF
