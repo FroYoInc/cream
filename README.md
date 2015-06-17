@@ -12,3 +12,7 @@ The backend API
    ```
 3. Run `npm install` inside `wafflecone/`
 4. Run `gulp` inside `wafflecone/`
+
+# How to run rethinkDB on Windows
+1. Make sure you have `VirtualBox` and `Vagrant` installed
+2. Run `vagrant up` inside `wafflecone/vagrant/`
