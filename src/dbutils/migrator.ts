@@ -44,6 +44,15 @@ module DBUtils {
       return p.map(Migrator.dbShape.tables, createTable);
     }
 
+    private createIndices() {
+      console.error("TODO");
+    }
+
+    private createAdminAccount() {
+      // User userService to create an admin
+      console.error("TODO")
+    }
+
     migrate (connOpts : r.ConnectionOptions)  {
       return r.connect(connOpts)
         .then(this.setConnection)
