@@ -31,6 +31,7 @@ declare module "rethinkdb" {
   export function expr(stuff:any):Expression<any>;
 
   export function now():Expression<any>;
+  export function args(list:string[]):Expression<any>;
 
   // Control Structures
   export function branch(test:Expression<boolean>, trueBranch:Expression<any>, falseBranch:Expression<any>):Expression<any>;
@@ -61,7 +62,7 @@ declare module "rethinkdb" {
   }
 
   interface Db {
-    tableCreate(name:string, options?:TableOptions):Operation<CreateResult>;
+    tableCreate(name:string, options?:TableOptions):Expression<any>;
     tableDrop(name:string):Operation<DropResult>;
     tableList():Expression<string[]>;
     table(name:string, options?:GetTableOptions):Table;
@@ -201,6 +202,7 @@ declare module "rethinkdb" {
       merge(query:Expression<Object>):Expression<Object>;
       append(prop:string):Expression<Object>;
       contains(prop:string):Expression<boolean>;
+      contains(expr:Expression<any>):Expression<boolean>;
 
       and(b:boolean):Expression<boolean>;
       or(b:boolean):Expression<boolean>;

@@ -1,14 +1,19 @@
 /// <reference path="../../typings/rethinkdb/rethinkdb.d.ts"/>
+/// <reference path="../../typings/bluebird/bluebird.d.ts"/>
 
 import r = require('rethinkdb');
+import p = require('bluebird');
+import shapes = require('./shapes');
 
 module DBUtils {
-
   export class Migrator {
-    static dbShape = {
+    static dbShape : shapes.DBShape = {
       dbname: 'froyo',
-      tables: ['a']
-    }
+      tables: [{
+        tableName: 'users',
+        indices: ['userName', 'email']
+      }]
+    };
     private _conn : r.Connection;
 
     private setConnection(conn : r.Connection) {
@@ -27,10 +32,23 @@ module DBUtils {
       return r.branch(test, trueBranch, falseBranch).run(this._conn);
     }
 
+    private createTables() {
+      var createTable = (t) => {
+        var test = r.db(Migrator.dbShape.dbname).tableList()
+          .contains(t.tableName);
+        var trueBranch = r.now();
+        var falseBranch = r.db(Migrator.dbShape.dbname)
+          .tableCreate(t.tableName);
+        return r.branch(test, trueBranch, falseBranch).run(this._conn);
+      }
+      return p.map(Migrator.dbShape.tables, createTable);
+    }
+
     migrate (connOpts : r.ConnectionOptions)  {
       return r.connect(connOpts)
         .then(this.setConnection)
         .then(this.createDatabase)
+        .then(this.createTables)
         .then(this.closeConnection)
     }
   }

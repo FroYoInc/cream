@@ -1,8 +1,9 @@
 import r = require('rethinkdb');
 import c = require('../../src/config');
-import dbutils = require('../../src/dbutils/migrator');
+import Migrator = require('../../src/dbutils/migrator');
+import Shapes = require('../../src/dbutils/shapes');
 
-var migrator = new dbutils.Migrator();
+var migrator = new Migrator.Migrator();
 var conn : r.Connection;
 
 beforeAll((done) => {
@@ -21,24 +22,34 @@ afterAll((done) => {
 describe('Database Migrator', () => {
   var fail = (error) => {expect(error).toBeUndefined();}
   var testTrue = (result) => {expect(result).toBe(true);}
-  var dbShape = {
+
+  var dbShape : Shapes.DBShape = {
     dbname: 'froyo',
-    tables: ['user', 'carpools']
+    tables: [{
+      tableName: 'users',
+      indices: ['userName', 'email']
+    }]
   };
 
   it('should have database named to following', () => {
-    expect(dbutils.Migrator.dbShape.dbname).toBe(dbShape.dbname);
+    expect(Migrator.Migrator.dbShape.dbname).toBe(dbShape.dbname);
   });
 
   it('should have created databse ' + dbShape.dbname, (done) => {
-    r.dbList().contains(dbShape.dbname).run(conn)
+    r.dbList()
+      .contains(dbShape.dbname)
+      .run(conn)
       .then(testTrue)
       .error(fail)
       .finally(done);
   });
 
-  xit('should have created following tables: ' + dbShape.tables, (done) => {
-    r.db(dbShape.dbname).tableList().contains(dbShape.tables[0]).run(conn)
+  it('should have created following tables: ' + dbShape.tables, (done) => {
+    var tables = dbShape.tables.map((t) => {return t.tableName});
+    r.db(dbShape.dbname)
+      .tableList()
+      .contains(r.args(tables))
+      .run(conn)
       .then(testTrue)
       .error(fail)
       .finally(done);
