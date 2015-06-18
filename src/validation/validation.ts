@@ -5,3 +5,5 @@ module Validation {
     isValid(str: string): Promise<boolean>
   }
 }
+
+export = Validation;
