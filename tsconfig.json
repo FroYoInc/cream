@@ -35,6 +35,7 @@
         "./test/services/user-service.spec.ts",
         "./typings/bluebird/bluebird.d.ts",
         "./typings/bunyan/bunyan.d.ts",
+        "./typings/generic-pool/generic-pool.d.ts",
         "./typings/jasmine/jasmine.d.ts",
         "./typings/node/node.d.ts",
         "./typings/nodemailer-direct-transport/nodemailer-direct-transport.d.ts",
