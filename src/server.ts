@@ -18,6 +18,15 @@ server.get('/flavors', function(req, res, next) {
   next();
 });
 
+import email = require('./services/email-service');
+server.get('/send-activation', function(req, res, next) {
+
+  var service = new email.EmailService();
+  service.sendActivation({});
+
+  res.send({'test' : 'test'})
+});
+
 server.listen(config.app.port, function() {
   console.log('> %s listening on %s', server.name, server.url);
 });

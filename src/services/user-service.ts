@@ -1,7 +1,7 @@
-/// <reference path="../models/User"/>
+/// <reference path="../models/user"/>
 
 import p = require('bluebird');
-import email = require('./email-service');
+import emailService = require('./email-service');
 
 export class UserService {
 
