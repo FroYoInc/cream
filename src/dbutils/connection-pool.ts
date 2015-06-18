@@ -18,10 +18,10 @@ module DBUtils {
     },
     max: 8,
     min: 2,
-    log: true
+    log: false
   });
 
-  export function getConnection() {
+  export function acquire() {
     return new Promise<r.Connection>((resolve, reject) => {
       _pool.acquire((err, conn) => {
         if (err) {
@@ -31,6 +31,10 @@ module DBUtils {
         }
       });
     })
+  }
+
+  export function release(c: r.Connection) {
+    return _pool.release(c);
   }
 }
 

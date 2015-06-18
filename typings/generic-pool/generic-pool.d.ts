@@ -10,6 +10,7 @@ declare module 'generic-pool' {
   }
 
   export interface Pool {
-    acquire: (a : (err: any, conn: any) => void) => void
+    acquire: (a : (err: any, conn: any) => void) => void;
+    release: (v: any) => void;
   }
 }
