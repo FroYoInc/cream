@@ -3,6 +3,11 @@ import restify = require('restify');
 import DBUtils = require('./dbutils/migrator');
 import Config  = require('./config');
 
+import us = require('./services/user-service');
+
+var userService = new us.UserService();
+userService.createUser('_', '_', '_', '_');
+
 var config = Config.Config;
 var migrator = new DBUtils.Migrator();
 migrator.migrate(config.db);

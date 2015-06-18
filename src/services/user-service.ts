@@ -2,6 +2,7 @@
 
 import p = require('bluebird');
 import email = require('./email-service');
+import ConnectionPool = require('../dbutils/connection-pool');
 
 export class UserService {
 
@@ -10,9 +11,9 @@ export class UserService {
     return new User();
   }
 
-  createUser(firstName:string, lastName:string, userName:string, email:string): User {
+  createUser(firstName:string, lastName:string, userName:string, email:string) {
     // TODO: implement
-    return new User();
+    console.log(ConnectionPool.getConnection());
   }
 
   getUserByEmail(id: string): User {
