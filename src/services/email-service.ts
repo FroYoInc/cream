@@ -1,5 +1,8 @@
+/// <reference path="../models/User"/>
+
 import mailer = require('nodemailer');
 import config = require('../config');
+
 
 export class EmailService {
 

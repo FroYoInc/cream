@@ -1,3 +1,5 @@
+/// <reference path="./models/User"/>
+
 import r = require('rethinkdb');
 import restify = require('restify');
 import DBUtils = require('./dbutils/migrator');
@@ -22,7 +24,9 @@ import email = require('./services/email-service');
 server.get('/send-activation', function(req, res, next) {
 
   var service = new email.EmailService();
-  service.sendActivation({});
+
+  var user : User = new User();
+  service.sendActivation(user);
 
   res.send({'test' : 'test'})
 });
