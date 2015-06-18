@@ -31,7 +31,20 @@ export class UserService {
 
   activateUser(id: string, activationCode: string): boolean {
     // TODO: implement
-    return false;
+    /*
+    boolean status = false;
+    if (activation code && userID is in DB) {
+        set _isAccountActivated = true;
+        status = true;
+    }
+     else if (activation code is false)
+        console.log("false action code")
+     else
+        console.log("userID does not exist")
+
+
+    */
+    return status;
   }
 
 
