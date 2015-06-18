@@ -4,6 +4,7 @@ declare module 'generic-pool' {
   export interface PoolShape {
     name: string;
     create: (err: any, conn: any) => void;
+    destroy: (c: any) => void;
     max: number;
     min: number;
     log: boolean;

@@ -16,6 +16,10 @@ module DBUtils {
           cb(reason, null);
         })
     },
+
+    destroy: (conn) => {
+      conn.close();
+    },
     max: 8,
     min: 2,
     log: false
