@@ -13,7 +13,11 @@ export class UserService {
 
   createUser(firstName:string, lastName:string, userName:string, email:string) {
     // TODO: implement
-    console.log(ConnectionPool.acquire());
+    ConnectionPool.acquire()
+      .then((c) => {
+        console.log(c);
+      })
+      .error(console.error);
   }
 
   getUserByEmail(id: string): User {
