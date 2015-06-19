@@ -2,42 +2,40 @@
 
 import p = require('bluebird');
 import email = require('./email-service');
-import ConnectionPool = require('../dbutils/connection-pool');
+import pool = require('../dbutils/connection-pool');
 
-export class UserService {
+module UserService {
 
-  private updateUser(_user: User): User {
-    // TODO: implement
-    return new User();
-  }
+  // export function updateUser(_user: User): User {
+  //   // TODO: implement
+  //   return new User();
+  // }
 
-  createUser(firstName:string, lastName:string, userName:string, email:string) {
-    // TODO: implement
-    ConnectionPool.acquire()
-      .then((c) => {
-        console.log(c);
-      })
+  export function createUser(firstName:string, lastName:string,
+     userName:string, email:string) {
+    pool.acquire()
+      .then(pool.release)
       .error(console.error);
   }
 
-  getUserByEmail(id: string): User {
-    // TODO: implement
-    return new User();
-  }
-
-  getUserByUserName(id: string): User {
-    // TODO: implement
-    return new User();
-  }
-
-  getUserById(id: string): User {
-    return new User();
-  }
-
-  activateUser(id: string, activationCode: string): boolean {
-    // TODO: implement
-    return false;
-  }
-
-
+  // getUserByEmail(id: string): User {
+  //   // TODO: implement
+  //   return new User();
+  // }
+  //
+  // getUserByUserName(id: string): User {
+  //   // TODO: implement
+  //   return new User();
+  // }
+  //
+  // getUserById(id: string): User {
+  //   return new User();
+  // }
+  //
+  // activateUser(id: string, activationCode: string): boolean {
+  //   // TODO: implement
+  //   return false;
+  // }
 }
+
+export = UserService;
