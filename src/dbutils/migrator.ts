@@ -44,12 +44,21 @@ module DBUtils {
         var falseBranch = r.db(Migrator.dbShape.dbname)
           .tableCreate(t.tableName);
         return r.branch(test, trueBranch, falseBranch).run(this._conn);
-      }
+      };
       return p.map(Migrator.dbShape.tables, createTable);
     }
 
     private createIndices() {
-      console.error("TODO");
+      var createIndex = (i) => {
+        var tables = r.db(Migrator.dbShape.dbname).tableList();
+        for (var table in tables) {
+          var test = r.db(Migrator.dbShape.dbname).table(table).indexList();
+          var trueBranch = r.now();
+          var falseBranch = r.db(Migrator.dbShape.dbname).table(table).indexCreate(i.indexNames);
+          //return r.branch(test, trueBranch, falseBranch).run(this._conn);
+        }
+      };
+      //return p.map(Migrator.dbShape.
     }
 
     private createAdminAccount() {
@@ -62,6 +71,7 @@ module DBUtils {
         .then(this.setConnection)
         .then(this.createDatabase)
         .then(this.createTables)
+        .then(this.createIndices)
         .then(this.closeConnection)
     }
   }
