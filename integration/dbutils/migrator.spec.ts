@@ -32,7 +32,7 @@ afterAll((done) => {
   }
 });
 
-xdescribe('Database Migrator', () => {
+describe('Database Migrator', () => {
   var fail = (error) => {expect(error).toBeUndefined();}
   var testTrue = (result) => {expect(result).toBe(true);}
 
