@@ -10,12 +10,18 @@ module UserService {
   //   // TODO: implement
   //   return new User();
   // }
+  export class UserExistError implements Error {
+    name = "UserExistError";
+    message = "user already exist"
+  }
 
   export function createUser(firstName:string, lastName:string,
      userName:string, email:string) {
     return pool.acquire()
       .then(pool.release)
-      .error(console.error);
+      .then(() => {
+        throw new Error("user already exist");
+      });
   }
 
   // getUserByEmail(id: string): User {

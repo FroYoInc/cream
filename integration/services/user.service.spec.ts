@@ -7,10 +7,17 @@ var m = new Migrator.Migrator();
 
 var conn : r.Connection;
 
+var createIndex = () => {
+  return r.db('froyo').table('users')
+  .indexCreate('userName')
+  .run(conn);
+}
+
 beforeAll((done) => {
   m.migrate(c.Config.db)
     .then(connection.acquire)
     .then((_conn) => {conn =_conn})
+    .then(createIndex)
     .then(done)
     .error(done)
 });
@@ -27,7 +34,7 @@ describe('UserService', () => {
   var testTrue = (result) => {expect(result).toBe(true);}
   var testFalse = (result) => {expect(result).toBe(false);}
 
-  xit('should create a user', (done) => {
+  it('should create a user', (done) => {
     var userName = 'testUser';
     var runUserNotExistQuery = () => {
       return r.db('froyo')
@@ -37,7 +44,7 @@ describe('UserService', () => {
         .run(conn);
     };
     var createUser = () => {
-      return userService.createUser('_', '_', '_', '_');
+      return userService.createUser('_', '_', userName, '_');
     };
 
     runUserNotExistQuery()
@@ -47,5 +54,17 @@ describe('UserService', () => {
       .then(testFalse)
       .error(fail)
       .finally(done);
+  });
+
+  xit('should not create user if user exist', (done) => {
+    var userName = 'orio';
+    var createUser = () => {
+      return userService.createUser('_', '_', userName, '_');
+    };
+    createUser()
+      .error(fail)
+      .then(createUser)
+      .error(done)
+      .then(fail);
   });
 });
