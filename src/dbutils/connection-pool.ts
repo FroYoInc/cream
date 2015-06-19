@@ -5,6 +5,9 @@ import genericPool = require('generic-pool');
 import c = require('../config');
 
 module DBUtils {
+  export interface Released {};
+  export interface Drained {};
+
   var _pool = genericPool.Pool({
     name: 'rethinkdb',
     create: (cb) => {
@@ -38,7 +41,19 @@ module DBUtils {
   }
 
   export function release(c: r.Connection) {
-    return _pool.release(c);
+    return new Promise<Released>((resolve, reject) => {
+      _pool.release(c);
+      resolve({});
+    });
+  }
+
+  export function drain() {
+    return new Promise<Drained>((resolve, reject) => {
+      _pool.drain(() => {
+        _pool.destroyAllNow();
+        resolve({});
+      });
+    });
   }
 }
 

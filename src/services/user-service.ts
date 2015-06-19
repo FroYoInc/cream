@@ -1,6 +1,6 @@
 /// <reference path="../models/User"/>
 
-import p = require('bluebird');
+import Promise = require('bluebird');
 import email = require('./email-service');
 import pool = require('../dbutils/connection-pool');
 
@@ -13,7 +13,7 @@ module UserService {
 
   export function createUser(firstName:string, lastName:string,
      userName:string, email:string) {
-    pool.acquire()
+    return pool.acquire()
       .then(pool.release)
       .error(console.error);
   }
