@@ -20,11 +20,15 @@ module UserService {
   }
 
   function _run(expr: r.Expression<any>) {
+    var _conn: r.Connection;
     connections.acquire()
       .then((conn) => {
-        return expr.run(conn)
-          .finally(connections._release(conn))
+        _conn = conn;
       })
+      .finally(() => {
+        if (_conn)
+        connections.release(_)
+      });
   };
   export function createUser(firstName:string, lastName:string,
      userName:string, email:string) {
