@@ -47,6 +47,10 @@ module DBUtils {
     });
   }
 
+  export function _release(c: r.Connection) {
+    return release;
+  }
+
   export function drain() {
     return new Promise<Drained>((resolve, reject) => {
       _pool.drain(() => {

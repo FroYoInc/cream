@@ -19,23 +19,22 @@ module UserService {
     message = "user already exist"
   }
 
+  function _run(expr: r.Expression<any>) {
+    connections.acquire()
+      .then((conn) => {
+        return expr.run(conn)
+          .finally(connections._release(conn))
+      })
+  };
   export function createUser(firstName:string, lastName:string,
      userName:string, email:string) {
-    var conn: r.Connection;
 
-    var _setConn = (_conn: r.Connection) => {
-      conn = _conn;
+    var _validateEmail = (conn: r.Connection) => {
+      return emailValidator.isValid(email)
+        .return(conn);
     };
 
-    var _releaseConn = () => {
-      return connections.release(conn);
-    };
-
-    var _validateEmail = () => {
-      return emailValidator.isValid(email);
-    };
-
-    var _createUser = () => {
+    var _createUser = (conn: r.Connection) => {
       return r.db('froyo')
         .table('users')
         .insert({
@@ -44,14 +43,14 @@ module UserService {
           'userName': userName,
           'email': email
         })
-        .run(conn);
+        .run(conn)
+        .return(conn);
     };
 
     return connections.acquire()
-      .then(_setConn)
       .then(_validateEmail)
       .then(_createUser)
-      .then(_releaseConn)
+      .then(connections.release);
   }
 
   // getUserByEmail(id: string): User {

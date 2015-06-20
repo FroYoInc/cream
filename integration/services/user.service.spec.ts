@@ -23,6 +23,7 @@ beforeAll((done) => {
 });
 
 afterAll((done) => {
+  console.log("after all called");
   connection.release(conn)
     .then(connection.drain)
     .then(done)
@@ -30,7 +31,7 @@ afterAll((done) => {
 });
 
 describe('UserService', () => {
-  var fail = (error) => {expect(error).toBeUndefined();}
+  var fail = (error) => {expect(error).toBeUndefined();console.error(error);}
   var testTrue = (result) => {expect(result).toBe(true);}
   var testFalse = (result) => {expect(result).toBe(false);}
 
@@ -44,7 +45,7 @@ describe('UserService', () => {
         .run(conn);
     };
     var createUser = () => {
-      return userService.createUser('_', '_', userName, '_');
+      return userService.createUser('_', '_', userName, '');
     };
 
     runUserNotExistQuery()
@@ -52,8 +53,15 @@ describe('UserService', () => {
       .then(createUser)
       .then(runUserNotExistQuery)
       .then(testFalse)
-      .error(fail)
-      .finally(done);
+      .error((err) => {
+        console.error("fpp");
+        console.error(err);
+        expect(true).toBe(false);
+      })
+      .finally(() => {
+        done();
+        console.log("finally called");
+      });
   });
 
   xit('should not create user if user exist', (done) => {
