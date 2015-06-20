@@ -49,15 +49,17 @@ module DBUtils {
     }
 
     private createIndices() {
-      var createIndex = (i) => {
-        var tables = r.db(Migrator.dbShape.dbname).tableList();
-        for (var t in tables) {
-          var test = r.db(Migrator.dbShape.dbname).table(t).indexList();
+      var _foo = (i: string, tableName: string) => {
+        var test = r.db(Migrator.dbShape.dbname).table(tableName).indexList().contains(i);
+        var trueBranch = r.now();
+        var falseBranch = r.db(Migrator.dbShape.dbname).table(tableName).indexCreate(i);
+        return r.branch(test, trueBranch, falseBranch).run(this._conn);
+      };
+      var createIndex = (table: shapes.TableShape) => {
 
-          var trueBranch = r.now();
-          var falseBranch = r.db(Migrator.dbShape.dbname).table(t).indexCreate(i.indices);
-          //return r.branch(test, trueBranch, falseBranch).run(this._conn);
-        }
+        table.indices.forEach(function(index) {
+          _foo(index, table.tableName);
+        });
       };
       return p.map(Migrator.dbShape.tables, createIndex);
     }
@@ -72,7 +74,7 @@ module DBUtils {
         .then(this.setConnection)
         .then(this.createDatabase)
         .then(this.createTables)
-        //.then(this.createIndices)
+        .then(this.createIndices)
         .then(this.closeConnection)
     }
   }
