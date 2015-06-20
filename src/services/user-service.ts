@@ -19,42 +19,25 @@ module UserService {
     message = "user already exist"
   }
 
-  function _run(expr: r.Expression<any>) {
-    var _conn: r.Connection;
-    connections.acquire()
-      .then((conn) => {
-        _conn = conn;
-      })
-      .finally(() => {
-        if (_conn)
-        connections.release(_)
-      });
-  };
   export function createUser(firstName:string, lastName:string,
      userName:string, email:string) {
 
-    var _validateEmail = (conn: r.Connection) => {
-      return emailValidator.isValid(email)
-        .return(conn);
+    var _createUser = () => {
+      return Promise.using<r.Connection>(connections.conn(), (conn) => {
+        return r.db('froyo')
+          .table('users')
+          .insert({
+            'firstName': firstName,
+            'lastName': lastName,
+            'userName': userName,
+            'email': email
+          })
+          .run(conn)
+      });
     };
 
-    var _createUser = (conn: r.Connection) => {
-      return r.db('froyo')
-        .table('users')
-        .insert({
-          'firstName': firstName,
-          'lastName': lastName,
-          'userName': userName,
-          'email': email
-        })
-        .run(conn)
-        .return(conn);
-    };
-
-    return connections.acquire()
-      .then(_validateEmail)
+    return emailValidator.isValid(email)
       .then(_createUser)
-      .then(connections.release);
   }
 
   // getUserByEmail(id: string): User {

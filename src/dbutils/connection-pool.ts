@@ -28,6 +28,22 @@ module DBUtils {
     log: false
   });
 
+  export function conn() {
+    var _conn: r.Connection;
+    return new Promise<r.Connection>((resolve, reject) => {
+      _pool.acquire((err, conn) => {
+        if (err) {
+          reject(new Error(err));
+        } else {
+          _conn = conn;
+          resolve(conn);
+        }
+      });
+    }).disposer(() => {
+      _pool.release(_conn);
+    })
+  }
+
   export function acquire() {
     return new Promise<r.Connection>((resolve, reject) => {
       _pool.acquire((err, conn) => {

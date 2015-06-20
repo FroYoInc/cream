@@ -45,7 +45,7 @@ describe('UserService', () => {
         .run(conn);
     };
     var createUser = () => {
-      return userService.createUser('_', '_', userName, '');
+      return userService.createUser('_', '_', userName, '_');
     };
 
     runUserNotExistQuery()

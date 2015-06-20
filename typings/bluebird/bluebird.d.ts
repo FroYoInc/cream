@@ -604,9 +604,13 @@ declare class Promise<R> implements Promise.Thenable<R>, Promise.Inspection<R> {
 	// array with values
 	static filter<R>(values: R[], filterer: (item: R, index: number, arrayLength: number) => Promise.Thenable<boolean>): Promise<R[]>;
 	static filter<R>(values: R[], filterer: (item: R, index: number, arrayLength: number) => boolean): Promise<R[]>;
+
+	static using<T>(disposer: Promise.Disposer, func: (resource: T) => Promise<any>): Promise<any>
+	disposer(a: () => void): Promise.Disposer
 }
 
 declare module Promise {
+	export interface Disposer {}
 	export interface RangeError extends Error {
 	}
 	export interface CancellationError extends Error {
