@@ -18,8 +18,20 @@ module UserService {
     message = "user already exist"
   }
 
+  export function doesUserExist(userName: string): Promise<boolean> {
+    var userExistQuery = r.db('froyo')
+      .table('users')
+      .getAll(userName, {index: 'userName'})
+      .isEmpty();
+
+    return q.run(userExistQuery)()
+      .then((result) => {
+        return result === false
+      });
+  }
+
   export function createUser(firstName:string, lastName:string,
-     userName:string, email:string) {
+     userName:string, email:string): Promise<models.User> {
 
      var user: models.User = {
        firstName: firstName,
@@ -29,20 +41,33 @@ module UserService {
        isAccountActivated: false
      }
 
-     var userCreateQuery =  r.db('froyo')
+    var userCreateQuery =  r.db('froyo')
       .table('users')
       .insert(user);
 
+    var checkUserExistance = () => {
+      return doesUserExist(userName);
+    }
+
+    var throwErrorIfUserExist = (userExist) => {
+      if (userExist) throw new Error("user already exist");
+    }
+
+    var createUser = q.run(userCreateQuery);
+
+    var setUserID = (result) => {
+      if (result.generated_keys.length != 1) {
+        throw new Error("expected only 1 object to be created");
+      }
+      user.id = result.generated_keys[0];
+      return user;
+    }
+
     return emailValidator.isValid(email)
-      .then(q.run(userCreateQuery))
-      .then((result) => {
-        console.log(result);
-        if (result.generated_keys.length != 1) {
-          throw new Error("expected only 1 object to be created");
-        }
-        user.id = result.generated_keys[0];
-        return user;
-      });
+      .then(checkUserExistance)
+      .then(throwErrorIfUserExist)
+      .then(createUser)
+      .then(setUserID);
   }
 
   // getUserByEmail(id: string): User {

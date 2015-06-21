@@ -32,30 +32,23 @@ describe('UserService', () => {
 
   it('should create a user', (done) => {
     var userName = 'testUser';
-    var userNotExistQuery =  r.db('froyo')
-      .table('users')
-      .getAll(userName, {index: 'userName'})
-      .isEmpty();
 
-    var runUserNotExistQuery = () => {
-      return r.db('froyo')
-        .table('users')
-        .getAll(userName, {index: 'userName'})
-        .isEmpty()
-        .run(conn);
-    };
+    var doesUserExist = () => {
+      return userService.doesUserExist(userName);
+    }
+
     var createUser = () => {
       return userService.createUser('_', '_', userName, '_');
     };
 
-    q.run(userNotExistQuery)()
-      .then(testTrue)
+    doesUserExist()
+      .then(testFalse)
       .then(createUser)
       .then(console.log)
-      .then(q.run(userNotExistQuery))
-      .then(testFalse)
+      .then(doesUserExist)
+      .then(testTrue)
       .error(fail)
-      .finally(done);
+      .finally(done)
   });
 
   xit('should not create user if user exist', (done) => {
