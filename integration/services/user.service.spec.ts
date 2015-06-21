@@ -23,7 +23,6 @@ beforeAll((done) => {
 });
 
 afterAll((done) => {
-  console.log("after all called");
   connection.release(conn)
     .then(connection.drain)
     .then(done)
@@ -53,15 +52,8 @@ describe('UserService', () => {
       .then(createUser)
       .then(runUserNotExistQuery)
       .then(testFalse)
-      .error((err) => {
-        console.error("fpp");
-        console.error(err);
-        expect(true).toBe(false);
-      })
-      .finally(() => {
-        done();
-        console.log("finally called");
-      });
+      .error(fail)
+      .finally(done)
   });
 
   xit('should not create user if user exist', (done) => {

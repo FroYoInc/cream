@@ -5,6 +5,7 @@ import r = require('rethinkdb');
 import email = require('./email-service');
 import connections = require('../dbutils/connection-pool');
 import EmailValidator = require('../validation/email.validator');
+import q = require('../dbutils/query');
 
 var emailValidator = new EmailValidator.EmailValidator();
 
@@ -22,22 +23,17 @@ module UserService {
   export function createUser(firstName:string, lastName:string,
      userName:string, email:string) {
 
-    var _createUser = () => {
-      return Promise.using<r.Connection>(connections.conn(), (conn) => {
-        return r.db('froyo')
-          .table('users')
-          .insert({
-            'firstName': firstName,
-            'lastName': lastName,
-            'userName': userName,
-            'email': email
-          })
-          .run(conn)
+     var userCreateQuery =  r.db('froyo')
+      .table('users')
+      .insert({
+        'firstName': firstName,
+        'lastName': lastName,
+        'userName': userName,
+        'email': email
       });
-    };
 
     return emailValidator.isValid(email)
-      .then(_createUser)
+      .then(q.run(userCreateQuery))
   }
 
   // getUserByEmail(id: string): User {
