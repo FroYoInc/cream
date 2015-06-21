@@ -3,7 +3,6 @@
 import Promise = require('bluebird');
 import r = require('rethinkdb');
 import email = require('./email-service');
-import connections = require('../dbutils/connection-pool');
 import EmailValidator = require('../validation/email.validator');
 import q = require('../dbutils/query');
 
