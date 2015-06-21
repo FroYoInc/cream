@@ -8,8 +8,8 @@ module Query {
       return _run(expr);
     }
   }
-  
-  export function _run<T>(expr: r.Operation<T>) {
+
+  function _run<T>(expr: r.Operation<T>) {
     return Promise.using<r.Connection>(connections.conn(), (conn) => {
       return expr.run(conn);
     });

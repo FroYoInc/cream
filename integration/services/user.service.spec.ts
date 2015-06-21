@@ -1,41 +1,42 @@
 import r = require('rethinkdb');
 import userService = require('../../src/services/user-service');
-import connection = require('../../src/dbutils/connection-pool');
 import Migrator = require('../../src/dbutils/migrator');
 import c = require('../../src/config');
+import pool = require('../../src/dbutils/connection-pool');
+import q = require('../../src/dbutils/query');
 var m = new Migrator.Migrator();
 
 var conn : r.Connection;
 
-var createIndex = () => {
-  return r.db('froyo').table('users')
-  .indexCreate('userName')
-  .run(conn);
-}
+var createIndexQuery = r.db('froyo')
+  .table('users')
+  .indexCreate('userName');
 
 beforeAll((done) => {
   m.migrate(c.Config.db)
-    .then(connection.acquire)
-    .then((_conn) => {conn =_conn})
-    .then(createIndex)
+    .then(q.run(createIndexQuery))
     .then(done)
     .error(done)
 });
 
 afterAll((done) => {
-  connection.release(conn)
-    .then(connection.drain)
+  pool.drain()
     .then(done)
     .error(done);
 });
 
 describe('UserService', () => {
-  var fail = (error) => {expect(error).toBeUndefined();console.error(error);}
+  var fail = (error) => {expect(error).toBeUndefined();}
   var testTrue = (result) => {expect(result).toBe(true);}
   var testFalse = (result) => {expect(result).toBe(false);}
 
   it('should create a user', (done) => {
     var userName = 'testUser';
+    var userNotExistQuery =  r.db('froyo')
+      .table('users')
+      .getAll(userName, {index: 'userName'})
+      .isEmpty();
+
     var runUserNotExistQuery = () => {
       return r.db('froyo')
         .table('users')
@@ -47,13 +48,13 @@ describe('UserService', () => {
       return userService.createUser('_', '_', userName, '_');
     };
 
-    runUserNotExistQuery()
+    q.run(userNotExistQuery)()
       .then(testTrue)
       .then(createUser)
-      .then(runUserNotExistQuery)
+      .then(q.run(userNotExistQuery))
       .then(testFalse)
       .error(fail)
-      .finally(done)
+      .finally(done);
   });
 
   xit('should not create user if user exist', (done) => {
