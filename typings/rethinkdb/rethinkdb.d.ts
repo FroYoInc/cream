@@ -156,9 +156,10 @@ declare module "rethinkdb" {
   }
 
   interface InsertOptions {
-    upsert: boolean; // true
-    durability: string; // 'soft'
-    return_vals: boolean; // false
+    upsert?: boolean; // true
+    durability?: string;  // 'soft'
+    return_vals?: boolean; // false
+    returnChanges?: boolean;
   }
 
   interface UpdateOptions {

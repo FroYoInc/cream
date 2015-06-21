@@ -27,6 +27,7 @@
         "./src/dbutils/shapes.ts",
         "./src/models/campus.ts",
         "./src/models/carpool.ts",
+        "./src/models/models.ts",
         "./src/models/user.ts",
         "./src/server.ts",
         "./src/services/email-service.ts",

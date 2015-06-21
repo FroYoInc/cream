@@ -51,6 +51,7 @@ describe('UserService', () => {
     q.run(userNotExistQuery)()
       .then(testTrue)
       .then(createUser)
+      .then(console.log)
       .then(q.run(userNotExistQuery))
       .then(testFalse)
       .error(fail)
