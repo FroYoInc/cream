@@ -28,7 +28,7 @@ module DBUtils {
     log: false
   });
 
-  export function conn() {
+  export function acquire() {
     var _conn: r.Connection;
     return new Promise<r.Connection>((resolve, reject) => {
       _pool.acquire((err, conn) => {
@@ -44,19 +44,7 @@ module DBUtils {
     })
   }
 
-  export function acquire() {
-    return new Promise<r.Connection>((resolve, reject) => {
-      _pool.acquire((err, conn) => {
-        if (err) {
-          reject(new Error(err));
-        } else {
-          resolve(conn);
-        }
-      });
-    })
-  }
-
-  export function release(c: r.Connection) {
+  function release(c: r.Connection) {
     return new Promise<Released>((resolve, reject) => {
       _pool.release(c);
       resolve({});

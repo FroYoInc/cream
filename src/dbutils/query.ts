@@ -10,7 +10,7 @@ module Query {
   }
 
   function _run<T>(expr: r.Operation<T>) {
-    return Promise.using<r.Connection>(connections.conn(), (conn) => {
+    return Promise.using<r.Connection>(connections.acquire(), (conn) => {
       return expr.run(conn);
     });
   }
