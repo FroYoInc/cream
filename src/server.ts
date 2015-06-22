@@ -26,7 +26,7 @@ server.get('/flavors', function(req, res, next) {
 
 
 server.get('/send-activation', (req, res, next) => {
-  var e = new EmailService();
+  var e = new EmailService.EmailService();
 
   var u = new user.User();
 

@@ -5,15 +5,45 @@ import config = require('../config');
 import Promise = require('bluebird');
 
 /**
- * Email service.
+ * The email service which provides methods to send such things as activation
+ * emails.
  */
-class EmailService {
+export class EmailService {
+
+  /**
+   * All email configuration options are stored here.
+   * @type {EmailConfigOptions}
+   */
+  private _transportConfig: EmailConfigOptions;
+
+  /**
+   * Initializes the email service instance.
+   */
+  constructor() {
+    this._transportConfig = config.Config.email;
+  }
+
+  /**
+   * Returns the current transportation configuration options.
+   * @return {EmailConfigOptions} The email configuration options.
+   */
+  get transportConfig(): EmailConfigOptions {
+    return this._transportConfig;
+  }
+
+  /**
+   * Sets the transportation configuration options.
+   * @param  {EmailConfigOptions} config The email configuration options.
+   */
+  set transportConfig(config: EmailConfigOptions) {
+    this._transportConfig = config;
+  }
 
   /**
    * Sends the activation email to the specified user.
    *
-   * @param  {User}    user The user to send the activation email to.
-   * @return {boolean}      [description]
+   * @param  {models.User}                         user The user object.
+   * @return {Promise<nodemailer.SentMessageInfo>}      A Promise.
    */
   public sendActivation(user: models.User): Promise<nodemailer.SentMessageInfo> {
 
@@ -54,4 +84,114 @@ class EmailService {
   }
 }
 
-export = EmailService;
+/**
+ * The interface for defining authentication options for nodemailer.
+ */
+export interface EmailConfigAuthOption
+{
+  /**
+   * The user name.
+   * @type {string}
+   */
+  user?: string;
+
+  /**
+   * The password.
+   * @type {string}
+   */
+  pass?: string;
+
+  /**
+   * The OAuth2 access token.
+   * @type {string}
+   */
+  xoauth2?: string;
+}
+
+/**
+ * The interface for defining email configuration options for nodemailer.
+ *
+ * Documentation found here:
+ * https://github.com/andris9/nodemailer-smtp-transport#usage
+ */
+export interface EmailConfigOptions
+{
+  /**
+   * The SMTP port, defaults to 25 or 465.
+   * @type {number}
+   */
+  port?: number;
+
+  /**
+   * The SMTP host, defaults to localhost.
+   * @type {string}
+   */
+  host?: string;
+
+  /**
+   * Whether the connection should use SSL, true for yes, false for no.
+   * @type {boolean}
+   */
+  secure?: boolean;
+
+  /**
+   * The authentication options for the SMTP connection.
+   *
+   * @type {EmailConfigAuthOption}
+   */
+  auth?: EmailConfigAuthOption;
+
+  /**
+   * Turns off STARTTLS support, if set to true.
+   * @type {boolean}
+   */
+  ignoreTLS?: boolean;
+
+  /**
+   * An optional host name, not required.
+   * @type {string}
+   */
+  name?: string;
+
+  /**
+   * The local interface to use for network connections.
+   * @type {string}
+   */
+  localAddress?: string;
+
+  /**
+   * The number of milliseconds after which attempting to connect to timeout.
+   * @type {number}
+   */
+  connectionTimeout?: number;
+
+  /**
+   * The number of milliseconds to wait for the greeting after connection.
+   * @type {number}
+   */
+  greetingTimeout?: number;
+
+  /**
+   * The time in milliseconds after which the connection is considered inactive.
+   * @type {number}
+   */
+  socketTimeout?: number;
+
+  /**
+   * If set to true, nodemailer will output logs to the console.
+   * @type {[type]}
+   */
+  debug?: boolean;
+
+  /**
+   * The preferred authentication method.
+   * @type {string}
+   */
+  authMethod?: string;
+
+  /**
+   * Any configuration options to pass to the socket constructor.
+   * @type {object}
+   */
+  tls?: any;
+}
