@@ -25,6 +25,7 @@
         "./src/dbutils/migrator.ts",
         "./src/dbutils/query.ts",
         "./src/dbutils/shapes.ts",
+        "./src/errors/errors.ts",
         "./src/models/campus.ts",
         "./src/models/carpool.ts",
         "./src/models/models.ts",

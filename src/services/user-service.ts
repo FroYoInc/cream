@@ -4,6 +4,7 @@ import email = require('./email-service');
 import EmailValidator = require('../validation/email.validator');
 import q = require('../dbutils/query');
 import models = require('../models/models');
+import errors = require('../errors/errors');
 
 var emailValidator = new EmailValidator.EmailValidator();
 
@@ -50,7 +51,7 @@ module UserService {
     }
 
     var throwErrorIfUserExist = (userExist) => {
-      if (userExist) throw new Error("user already exist");
+      if (userExist) throw new errors.UserExistException("user already exist");
     }
 
     var createUser = q.run(userCreateQuery);
@@ -58,6 +59,9 @@ module UserService {
     var setUserID = (result) => {
       if (result.generated_keys.length != 1) {
         throw new Error("expected only 1 object to be created");
+      }
+      if (userName === 'orio') {
+        throw new errors.TestError('ad');
       }
       user.id = result.generated_keys[0];
       return user;

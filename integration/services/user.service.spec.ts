@@ -4,6 +4,7 @@ import Migrator = require('../../src/dbutils/migrator');
 import c = require('../../src/config');
 import pool = require('../../src/dbutils/connection-pool');
 import q = require('../../src/dbutils/query');
+import errors = require('../../src/errors/errors');
 var m = new Migrator.Migrator();
 
 var conn : r.Connection;
@@ -44,22 +45,26 @@ describe('UserService', () => {
     doesUserExist()
       .then(testFalse)
       .then(createUser)
-      .then(console.log)
       .then(doesUserExist)
       .then(testTrue)
       .error(fail)
       .finally(done)
   });
 
-  xit('should not create user if user exist', (done) => {
+  it('should not create user if user exist', (done) => {
     var userName = 'orio';
     var createUser = () => {
       return userService.createUser('_', '_', userName, '_');
     };
     createUser()
       .error(fail)
-      .then(createUser)
-      .error(done)
-      .then(fail);
+      .catch((a) => {
+        console.log(a instanceof errors.UserExistException);
+      })
+      .finally(done)
+      // .then(createUser)
+      // .catch(errors.UserExistException, ()=>{})
+      // .error(fail)
+      // .finally(done);
   });
 });
