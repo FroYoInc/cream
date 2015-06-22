@@ -23,23 +23,6 @@ server.get('/flavors', function(req, res, next) {
   next();
 });
 
-
-
-server.get('/send-activation', (req, res, next) => {
-  var e = new EmailService.EmailService();
-
-  var u = new user.User();
-
-  u.email = 'aldrig@pdx.edu';
-  u.firstName = 'Ian';
-  u.lastName = 'A';
-  u.id = 'fhasjkhfd-dsadas';
-
-  e.sendActivation(u).done(r => {
-    res.send({'r': r});
-  });
-});
-
 server.listen(c.Config.app.port, function() {
   console.log('> %s listening on %s', server.name, server.url);
 });
