@@ -4,6 +4,9 @@ import r = require('rethinkdb');
 import restify = require('restify');
 import DBUtils = require('./dbutils/migrator');
 import c  = require('./config');
+import EmailService = require('./services/email-service');
+import models = require('./models/models');
+import user = require('./models/user');
 
 var migrator = new DBUtils.Migrator();
 migrator.migrate(c.Config.db);
@@ -17,6 +20,23 @@ server.get('/flavors', function(req, res, next) {
   var flavors : string[] = ['Peanut Butter', 'Cookies N Cream', 'Cake Batter'];
   res.send({'flavors': flavors});
   next();
+});
+
+
+
+server.get('/send-activation', (req, res, next) => {
+  var e = new EmailService();
+
+  var u = new user.User();
+
+  u.email = 'aldrig@pdx.edu';
+  u.firstName = 'Ian';
+  u.lastName = 'A';
+  u.id = 'fhasjkhfd-dsadas';
+
+  e.sendActivation(u).done(r => {
+    res.send({'r': r});
+  });
 });
 
 server.listen(c.Config.app.port, function() {

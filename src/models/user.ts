@@ -1,3 +1,5 @@
+import models = require('../models/models');
+
 export class User {
   private _firstName : string;
   private _lastName : string;
@@ -7,7 +9,7 @@ export class User {
   private _isAccountActivated : boolean;
   private _salt : string;
   private _id : string;
-  private _carpools : [Carpool];
+  private _carpools : [models.Carpool];
 
   get firstName(): string {
     return this._firstName;
@@ -73,11 +75,11 @@ export class User {
     this._id = newID;
   }
 
-  get carPools(): [Carpool] {
+  get carPools(): [models.Carpool] {
     return this._carpools;
   }
 
-  set carPools(newCarpools: [Carpool]) {
+  set carPools(newCarpools: [models.Carpool]) {
     this._carpools = newCarpools;
   }
 }

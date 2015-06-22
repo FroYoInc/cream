@@ -16,14 +16,15 @@ export class Config {
    * @type {Object}
    */
   static email = {
-    port: 465,
-    host: 'localhost',
-    secure: true,
+    //port: 465,
+    //host: 'localhost',
+    //secure: true,
     auth: {
-      user: 'username@gmail.com',
+      user: 'someone@gmail.com',
       pass: 'password'
     },
-    ignoreTLS: false,
+    service: 'Gmail',
+    //ignoreTLS: false,
     name: 'Gmail'
   };
 }

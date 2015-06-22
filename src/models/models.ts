@@ -25,9 +25,9 @@ module Models {
     email: string;
     isAccountActivated?: boolean;
     carpools?: Array<Models.Carpool>
-    passwordHash?: boolean;
-    salt?: boolean;
-    id?: boolean;
+    passwordHash?: string;
+    salt?: string;
+    id?: string;
   }
 }
 

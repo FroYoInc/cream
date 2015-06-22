@@ -1,12 +1,12 @@
-/// <reference path="../models/User"/>
 
+import models = require('../models/models');
 import mailer = require('nodemailer');
 import config = require('../config');
 
 /**
  * Email service.
  */
-export class EmailService {
+class EmailService {
 
   /**
    * Sends the activation email to the specified user.
@@ -14,7 +14,7 @@ export class EmailService {
    * @param  {User}    user The user to send the activation email to.
    * @return {boolean}      [description]
    */
-  public sendActivation(user: User): Promise<nodemailer.SentMessageInfo> {
+  public sendActivation(user: models.User): Promise<nodemailer.SentMessageInfo> {
 
     var transporter = this.buildTransporter();
 
@@ -52,3 +52,5 @@ export class EmailService {
     return mailer.createTransport(config.Config.email);
   }
 }
+
+export = EmailService;
