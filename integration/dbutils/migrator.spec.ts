@@ -60,6 +60,4 @@ describe('Database Migrator', () => {
       .error(fail)
       .finally(done);
   });
-
-
 });

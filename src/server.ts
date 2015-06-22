@@ -3,11 +3,10 @@
 import r = require('rethinkdb');
 import restify = require('restify');
 import DBUtils = require('./dbutils/migrator');
-import Config  = require('./config');
+import c  = require('./config');
 
-var config = Config.Config;
 var migrator = new DBUtils.Migrator();
-migrator.migrate(config.db);
+migrator.migrate(c.Config.db);
 
 var server = restify.createServer({
   name: 'Waffle Cone',
@@ -20,17 +19,6 @@ server.get('/flavors', function(req, res, next) {
   next();
 });
 
-import email = require('./services/email-service');
-server.get('/send-activation', function(req, res, next) {
-
-  var service = new email.EmailService();
-
-  var user : User = new User();
-  service.sendActivation(user);
-
-  res.send({'test' : 'test'})
-});
-
-server.listen(config.app.port, function() {
+server.listen(c.Config.app.port, function() {
   console.log('> %s listening on %s', server.name, server.url);
 });

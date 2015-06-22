@@ -87,9 +87,9 @@ declare module "rethinkdb" {
   }
 
   interface Table extends Sequence {
-    indexCreate(name:string, index?:ExpressionFunction<any>):Operation<CreateResult>;
+    indexCreate(name:string, index?:ExpressionFunction<any>):Expression<any>;
     indexDrop(name:string):Operation<DropResult>;
-    indexList():Operation<string[]>;
+    indexList():Expression<any>;
 
     insert(obj:any[], options?:InsertOptions):Operation<WriteResult>;
     insert(obj:any, options?:InsertOptions):Operation<WriteResult>;
@@ -156,9 +156,10 @@ declare module "rethinkdb" {
   }
 
   interface InsertOptions {
-    upsert: boolean; // true
-    durability: string; // 'soft'
-    return_vals: boolean; // false
+    upsert?: boolean; // true
+    durability?: string;  // 'soft'
+    return_vals?: boolean; // false
+    returnChanges?: boolean;
   }
 
   interface UpdateOptions {
