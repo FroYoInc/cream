@@ -20,7 +20,7 @@ export class Config {
     //host: 'localhost',
     //secure: true,
     auth: {
-      user: 'someone@gmail.com',
+      user: 'some@gmail.com',
       pass: 'password'
     },
     service: 'Gmail',

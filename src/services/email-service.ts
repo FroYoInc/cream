@@ -2,6 +2,7 @@
 import models = require('../models/models');
 import mailer = require('nodemailer');
 import config = require('../config');
+import Promise = require('bluebird');
 
 /**
  * Email service.
