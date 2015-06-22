@@ -3,7 +3,9 @@
 import mailer = require('nodemailer');
 import config = require('../config');
 
-
+/**
+ * Email service.
+ */
 export class EmailService {
 
   /**
@@ -12,7 +14,7 @@ export class EmailService {
    * @param  {User}    user The user to send the activation email to.
    * @return {boolean}      [description]
    */
-  public sendActivation(user: User): boolean {
+  public sendActivation(user: User): Promise<nodemailer.SentMessageInfo> {
 
     var transporter = this.buildTransporter();
 
@@ -26,9 +28,17 @@ export class EmailService {
             + 'You need to activate your account here: http://somelink.com/activate?id=' + user.id
     };
 
-    transporter.sendMail(mailOptions);
+    return new Promise<nodemailer.SentMessageInfo>((resolve, reject) => {
+      transporter.sendMail(mailOptions, (error, sent) => {
+        if (error)
+        {
+          reject(error);
+          return;
+        }
 
-    return true;
+        resolve(sent);
+      });
+    });
   }
 
   /**
