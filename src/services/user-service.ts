@@ -63,7 +63,7 @@ module UserService {
 
     var createUserIfUserDoesNotExist = q.run(createUserIfUserDoesNotExistQuery);
 
-    function setUserID(result) {
+    function setUserIDAndReturnUser(result) {
       if (result.generated_keys.length != 1) {
         throw new Error("expected only 1 object to be created");
       }
@@ -74,7 +74,7 @@ module UserService {
     return emailValidator.isValid(email)
       .then(createUserIfUserDoesNotExist)
       .then(throwErrorIfUserExist)
-      .then(setUserID);
+      .then(setUserIDAndReturnUser);
   }
 
   export function getUserById(id: string): Promise<models.User> {
