@@ -53,7 +53,7 @@ describe('UserService', () => {
       .finally(done)
   });
 
-  it('should not create user if user exist', (done) => {
+  it('should not create user if user with same userName exist', (done) => {
     var userName = 'orio';
     var createUser = () => {
       return userService.createUser('_', '_', userName, '_');
@@ -65,6 +65,10 @@ describe('UserService', () => {
       .catch(fail)
       .finally(done);
   });
+
+  xit('should not create user if user with same email exist', (done) => {
+    done();
+  })
 
   it('should return user given user id', (done) => {
     var user: models.User;
@@ -82,5 +86,9 @@ describe('UserService', () => {
       .catch(fail)
       .error(fail)
       .finally(done)
+  });
+
+  xit('should activate a user', (done) => {
+    done();
   });
 });
