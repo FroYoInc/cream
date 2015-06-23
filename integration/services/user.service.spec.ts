@@ -48,6 +48,7 @@ describe('UserService', () => {
       .then(doesUserExist)
       .then(testTrue)
       .error(fail)
+      .catch(fail)
       .finally(done)
   });
 
@@ -57,14 +58,10 @@ describe('UserService', () => {
       return userService.createUser('_', '_', userName, '_');
     };
     createUser()
+      .then(createUser)
+      .catch(errors.UserExistException, () => {})
       .error(fail)
-      .catch((a) => {
-        console.log(a instanceof errors.UserExistException);
-      })
-      .finally(done)
-      // .then(createUser)
-      // .catch(errors.UserExistException, ()=>{})
-      // .error(fail)
-      // .finally(done);
+      .catch(fail)
+      .finally(done);
   });
 });

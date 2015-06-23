@@ -74,9 +74,6 @@ module UserService {
       if (result.generated_keys.length != 1) {
         throw new Error("expected only 1 object to be created");
       }
-      if (userName === 'orio') {
-        throw new errors.TestError('ad');
-      }
       user.id = result.generated_keys[0];
       return user;
     }
