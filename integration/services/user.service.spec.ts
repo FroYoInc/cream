@@ -64,4 +64,12 @@ describe('UserService', () => {
       .catch(fail)
       .finally(done);
   });
+
+  it('should return user given user id', (done) => {
+    var userName = "orio1"
+    function createUser() {
+      return userService.createUser('_', '_', userName, '_');
+    };
+    done();
+  });
 });

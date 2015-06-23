@@ -77,6 +77,18 @@ module UserService {
       .then(setUserID);
   }
 
+  export function getUserById(id: string): Promise<models.User> {
+    return emailValidator.isValid(id)
+      .then(() => {
+        throw new errors.UserNotFoundException();
+      })
+      .then(() => {
+        var user: models.User =
+         {userName: '_',firstName: '_',lastName: '_',email: '_'}
+        return user;
+      })
+  }
+
   // getUserByEmail(id: string): User {
   //   // TODO: implement
   //   return new User();
@@ -87,9 +99,6 @@ module UserService {
   //   return new User();
   // }
   //
-  // getUserById(id: string): User {
-  //   return new User();
-  // }
   //
   // activateUser(id: string, activationCode: string): boolean {
   //   // TODO: implement
