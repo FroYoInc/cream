@@ -14,11 +14,6 @@ module UserService {
   //   // TODO: implement
   //   return new User();
   // }
-  export class UserExistError implements Error {
-    name = "UserExistError";
-    message = "user already exist"
-  }
-
   function userCreateQuery (user) {
     return r.db('froyo')
       .table('users')

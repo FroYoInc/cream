@@ -18,7 +18,7 @@ module Errors {
   export class UserExistException extends Error {
   }
 
-  export class TestError extends Error {
+  export class TestException extends Error {
   }
 }
 export = Errors
