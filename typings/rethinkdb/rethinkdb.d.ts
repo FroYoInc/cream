@@ -230,6 +230,7 @@ declare module "rethinkdb" {
 
   interface Operation<T> {
    run(conn:Connection) : Promise<T>;
+   run<T>(conn:Connection) : Promise<T>;
    run(conn:Connection, cb:(err:Error, result:T)=>void);
   }
 
