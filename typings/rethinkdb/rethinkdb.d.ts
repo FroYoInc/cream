@@ -87,9 +87,9 @@ declare module "rethinkdb" {
   }
 
   interface Table extends Sequence {
-    indexCreate(name:string, index?:ExpressionFunction<any>):Operation<CreateResult>;
+    indexCreate(name:string, index?:ExpressionFunction<any>):Expression<any>;
     indexDrop(name:string):Operation<DropResult>;
-    indexList():Operation<string[]>;
+    indexList():Expression<any>;
 
     insert(obj:any[], options?:InsertOptions):Operation<WriteResult>;
     insert(obj:any, options?:InsertOptions):Operation<WriteResult>;
@@ -228,6 +228,7 @@ declare module "rethinkdb" {
 
   interface Operation<T> {
    run(conn:Connection) : Promise<T>;
+   run<T>(conn:Connection) : Promise<T>;
    run(conn:Connection, cb:(err:Error, result:T)=>void);
   }
 
