@@ -19,13 +19,22 @@ module UserService {
     message = "user already exist"
   }
 
-  export function doesUserExist(userName: string): Promise<boolean> {
-    var userExistQuery = r.db('froyo')
+  function userCreateQuery (user) {
+    return r.db('froyo')
+      .table('users')
+      .insert(user);
+  }
+
+  function userExistQuery(userName) {
+    return r.db('froyo')
       .table('users')
       .getAll(userName, {index: 'userName'})
       .isEmpty();
+  }
 
-    return q.run(userExistQuery)()
+
+  export function doesUserExist(userName: string): Promise<boolean> {
+    return q.run(userExistQuery(userName))()
       .then((result) => {
         return result === false
       });
@@ -42,19 +51,24 @@ module UserService {
        isAccountActivated: false
      }
 
-    var userCreateQuery =  r.db('froyo')
-      .table('users')
-      .insert(user);
+    var falseBranch = r.expr(0).eq(1);
+    var createUserIfUserDoesNotExistQuery =
+      r.branch(userExistQuery(userName), userCreateQuery(user), falseBranch);
+
 
     var checkUserExistance = () => {
       return doesUserExist(userName);
     }
 
-    var throwErrorIfUserExist = (userExist) => {
-      if (userExist) throw new errors.UserExistException("user already exist");
+    var throwErrorIfUserExist = (result) => {
+      if (result === false) {
+        throw new errors.UserExistException("user already exist");
+      } else {
+        return result;
+      }
     }
 
-    var createUser = q.run(userCreateQuery);
+    var createUserIfUserDoesNotExist = q.run(createUserIfUserDoesNotExistQuery);
 
     var setUserID = (result) => {
       if (result.generated_keys.length != 1) {
@@ -68,9 +82,8 @@ module UserService {
     }
 
     return emailValidator.isValid(email)
-      .then(checkUserExistance)
+      .then(createUserIfUserDoesNotExist)
       .then(throwErrorIfUserExist)
-      .then(createUser)
       .then(setUserID);
   }
 

@@ -92,7 +92,8 @@ declare module "rethinkdb" {
     indexList():Expression<any>;
 
     insert(obj:any[], options?:InsertOptions):Operation<WriteResult>;
-    insert(obj:any, options?:InsertOptions):Operation<WriteResult>;
+    //insert(obj:any, options?:InsertOptions):Operation<WriteResult>;
+    insert(obj:any, options?:InsertOptions):Expression<any>;
 
     get(key:string):Sequence; // primary key
     getAll(key:string, index?:Index):Sequence; // without index defaults to primary key
