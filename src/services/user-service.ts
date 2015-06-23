@@ -27,7 +27,6 @@ module UserService {
       .isEmpty();
   }
 
-
   export function doesUserExist(userName: string): Promise<boolean> {
     return q.run(userExistQuery(userName))()
       .then((result) => {
@@ -50,12 +49,11 @@ module UserService {
     var createUserIfUserDoesNotExistQuery =
       r.branch(userExistQuery(userName), userCreateQuery(user), falseBranch);
 
-
-    var checkUserExistance = () => {
+    function checkUserExistance() {
       return doesUserExist(userName);
     }
 
-    var throwErrorIfUserExist = (result) => {
+    function throwErrorIfUserExist(result)  {
       if (result === false) {
         throw new errors.UserExistException("user already exist");
       } else {
@@ -65,7 +63,7 @@ module UserService {
 
     var createUserIfUserDoesNotExist = q.run(createUserIfUserDoesNotExistQuery);
 
-    var setUserID = (result) => {
+    function setUserID(result) {
       if (result.generated_keys.length != 1) {
         throw new Error("expected only 1 object to be created");
       }
