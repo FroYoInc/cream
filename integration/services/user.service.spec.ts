@@ -56,7 +56,8 @@ describe('UserService', () => {
   it('should not create user if userName exist', (done) => {
     createUser('_', '_', 'orio0', '_', '_')()
       .then(createUser('_', '_', 'orio0', '_', '_'))
-      .catch(errors.UserExistException, () => {})
+      .catch(errors.UserExistException, done)
+      .then(fail)
       .error(fail)
       .catch(fail)
       .finally(done);
@@ -65,7 +66,8 @@ describe('UserService', () => {
   xit('should not create user if email exist', (done) => {
     createUser('_', '_', 'foo', 'foo@example.com', '_')()
       .then(createUser('_', '_', 'bar', 'foo@example.com', '_'))
-      .catch(errors.EmailExistException, () => {})
+      .catch(errors.EmailExistException, done)
+      .then(fail)
       .catch(fail)
       .error(fail)
       .finally(done);
