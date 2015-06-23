@@ -76,7 +76,7 @@ describe('Database Migrator', () => {
   });
 
   it('should have created following indices: ' + JSON.stringify(indices), (done) => {
-    function foo(i: Shapes.TableShape) {
+    function checkIndices(i: Shapes.TableShape) {
       return r.db(dbShape.dbname)
         .table(i.tableName)
         .indexList()
@@ -92,7 +92,7 @@ describe('Database Migrator', () => {
           }
         })
     }
-    var checks = dbShape.tables.map(foo);
+    var checks = dbShape.tables.map(checkIndices);
     Promise.all(checks)
       .catch(fail)
       .error(fail)
