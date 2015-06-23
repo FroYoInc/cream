@@ -1,4 +1,5 @@
 import r = require('rethinkdb');
+import Promise = require('bluebird');
 import c = require('../../src/config');
 import Migrator = require('../../src/dbutils/migrator');
 import Shapes = require('../../src/dbutils/shapes');
@@ -28,7 +29,8 @@ afterAll((done) => {
       .then(() => {return conn.close();})
       .then(done);
   } else {
-    done(new Error("No rethinkdb exist to close..."))
+    throw new Error("No rethinkdb exist to close...");
+    done();
   }
 });
 
@@ -46,6 +48,7 @@ describe('Database Migrator', () => {
       .contains(dbShape.dbname)
       .run(conn)
       .then(testTrue)
+      .catch(fail)
       .error(fail)
       .finally(done);
   });
@@ -58,8 +61,41 @@ describe('Database Migrator', () => {
       .run(conn)
       .then(testTrue)
       .error(fail)
+      .catch(fail)
       .finally(done);
   });
+  // Get list of form [{'tableName': 'indexName'}, {'tableName': 'indexName'}, ...]
+  var indices = dbShape.tables.map((t) => {
+    return t.indices.map((i) => {
+      var obj = {};
+      obj[t.tableName] = i
+      return obj;
+    })
+  }).reduce((last, next) => {
+    return last.concat(next);
+  });
 
-
+  it('should have created following indices: ' + JSON.stringify(indices), (done) => {
+    function checkIndices(i: Shapes.TableShape) {
+      return r.db(dbShape.dbname)
+        .table(i.tableName)
+        .indexList()
+        .contains(r.args(i.indices))
+        .run<Boolean>(conn)
+        .then((result) => {
+          if (result === false) {
+            var msg = "Table " + i.tableName + ' missing indices in ' +
+            JSON.stringify(i.indices);
+            throw new Error(msg);
+          } else {
+            return result;
+          }
+        })
+    }
+    var checks = dbShape.tables.map(checkIndices);
+    Promise.all(checks)
+      .catch(fail)
+      .error(fail)
+      .finally(done);
+  })
 });
