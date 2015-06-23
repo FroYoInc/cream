@@ -5,6 +5,7 @@ import c = require('../../src/config');
 import pool = require('../../src/dbutils/connection-pool');
 import q = require('../../src/dbutils/query');
 import errors = require('../../src/errors/errors');
+import models = require('../../src/models/models');
 var m = new Migrator.Migrator();
 
 var conn : r.Connection;
@@ -66,10 +67,20 @@ describe('UserService', () => {
   });
 
   it('should return user given user id', (done) => {
-    var userName = "orio1"
-    function createUser() {
-      return userService.createUser('_', '_', userName, '_');
-    };
-    done();
+    var user: models.User;
+    userService.createUser('_', '_', 'orio1', '_')
+      .then((_user) => {
+        user = _user;
+        return _user.id;
+      })
+      .then(userService.getUserById)
+      .then((_user) => {
+        expect(user.id).toBe(_user.id);
+        expect(user.userName).toBe(_user.userName);
+        expect(user.email).toBe(_user.email);
+      })
+      .catch(fail)
+      .error(fail)
+      .finally(done)
   });
 });

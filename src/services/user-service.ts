@@ -14,16 +14,21 @@ module UserService {
   //   // TODO: implement
   //   return new User();
   // }
+
+  var db = 'froyo';
+  var table = 'users';
+  var userNameIndex = 'userName';
+
   function userCreateQuery (user) {
-    return r.db('froyo')
-      .table('users')
+    return r.db(db)
+      .table(table)
       .insert(user);
   }
 
   function userExistQuery(userName) {
-    return r.db('froyo')
-      .table('users')
-      .getAll(userName, {index: 'userName'})
+    return r.db(db)
+      .table(table)
+      .getAll(userName, {index: userNameIndex})
       .isEmpty();
   }
 
@@ -78,15 +83,25 @@ module UserService {
   }
 
   export function getUserById(id: string): Promise<models.User> {
-    return emailValidator.isValid(id)
-      .then(() => {
-        throw new errors.UserNotFoundException();
-      })
-      .then(() => {
-        var user: models.User =
-         {userName: '_',firstName: '_',lastName: '_',email: '_'}
-        return user;
-      })
+    var getUserByIdQuery = r.db(db)
+      .table(table)
+      .get(id);
+
+    function throwErrorIfUserNotFound(_user) {
+      if (_user === null) {
+        throw new errors.UserNotFoundException()
+      } else {
+        return _user;
+      }
+    }
+
+    function returnUser(_user): models.User {
+      return <models.User> _user;
+    }
+
+    return q.run(getUserByIdQuery)()
+      .then(throwErrorIfUserNotFound)
+      .then(returnUser)
   }
 
   // getUserByEmail(id: string): User {
