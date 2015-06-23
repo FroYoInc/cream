@@ -31,48 +31,49 @@ describe('UserService', () => {
   var fail = (error) => {expect(error).toBeUndefined();}
   var testTrue = (result) => {expect(result).toBe(true);}
   var testFalse = (result) => {expect(result).toBe(false);}
+  function createUser(f, l, u, e, p) {
+    return () => {
+      return userService.createUser(f, l, u, e)
+    }
+  }
+  function doesUserExist(u) {
+    return () => {
+      return userService.doesUserExist(u);
+    }
+  }
 
   it('should create a user', (done) => {
-    var userName = 'testUser';
-
-    var doesUserExist = () => {
-      return userService.doesUserExist(userName);
-    }
-
-    var createUser = () => {
-      return userService.createUser('_', '_', userName, '_');
-    };
-
-    doesUserExist()
+    doesUserExist('testUser')()
       .then(testFalse)
-      .then(createUser)
-      .then(doesUserExist)
+      .then(createUser('_', '_', 'testUser', '_', '_'))
+      .then(doesUserExist('testUser'))
       .then(testTrue)
       .error(fail)
       .catch(fail)
       .finally(done)
   });
 
-  it('should not create user if user with same userName exist', (done) => {
-    var userName = 'orio';
-    var createUser = () => {
-      return userService.createUser('_', '_', userName, '_');
-    };
-    createUser()
-      .then(createUser)
+  it('should not create user if userName exist', (done) => {
+    createUser('_', '_', 'orio0', '_', '_')()
+      .then(createUser('_', '_', 'orio0', '_', '_'))
       .catch(errors.UserExistException, () => {})
       .error(fail)
       .catch(fail)
       .finally(done);
   });
 
-  xit('should not create user if user with same email exist', (done) => {
-    done();
+  xit('should not create user if email exist', (done) => {
+    createUser('_', '_', 'foo', 'foo@example.com', '_')()
+      .then(createUser('_', '_', 'bar', 'foo@example.com', '_'))
+      .catch(errors.EmailExistException, () => {})
+      .catch(fail)
+      .error(fail)
+      .finally(done);
   })
 
   it('should return user given user id', (done) => {
     var user: models.User;
-    userService.createUser('_', '_', 'orio1', '_')
+    createUser('_', '_', 'orio1', '_', '_')()
       .then((_user) => {
         user = _user;
         return _user.id;

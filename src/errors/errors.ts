@@ -15,6 +15,7 @@ module Errors {
     }
   }
   export class UserExistException extends Error {}
+  export class EmailExistException extends Error {}
   export class UserNotFoundException extends Error {}
   export class TestException extends Error {}
 }
