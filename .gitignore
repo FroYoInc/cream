@@ -21,3 +21,9 @@ Thumbs.db
 
 # App specific ignore rules
 built/
+
+# Webstorm
+.idea
+
+# Vagrant
+.vagrant/

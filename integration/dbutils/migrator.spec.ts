@@ -23,10 +23,10 @@ beforeAll((done) => {
 
 afterAll((done) => {
   if (conn) {
-    //r.dbDrop(dbShape.dbname)
-    //  .run(conn)
-    //  .then(() => {return conn.close();})
-    //  .then(done);
+    r.dbDrop(dbShape.dbname)
+      .run(conn)
+      .then(() => {return conn.close();})
+      .then(done);
   } else {
     done(new Error("No rethinkdb exist to close..."))
   }

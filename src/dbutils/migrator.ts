@@ -49,19 +49,16 @@ module DBUtils {
     }
 
     private createIndices() {
-      var _foo = (i: string, tableName: string) => {
-        var test = r.db(Migrator.dbShape.dbname).table(tableName).indexList().contains(i);
-        var trueBranch = r.now();
-        var falseBranch = r.db(Migrator.dbShape.dbname).table(tableName).indexCreate(i);
-        return r.branch(test, trueBranch, falseBranch).run(this._conn);
+      var forEachTable = (table: shapes.TableShape) => {
+        var createIndex = (i: string) => {
+          var test = r.db(Migrator.dbShape.dbname).table(table.tableName).indexList().contains(i);
+          var trueBranch = r.now();
+          var falseBranch = r.db(Migrator.dbShape.dbname).table(table.tableName).indexCreate(i);
+          return r.branch(test, trueBranch, falseBranch).run(this._conn);
+        };
+        return p.map(table.indices, createIndex);
       };
-      var createIndex = (table: shapes.TableShape) => {
-
-        table.indices.forEach(function(index) {
-          _foo(index, table.tableName);
-        });
-      };
-      return p.map(Migrator.dbShape.tables, createIndex);
+      return p.map(Migrator.dbShape.tables, forEachTable);
     }
 
     private createAdminAccount() {
