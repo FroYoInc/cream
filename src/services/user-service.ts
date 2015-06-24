@@ -132,7 +132,7 @@ module UserService {
 
   function returnUser(result)  {
     assert.equal((result.length <= 1), true,
-    "Expected only 0 or 1 user to return. More than 1 user exist with same email")
+    "Expected only 0 or 1 user to return. More than 1 user exist with same email or userName")
     if (result.length === 0) {
       throw new errors.UserNotFoundException();
     }
@@ -145,7 +145,6 @@ module UserService {
       .table(table)
       .getAll(email, {index: emailIndex})
       .coerceTo('array');
-
     return emailValidator.isValid(email)
       .then(q.run(getUserByEmailQuery))
       .then(returnUser);
