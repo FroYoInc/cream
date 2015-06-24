@@ -37,6 +37,7 @@ declare module "rethinkdb" {
   export function branch(test:Expression<boolean>, trueBranch:Expression<any>, falseBranch:Expression<any>):Expression<any>;
 
 
+
   export class Cursor {
     hasNext():boolean;
     each(cb:(err:Error, row:any)=>void, done?:()=>void);
@@ -87,12 +88,13 @@ declare module "rethinkdb" {
   }
 
   interface Table extends Sequence {
-    indexCreate(name:string, index?:ExpressionFunction<any>):Operation<CreateResult>;
+    indexCreate(name:string, index?:ExpressionFunction<any>):Expression<any>;
     indexDrop(name:string):Operation<DropResult>;
-    indexList():Operation<string[]>;
+    indexList():Expression<any>;
 
     insert(obj:any[], options?:InsertOptions):Operation<WriteResult>;
-    insert(obj:any, options?:InsertOptions):Operation<WriteResult>;
+    //insert(obj:any, options?:InsertOptions):Operation<WriteResult>;
+    insert(obj:any, options?:InsertOptions):Expression<any>;
 
     get(key:string):Sequence; // primary key
     getAll(key:string, index?:Index):Sequence; // without index defaults to primary key
@@ -141,6 +143,7 @@ declare module "rethinkdb" {
     // Manipulation
     pluck(...props:string[]):Sequence;
     without(...props:string[]):Sequence;
+    coerceTo(arg: string):Sequence;
   }
 
   interface ExpressionFunction<U> {
@@ -156,9 +159,10 @@ declare module "rethinkdb" {
   }
 
   interface InsertOptions {
-    upsert: boolean; // true
-    durability: string; // 'soft'
-    return_vals: boolean; // false
+    upsert?: boolean; // true
+    durability?: string;  // 'soft'
+    return_vals?: boolean; // false
+    returnChanges?: boolean;
   }
 
   interface UpdateOptions {
@@ -205,7 +209,9 @@ declare module "rethinkdb" {
       contains(expr:Expression<any>):Expression<boolean>;
 
       and(b:boolean):Expression<boolean>;
+      and(b:Expression<boolean>):Expression<boolean>;
       or(b:boolean):Expression<boolean>;
+      or(e:Expression<boolean>):Expression<boolean>;
       eq(v:any):Expression<boolean>;
       ne(v:any):Expression<boolean>;
       not():Expression<boolean>;
@@ -227,7 +233,8 @@ declare module "rethinkdb" {
   }
 
   interface Operation<T> {
-   run(conn:Connection) : Promise<void>;
+   run(conn:Connection) : Promise<T>;
+   run<T>(conn:Connection) : Promise<T>;
    run(conn:Connection, cb:(err:Error, result:T)=>void);
   }
 

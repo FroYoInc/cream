@@ -130,6 +130,24 @@ module UserService {
       .then(returnUser)
   }
 
+<<<<<<< HEAD
+  activateUser(id: string, activationCode: string): boolean {
+    // TODO: implement
+    /*
+    boolean status = false;
+    if (activation code && userID is in DB) {
+        set _isAccountActivated = true;
+        status = true;
+    }
+     else if (activation code is false)
+        console.log("false action code")
+     else
+        console.log("userID does not exist")
+
+
+    */
+    return status;
+=======
   function returnUser(result)  {
     assert.equal((result.length <= 1), true,
     "Expected only 0 or 1 user to return. More than 1 user exist with same email or userName")
@@ -138,6 +156,7 @@ module UserService {
     }
     var user:models.User = result[0]
     return user;
+>>>>>>> feature-user-service
   }
 
   export function getUserByEmail(email: string):Promise<models.User> {
