@@ -18,6 +18,7 @@ module UserService {
   var db = 'froyo';
   var table = 'users';
   var userNameIndex = 'userName';
+  var emailIndex = 'email';
 
   function userCreateQuery (user) {
     return r.db(db)
@@ -29,13 +30,20 @@ module UserService {
     return r.db(db)
       .table(table)
       .getAll(userName, {index: userNameIndex})
-      .isEmpty();
+      .isEmpty().not();
+  }
+
+  function emailExistQuery(email) {
+    return r.db(db)
+      .table(table)
+      .getAll(email, {index: emailIndex})
+      .isEmpty().not();
   }
 
   export function doesUserExist(userName: string): Promise<boolean> {
     return q.run(userExistQuery(userName))()
       .then((result) => {
-        return result === false
+        return result === true
       });
   }
 
@@ -50,23 +58,26 @@ module UserService {
        isAccountActivated: false
      }
 
-    var falseBranch = r.expr(0).eq(1);
-    var createUserIfUserDoesNotExistQuery =
-      r.branch(userExistQuery(userName), userCreateQuery(user), falseBranch);
+    var doesUserOrEmailExistQuery = userExistQuery(userName)
+      .or(emailExistQuery(email));
 
-    function checkUserExistance() {
-      return doesUserExist(userName);
-    }
+    var returnError = r.branch(
+      userExistQuery(userName), r.expr('user exist'), r.expr('email exist'));
+    var createUserIfUserOrEmailDoesNotExistQuery =
+      r.branch(doesUserOrEmailExistQuery, returnError, userCreateQuery(user));
 
-    function throwErrorIfUserExist(result)  {
-      if (result === false) {
+    function throwErrorIfUserExistOrEmailExist(result)  {
+      if (result === 'user exist') {
         throw new errors.UserExistException("user already exist");
+      } else if (result === 'email exist') {
+        throw new errors.EmailExistException("email already exist");
       } else {
         return result;
       }
     }
 
-    var createUserIfUserDoesNotExist = q.run(createUserIfUserDoesNotExistQuery);
+    var createUserIfUserOrEmailDoesNotExist =
+      q.run(createUserIfUserOrEmailDoesNotExistQuery);
 
     function setUserIDAndReturnUser(result) {
       if (result.generated_keys.length != 1) {
@@ -77,8 +88,8 @@ module UserService {
     }
 
     return emailValidator.isValid(email)
-      .then(createUserIfUserDoesNotExist)
-      .then(throwErrorIfUserExist)
+      .then(createUserIfUserOrEmailDoesNotExist)
+      .then(throwErrorIfUserExistOrEmailExist)
       .then(setUserIDAndReturnUser);
   }
 

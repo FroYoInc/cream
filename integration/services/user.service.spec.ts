@@ -10,13 +10,18 @@ var m = new Migrator.Migrator();
 
 var conn : r.Connection;
 
-var createIndexQuery = r.db('froyo')
+var createIndexQuery0 = r.db('froyo')
   .table('users')
   .indexCreate('userName');
 
+var createIndexQuery1 = r.db('froyo')
+  .table('users')
+  .indexCreate('email');
+
 beforeAll((done) => {
   m.migrate(c.Config.db)
-    .then(q.run(createIndexQuery))
+    .then(q.run(createIndexQuery0))
+    .then(q.run(createIndexQuery1))
     .then(done)
     .error(done)
 });
@@ -54,8 +59,8 @@ describe('UserService', () => {
   });
 
   it('should not create user if userName exist', (done) => {
-    createUser('_', '_', 'orio0', '_', '_')()
-      .then(createUser('_', '_', 'orio0', '_', '_'))
+    createUser('_', '_', 'orio0', 'a@example.com', '_')()
+      .then(createUser('_', '_', 'orio0', 'b@example.com', '_'))
       .catch(errors.UserExistException, done)
       .then(fail)
       .error(fail)
@@ -63,7 +68,7 @@ describe('UserService', () => {
       .finally(done);
   });
 
-  xit('should not create user if email exist', (done) => {
+  it('should not create user if email exist', (done) => {
     createUser('_', '_', 'foo', 'foo@example.com', '_')()
       .then(createUser('_', '_', 'bar', 'foo@example.com', '_'))
       .catch(errors.EmailExistException, done)
@@ -75,7 +80,7 @@ describe('UserService', () => {
 
   it('should return user given user id', (done) => {
     var user: models.User;
-    createUser('_', '_', 'orio1', '_', '_')()
+    createUser('_', '_', 'orio1', 'c@example.com', '_')()
       .then((_user) => {
         user = _user;
         return _user.id;

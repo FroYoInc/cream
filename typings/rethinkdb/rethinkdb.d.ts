@@ -207,7 +207,9 @@ declare module "rethinkdb" {
       contains(expr:Expression<any>):Expression<boolean>;
 
       and(b:boolean):Expression<boolean>;
+      and(b:Expression<boolean>):Expression<boolean>;
       or(b:boolean):Expression<boolean>;
+      or(e:Expression<boolean>):Expression<boolean>;
       eq(v:any):Expression<boolean>;
       ne(v:any):Expression<boolean>;
       not():Expression<boolean>;
