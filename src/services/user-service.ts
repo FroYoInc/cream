@@ -43,7 +43,7 @@ module UserService {
       .isEmpty().not();
   }
 
-  export function doesUserExist(userName: string): Promise<boolean> {
+  export function doesUserExist(userName: string):Promise<boolean> {
     return q.run(userExistQuery(userName))()
       .then((result) => {
         return result === true
@@ -51,7 +51,7 @@ module UserService {
   }
 
   export function createUser(firstName:string, lastName:string,
-     userName:string, email:string): Promise<models.User> {
+     userName:string, email:string):Promise<models.User> {
 
      var user: models.User = {
        firstName: firstName,
@@ -108,7 +108,7 @@ module UserService {
       .then(generateAndSaveActivationCode);
   }
 
-  export function getUserById(id: string): Promise<models.User> {
+  export function getUserById(id: string):Promise<models.User> {
     var getUserByIdQuery = r.db(db)
       .table(table)
       .get(id);
@@ -121,7 +121,7 @@ module UserService {
       }
     }
 
-    function returnUser(_user): models.User {
+    function returnUser(_user):models.User {
       return <models.User> _user;
     }
 
@@ -130,7 +130,17 @@ module UserService {
       .then(returnUser)
   }
 
-  export function getUserByEmail(email: string): Promise<models.User> {
+  function returnUser(result)  {
+    assert.equal((result.length <= 1), true,
+    "Expected only 0 or 1 user to return. More than 1 user exist with same email")
+    if (result.length === 0) {
+      throw new errors.UserNotFoundException();
+    }
+    var user:models.User = result[0]
+    return user;
+  }
+
+  export function getUserByEmail(email: string):Promise<models.User> {
     var getUserByEmailQuery = r.db(db)
       .table(table)
       .getAll(email, {index: emailIndex})
@@ -138,21 +148,17 @@ module UserService {
 
     return emailValidator.isValid(email)
       .then(q.run(getUserByEmailQuery))
-      .then((result) => {
-        assert.equal((result.length <= 1), true,
-        "Expected only 0 or 1 user to return. More than 1 user exist with same email")
-        if (result.length === 0) {
-          throw new errors.UserNotFoundException();
-        }
-        var user: models.User = result[0]
-        return user;
-      });
+      .then(returnUser);
   }
-  //
-  // getUserByUserName(id: string): User {
-  //   // TODO: implement
-  //   return new User();
-  // }
+
+  export function getUserByUserName(userName: string):Promise<models.User> {
+    var getUserByUserNameQuery = r.db(db)
+      .table(table)
+      .getAll(userName, {index: userNameIndex})
+      .coerceTo('array');
+    return q.run(getUserByUserNameQuery)()
+      .then(returnUser)
+  }
   //
   //
   // activateUser(id: string, activationCode: string): boolean {
