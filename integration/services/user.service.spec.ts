@@ -1,4 +1,3 @@
-import r = require('rethinkdb');
 import userService = require('../../src/services/user-service');
 import Migrator = require('../../src/dbutils/migrator');
 import c = require('../../src/config');
@@ -8,20 +7,8 @@ import errors = require('../../src/errors/errors');
 import models = require('../../src/models/models');
 var m = new Migrator.Migrator();
 
-var conn : r.Connection;
-
-var createIndexQuery0 = r.db('froyo')
-  .table('users')
-  .indexCreate('userName');
-
-var createIndexQuery1 = r.db('froyo')
-  .table('users')
-  .indexCreate('email');
-
 beforeAll((done) => {
   m.migrate(c.Config.db)
-    .then(q.run(createIndexQuery0))
-    .then(q.run(createIndexQuery1))
     .then(done)
     .error(done)
 });
