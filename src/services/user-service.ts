@@ -1,5 +1,6 @@
 import Promise = require('bluebird');
 import r = require('rethinkdb');
+import uuid = require('uuid');
 import email = require('./email-service');
 import EmailValidator = require('../validation/email.validator');
 import q = require('../dbutils/query');
@@ -88,7 +89,7 @@ module UserService {
     }
 
     function generateAndSaveActivationCode() {
-      
+
     }
 
     return emailValidator.isValid(email)
