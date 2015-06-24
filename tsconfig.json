@@ -48,6 +48,7 @@
         "./typings/nodemailer/nodemailer.d.ts",
         "./typings/restify/restify.d.ts",
         "./typings/rethinkdb/rethinkdb.d.ts",
-        "./typings/tsd.d.ts"
+        "./typings/tsd.d.ts",
+        "./typings/uuid/UUID.d.ts"
     ]
 }

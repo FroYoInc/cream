@@ -87,6 +87,10 @@ module UserService {
       return user;
     }
 
+    function generateAndSaveActivationCode() {
+      
+    }
+
     return emailValidator.isValid(email)
       .then(createUserIfUserOrEmailDoesNotExist)
       .then(throwErrorIfUserExistOrEmailExist)
