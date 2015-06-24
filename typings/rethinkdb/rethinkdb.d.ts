@@ -37,6 +37,7 @@ declare module "rethinkdb" {
   export function branch(test:Expression<boolean>, trueBranch:Expression<any>, falseBranch:Expression<any>):Expression<any>;
 
 
+
   export class Cursor {
     hasNext():boolean;
     each(cb:(err:Error, row:any)=>void, done?:()=>void);
@@ -142,6 +143,7 @@ declare module "rethinkdb" {
     // Manipulation
     pluck(...props:string[]):Sequence;
     without(...props:string[]):Sequence;
+    coerceTo(arg: string):Sequence;
   }
 
   interface ExpressionFunction<U> {

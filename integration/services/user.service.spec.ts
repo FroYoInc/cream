@@ -5,8 +5,10 @@ import pool = require('../../src/dbutils/connection-pool');
 import q = require('../../src/dbutils/query');
 import errors = require('../../src/errors/errors');
 import models = require('../../src/models/models');
-var m = new Migrator.Migrator();
+import uuid = require('uuid');
 
+enum Caught {Yes};
+var m = new Migrator.Migrator();
 beforeAll((done) => {
   m.migrate(c.Config.db)
     .then(done)
@@ -23,6 +25,11 @@ describe('UserService', () => {
   var fail = (error) => {expect(error).toBeUndefined();}
   var testTrue = (result) => {expect(result).toBe(true);}
   var testFalse = (result) => {expect(result).toBe(false);}
+  function checkCaught(arg: Caught) {
+    if (arg !== Caught.Yes) {
+      fail(new Error("Expected an exception to be caught"))
+    }
+  }
   function createUser(f, l, u, e, p) {
     return () => {
       return userService.createUser(f, l, u, e)
@@ -33,6 +40,9 @@ describe('UserService', () => {
       return userService.doesUserExist(u);
     }
   }
+
+  function rs() {return uuid.v4();}
+  function em() {return rs() + '@example.com';}
 
   it('should create a user', (done) => {
     doesUserExist('testUser')()
@@ -74,13 +84,37 @@ describe('UserService', () => {
       })
       .then(userService.getUserById)
       .then((_user) => {
-        expect(user.id).toBe(_user.id);
-        expect(user.userName).toBe(_user.userName);
-        expect(user.email).toBe(_user.email);
+        expect(user).toEqual(_user);
       })
       .catch(fail)
       .error(fail)
       .finally(done)
+  });
+
+  it('should return user given email', (done) => {
+    var user: models.User;
+    var email = em();
+    function getUserByEmail(email) {
+      return () => {
+        return userService.getUserByEmail(email);
+      }
+    }
+    getUserByEmail(email)()
+      .catch(errors.UserNotFoundException, () =>{return Caught.Yes})
+      .then(checkCaught)
+      .then(createUser(rs(), rs(), rs(), email, rs()))
+      .then((_user) => { user = _user})
+      .then(getUserByEmail(email))
+      .then((_user) => {
+        expect(user).toEqual(_user);
+      })
+      .catch(fail)
+      .error(fail)
+      .finally(done)
+  });
+
+  xit('should return user given userName', (done) => {
+    done();
   });
 
   xit('should activate a user', (done) => {

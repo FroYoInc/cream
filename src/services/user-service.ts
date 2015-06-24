@@ -6,6 +6,7 @@ import EmailValidator = require('../validation/email.validator');
 import q = require('../dbutils/query');
 import models = require('../models/models');
 import errors = require('../errors/errors');
+import assert = require('assert');
 
 var emailValidator = new EmailValidator.EmailValidator();
 
@@ -82,9 +83,8 @@ module UserService {
       q.run(createUserIfUserOrEmailDoesNotExistQuery);
 
     function setUserID(result) {
-      if (result.generated_keys.length != 1) {
-        throw new Error("expected only 1 object to be created");
-      }
+      assert.equal(result.generated_keys.length, 1,
+        "expected only 1 object to be created");
       user.id = result.generated_keys[0];
       return user;
     }
@@ -130,10 +130,24 @@ module UserService {
       .then(returnUser)
   }
 
-  // getUserByEmail(id: string): User {
-  //   // TODO: implement
-  //   return new User();
-  // }
+  export function getUserByEmail(email: string): Promise<models.User> {
+    var getUserByEmailQuery = r.db(db)
+      .table(table)
+      .getAll(email, {index: emailIndex})
+      .coerceTo('array');
+
+    return emailValidator.isValid(email)
+      .then(q.run(getUserByEmailQuery))
+      .then((result) => {
+        assert.equal((result.length <= 1), true,
+        "Expected only 0 or 1 user to return. More than 1 user exist with same email")
+        if (result.length === 0) {
+          throw new errors.UserNotFoundException();
+        }
+        var user: models.User = result[0]
+        return user;
+      });
+  }
   //
   // getUserByUserName(id: string): User {
   //   // TODO: implement
