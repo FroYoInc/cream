@@ -18,6 +18,7 @@ module UserService {
 
   var db = 'froyo';
   var table = 'users';
+  var userDataTable = 'userData';
   var userNameIndex = 'userName';
   var emailIndex = 'email';
 
@@ -80,7 +81,7 @@ module UserService {
     var createUserIfUserOrEmailDoesNotExist =
       q.run(createUserIfUserOrEmailDoesNotExistQuery);
 
-    function setUserIDAndReturnUser(result) {
+    function setUserID(result) {
       if (result.generated_keys.length != 1) {
         throw new Error("expected only 1 object to be created");
       }
@@ -88,14 +89,23 @@ module UserService {
       return user;
     }
 
-    function generateAndSaveActivationCode() {
-
+    function generateAndSaveActivationCode(user: models.User) {
+      var activationCode = uuid.v4();
+      var userData = {
+        id: user.id,
+        activationCode: activationCode
+      }
+      var setActivationQuery = r.db(db)
+        .table(userDataTable)
+        .insert(userData);
+      return q.run(setActivationQuery)().return(user);
     }
 
     return emailValidator.isValid(email)
       .then(createUserIfUserOrEmailDoesNotExist)
       .then(throwErrorIfUserExistOrEmailExist)
-      .then(setUserIDAndReturnUser);
+      .then(setUserID)
+      .then(generateAndSaveActivationCode);
   }
 
   export function getUserById(id: string): Promise<models.User> {

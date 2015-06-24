@@ -29,6 +29,11 @@ module Models {
     salt?: string;
     id?: string;
   }
+
+  export interface UserData {
+    id: string;
+    activationCode: string;
+  }
 }
 
 export = Models;
