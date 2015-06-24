@@ -12,6 +12,10 @@ var dbShape : Shapes.DBShape = {
   tables: [{
     tableName: 'users',
     indices: ['userName', 'email']
+  },
+  {
+    tableName: 'userData',
+    indices: []
   }]
 };
 
@@ -38,9 +42,8 @@ describe('Database Migrator', () => {
   var fail = (error) => {expect(error).toBeUndefined();}
   var testTrue = (result) => {expect(result).toBe(true);}
 
-
-  it('should have database named to following', () => {
-    expect(Migrator.Migrator.dbShape.dbname).toBe(dbShape.dbname);
+  it('should have the same databse shape as described in this test', () => {
+    expect(dbShape).toEqual(Migrator.Migrator.dbShape);
   });
 
   it('should have created databse ' + dbShape.dbname, (done) => {
@@ -66,13 +69,18 @@ describe('Database Migrator', () => {
   });
 
   // Get list of form [{'tableName': 'indexName'}, {'tableName': 'indexName'}, ...]
-  var indices = dbShape.tables.map((t) => {
+  var indices = dbShape.tables
+  .filter((t) => {
+    return t.indices.length !== 0;
+  })
+  .map((t) => {
     return t.indices.map((i) => {
       var obj = {};
       obj[t.tableName] = i
       return obj;
     })
-  }).reduce((last, next) => {
+  })
+  .reduce((last, next) => {
     return last.concat(next);
   });
 
@@ -93,7 +101,11 @@ describe('Database Migrator', () => {
           }
         })
     }
-    var checks = dbShape.tables.map(checkIndices);
+    var checks = dbShape.tables
+    .filter((t) => {
+      return t.indices.length !== 0;
+    })
+    .map(checkIndices);
     Promise.all(checks)
       .catch(fail)
       .error(fail)
