@@ -42,21 +42,21 @@ export class EmailService {
   /**
    * Sends the activation email to the specified user.
    *
-   * @param  {models.User}                         user The user object.
-   * @return {Promise<nodemailer.SentMessageInfo>}      A Promise.
+   * @param  {models.User}                         user           The user.
+   * @param  {string}                              activationCode Their activation code.
+   * @return {Promise<nodemailer.SentMessageInfo>}                A Promise.
    */
-  public sendActivation(user: models.User): Promise<nodemailer.SentMessageInfo> {
+  public sendActivation(user: models.User, activationCode: string): Promise<nodemailer.SentMessageInfo> {
 
     var transporter = this.buildTransporter();
 
-    // TODO: What URL will be used for activation?
-    // TODO: WHere is the activation code?
+
     var mailOptions = {
-      from: '<' + config.Config.email.auth.user + '>',
+      from: config.Config.email.name + ' <' + config.Config.email.auth.user + '>',
       to: user.firstName + ' ' + user.lastName + ' <' + user.email + '>',
       subject: 'Activate Your Carpooling Account',
       text: 'Hello ' + user.firstName + ', ' + "\r\n"
-            + 'You need to activate your account here: http://somelink.com/activate?id=' + user.id
+            + 'You need to activate your account here: ' + config.Config.app.baseurl + '/activate?code=' + activationCode
     };
 
     return new Promise<nodemailer.SentMessageInfo>((resolve, reject) => {

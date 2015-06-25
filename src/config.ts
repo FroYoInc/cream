@@ -6,6 +6,7 @@ export class Config {
 
   static app = {
     'port': 8080,
+    'baseurl' : 'http://localhost'
   };
 
   /**
@@ -19,12 +20,12 @@ export class Config {
     //port: 465,
     //host: 'localhost',
     //secure: true,
+    name: 'Corpool',
     auth: {
       user: 'some@gmail.com',
       pass: 'password'
     },
     service: 'Gmail',
     //ignoreTLS: false,
-    name: 'Gmail'
   };
 }
