@@ -194,4 +194,16 @@ export interface EmailConfigOptions
    * @type {object}
    */
   tls?: any;
+
+  /**
+   * A version.
+   * @type {string}
+   */
+  version?: string;
+
+  /**
+   * A send callback.
+   * @type {(data: any, callback: () => void) => void}
+   */
+  send?: (data: any, callback: () => void) => void;
 }

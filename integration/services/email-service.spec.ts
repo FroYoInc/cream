@@ -65,8 +65,6 @@ describe('Email service integration tests', () => {
       logger: false
     });
 
-    server.listen(PORT_NUMBER, done);
-
     transportConfig = {
       host: 'localhost',
       port: PORT_NUMBER,
@@ -74,7 +72,12 @@ describe('Email service integration tests', () => {
         user: TEST_SMTP_USER,
         pass: TEST_SMTP_PASS
       },
-      ignoreTLS: true
+      ignoreTLS: true,
+      name: 'testsend',
+      version: '1',
+      send: (data, callback) => {
+        callback();
+      }
     };
 
     emailService = new EmailService.EmailService();
@@ -88,6 +91,8 @@ describe('Email service integration tests', () => {
       email: 'me@froyo4life.com',
       isAccountActivated: false
     };
+
+    server.listen(PORT_NUMBER, done);
   });
 
   afterEach((done) => {
