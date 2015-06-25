@@ -6,6 +6,7 @@ import q = require('../../src/dbutils/query');
 import errors = require('../../src/errors/errors');
 import models = require('../../src/models/models');
 import uuid = require('uuid');
+import r = require('rethinkdb');
 
 enum Caught {Yes};
 var m = new Migrator.Migrator();
@@ -25,6 +26,7 @@ describe('UserService', () => {
   var fail = (error) => {expect(error).toBeUndefined();}
   var testTrue = (result) => {expect(result).toBe(true);}
   var testFalse = (result) => {expect(result).toBe(false);}
+  function _catch() {return Caught.Yes}
   function checkCaught(arg: Caught) {
     if (arg !== Caught.Yes) {
       fail(new Error("Expected an exception to be caught"))
@@ -34,6 +36,9 @@ describe('UserService', () => {
     return () => {
       return userService.createUser(f, l, u, e)
     }
+  }
+  function activateUser(code: string) {
+    return () => {return userService.activateUser(code)}
   }
   function doesUserExist(u) {
     return () => {
@@ -100,7 +105,7 @@ describe('UserService', () => {
       }
     }
     getUserByEmail(email)()
-      .catch(errors.UserNotFoundException, () =>{return Caught.Yes})
+      .catch(errors.UserNotFoundException, _catch)
       .then(checkCaught)
       .then(createUser(rs(), rs(), rs(), email, rs()))
       .then((_user) => { user = _user})
@@ -117,7 +122,41 @@ describe('UserService', () => {
     done();
   });
 
-  xit('should activate a user', (done) => {
-    done();
+  it('should activate a user', (done) => {
+    var user:models.User;
+    var activationCode:string;
+    function findUserActivationCode(_user:models.User) {
+      var findUserActivationCodeQuery = r.db('froyo')
+        .table('activation')
+        .coerceTo('array')
+        .filter({'userId': _user.id})
+        .nth(0);
+      return q.run(findUserActivationCodeQuery)()
+        .then((result) => { activationCode = result.id})
+        .return(_user);
+    }
+    createUser(rs(), rs(), rs(), em(), rs())()
+      .then((_user) => {
+        expect(_user.isAccountActivated).toBe(false);
+        user = _user;
+        return _user;
+      })
+      .then(findUserActivationCode)
+      .then(activateUser('invalidactivationcode'))
+      .catch(errors.InvalidActivationCodeException, _catch)
+      .then(checkCaught)
+      .then(() => {return activateUser(activationCode)()})
+      .then(() => {return userService.getUserById(user.id)})
+      .then((_user) => {
+        expect(_user.isAccountActivated).toBe(true);
+        expect(_user.id).toBe(user.id);
+        return _user;
+      })
+      .then(() => {return activateUser(activationCode)()})
+      .catch(errors.UserAlreadyActivatedException, _catch)
+      .then(checkCaught)
+      .catch(fail)
+      .error(fail)
+      .finally(done);
   });
 });

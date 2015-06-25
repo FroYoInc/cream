@@ -15,6 +15,7 @@ module UserService {
 
   var db = 'froyo';
   var table = 'users';
+  var activationTable = 'activation';
   var userDataTable = 'userData';
   var userNameIndex = 'userName';
   var emailIndex = 'email';
@@ -92,7 +93,7 @@ module UserService {
         userId: user.id
       }
       var saveActivationQuery = r.db(db)
-        .table('activation')
+        .table(activationTable)
         .insert(activation);
       return q.run(saveActivationQuery)().return(user);
     }
@@ -160,18 +161,20 @@ module UserService {
       "Trying to update a user that doesn't have an id");
     var updateUserQuery = r.db(db)
       .table(table)
-      .update(user);
-    return q.run(updateUserQuery)()
-      .then(() => {
-        return user;
-      });
+      .get(user.id)
+      .update(user, {durability: 'hard'});
+    return q.run(updateUserQuery)().then(() => {return user});
   }
 
   export function activateUser(activationCode: string):Promise<models.User> {
 
+    if (activationCode === '') {
+      throw new errors.InvalidActivationCodeException();
+    }
+
     function getUserIdByActivationCode() {
       var getActivationQuery = r.db(db)
-        .table('activation')
+        .table(activationTable)
         .get(activationCode);
       return q.run(getActivationQuery)()
         .then((_result) => {
