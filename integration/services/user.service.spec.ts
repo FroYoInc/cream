@@ -118,8 +118,26 @@ describe('UserService', () => {
       .finally(done)
   });
 
-  xit('should return user given userName', (done) => {
-    done();
+  it('should return user given userName', (done) => {
+    var user: models.User;
+    var userName = rs();
+    function getUserByUserName(email) {
+      return () => {
+        return userService.getUserByUserName(userName);
+      }
+    }
+    getUserByUserName(userName)()
+      .catch(errors.UserNotFoundException, _catch)
+      .then(checkCaught)
+      .then(createUser(rs(), rs(), userName, em(), rs()))
+      .then((_user) => { user = _user})
+      .then(getUserByUserName(userName))
+      .then((_user) => {
+        expect(user).toEqual(_user);
+      })
+      .catch(fail)
+      .error(fail)
+      .finally(done)
   });
 
   it('should activate a user', (done) => {
