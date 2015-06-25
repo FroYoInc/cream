@@ -47,15 +47,19 @@ module UserService {
       });
   }
 
-  export function createUser(firstName:string, lastName:string,
-     userName:string, email:string):Promise<models.User> {
+  export function createUser(
+    firstName:string, lastName:string,
+    userName:string, email:string,
+    passwordHash: string, salt: string):Promise<models.User> {
 
      var user: models.User = {
        firstName: firstName,
        lastName: lastName,
        userName: userName,
        email: email,
-       isAccountActivated: false
+       isAccountActivated: false,
+       passwordHash: passwordHash,
+       salt: salt
      }
 
     var doesUserOrEmailExistQuery = userExistQuery(userName)

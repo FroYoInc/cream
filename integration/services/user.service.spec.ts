@@ -32,9 +32,9 @@ describe('UserService', () => {
       fail(new Error("Expected an exception to be caught"))
     }
   }
-  function createUser(f, l, u, e, p) {
+  function createUser(f, l, u, e, p, s) {
     return () => {
-      return userService.createUser(f, l, u, e)
+      return userService.createUser(f, l, u, e, p, s)
     }
   }
   function activateUser(code: string) {
@@ -52,7 +52,7 @@ describe('UserService', () => {
   it('should create a user', (done) => {
     doesUserExist('testUser')()
       .then(testFalse)
-      .then(createUser('_', '_', 'testUser', '_', '_'))
+      .then(createUser('_', '_', 'testUser', '_', '_', '_'))
       .then(doesUserExist('testUser'))
       .then(testTrue)
       .error(fail)
@@ -61,8 +61,10 @@ describe('UserService', () => {
   });
 
   it('should not create user if userName exist', (done) => {
-    createUser('_', '_', 'orio0', 'a@example.com', '_')()
-      .then(createUser('_', '_', 'orio0', 'b@example.com', '_'))
+    createUser(
+      '_', '_', 'orio0', 'a@example.com', '_', '_')()
+      .then(createUser(
+        '_', '_', 'orio0', 'b@example.com', '_', '_'))
       .catch(errors.UserExistException, done)
       .then(fail)
       .error(fail)
@@ -71,8 +73,9 @@ describe('UserService', () => {
   });
 
   it('should not create user if email exist', (done) => {
-    createUser('_', '_', 'foo', 'foo@example.com', '_')()
-      .then(createUser('_', '_', 'bar', 'foo@example.com', '_'))
+    createUser('_', '_', 'foo', 'foo@example.com', '_', '_')()
+      .then(createUser(
+        '_', '_', 'bar', 'foo@example.com', '_', '_'))
       .catch(errors.EmailExistException, done)
       .then(fail)
       .catch(fail)
@@ -82,7 +85,7 @@ describe('UserService', () => {
 
   it('should return user given user id', (done) => {
     var user: models.User;
-    createUser('_', '_', 'orio1', 'c@example.com', '_')()
+    createUser('_', '_', 'orio1', 'c@example.com', '_', '_')()
       .then((_user) => {
         user = _user;
         return _user.id;
@@ -107,7 +110,7 @@ describe('UserService', () => {
     getUserByEmail(email)()
       .catch(errors.UserNotFoundException, _catch)
       .then(checkCaught)
-      .then(createUser(rs(), rs(), rs(), email, rs()))
+      .then(createUser(rs(), rs(), rs(), email, rs(), rs()))
       .then((_user) => { user = _user})
       .then(getUserByEmail(email))
       .then((_user) => {
@@ -129,7 +132,7 @@ describe('UserService', () => {
     getUserByUserName(userName)()
       .catch(errors.UserNotFoundException, _catch)
       .then(checkCaught)
-      .then(createUser(rs(), rs(), userName, em(), rs()))
+      .then(createUser(rs(), rs(), userName, em(), rs(), rs()))
       .then((_user) => { user = _user})
       .then(getUserByUserName(userName))
       .then((_user) => {
@@ -153,7 +156,7 @@ describe('UserService', () => {
         .then((result) => { activationCode = result.id})
         .return(_user);
     }
-    createUser(rs(), rs(), rs(), em(), rs())()
+    createUser(rs(), rs(), rs(), em(), rs(), rs())()
       .then((_user) => {
         expect(_user.isAccountActivated).toBe(false);
         user = _user;
