@@ -166,9 +166,9 @@ declare module "rethinkdb" {
   }
 
   interface UpdateOptions {
-    non_atomic: boolean;
-    durability: string; // 'soft'
-    return_vals: boolean; // false
+    nonAtomic?: boolean;
+    durability?: string; // 'soft'
+    return_vals?: boolean; // false
   }
 
   interface WriteResult {

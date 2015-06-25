@@ -12,13 +12,10 @@ var emailValidator = new EmailValidator.EmailValidator();
 
 module UserService {
 
-  // export function updateUser(_user: User): User {
-  //   // TODO: implement
-  //   return new User();
-  // }
 
   var db = 'froyo';
   var table = 'users';
+  var activationTable = 'activation';
   var userDataTable = 'userData';
   var userNameIndex = 'userName';
   var emailIndex = 'email';
@@ -50,15 +47,19 @@ module UserService {
       });
   }
 
-  export function createUser(firstName:string, lastName:string,
-     userName:string, email:string):Promise<models.User> {
+  export function createUser(
+    firstName:string, lastName:string,
+    userName:string, email:string,
+    passwordHash: string, salt: string):Promise<models.User> {
 
      var user: models.User = {
        firstName: firstName,
        lastName: lastName,
        userName: userName,
        email: email,
-       isAccountActivated: false
+       isAccountActivated: false,
+       passwordHash: passwordHash,
+       salt: salt
      }
 
     var doesUserOrEmailExistQuery = userExistQuery(userName)
@@ -91,14 +92,14 @@ module UserService {
 
     function generateAndSaveActivationCode(user: models.User) {
       var activationCode = uuid.v4();
-      var userData = {
-        id: user.id,
-        activationCode: activationCode
+      var activation: models.Activation = {
+        id: activationCode,
+        userId: user.id
       }
-      var setActivationQuery = r.db(db)
-        .table(userDataTable)
-        .insert(userData);
-      return q.run(setActivationQuery)().return(user);
+      var saveActivationQuery = r.db(db)
+        .table(activationTable)
+        .insert(activation);
+      return q.run(saveActivationQuery)().return(user);
     }
 
     return emailValidator.isValid(email)
@@ -132,7 +133,8 @@ module UserService {
 
   function returnUser(result)  {
     assert.equal((result.length <= 1), true,
-    "Expected only 0 or 1 user to return. More than 1 user exist with same email or userName")
+    "Expected only 0 or 1 user to return." +
+    " More than 1 user exist with same email or userName")
     if (result.length === 0) {
       throw new errors.UserNotFoundException();
     }
@@ -158,12 +160,50 @@ module UserService {
     return q.run(getUserByUserNameQuery)()
       .then(returnUser)
   }
-  //
-  //
-  // activateUser(id: string, activationCode: string): boolean {
-  //   // TODO: implement
-  //   return false;
-  // }
+
+  function updateUser(user:models.User):Promise<models.User> {
+    assert.equal((user.id !== null), true,
+      "Trying to update a user that doesn't have an id");
+    var updateUserQuery = r.db(db)
+      .table(table)
+      .get(user.id)
+      .update(user, {durability: 'hard'});
+    return q.run(updateUserQuery)().then(() => {return user});
+  }
+
+  export function activateUser(activationCode: string):Promise<models.User> {
+
+    if (activationCode === '') {
+      throw new errors.InvalidActivationCodeException();
+    }
+
+    function getUserIdByActivationCode() {
+      var getActivationQuery = r.db(db)
+        .table(activationTable)
+        .get(activationCode);
+      return q.run(getActivationQuery)()
+        .then((_result) => {
+          var activation:models.Activation = _result;
+          if (_result === null) {
+            throw new errors.InvalidActivationCodeException()
+          }
+          return activation.userId
+        });
+    }
+
+    function setUserToActivated(user:models.User):models.User {
+      if (user.isAccountActivated) {
+        throw new errors.UserAlreadyActivatedException()
+      }
+      user.isAccountActivated = true;
+      return user;
+    }
+
+    return getUserIdByActivationCode()
+      .then(getUserById)
+      .then(setUserToActivated)
+      .then(updateUser);
+  }
 }
 
 export = UserService;

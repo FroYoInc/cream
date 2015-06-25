@@ -23,16 +23,21 @@ module Models {
     lastName: string;
     userName: string;
     email: string;
-    isAccountActivated?: boolean;
-    carpools?: Array<Models.Carpool>
-    passwordHash?: string;
-    salt?: string;
+    isAccountActivated: boolean;
+    passwordHash: string;
+    salt: string;
     id?: string;
+    carpools?: Array<Models.Carpool>
   }
 
   export interface UserData {
     id: string;
     activationCode: string;
+  }
+
+  export interface Activation {
+    id: string;
+    userId: string;
   }
 }
 

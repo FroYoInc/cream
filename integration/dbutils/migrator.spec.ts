@@ -16,6 +16,10 @@ var dbShape : Shapes.DBShape = {
   {
     tableName: 'userData',
     indices: []
+  },
+  {
+    tableName: 'activation',
+    indices: []
   }]
 };
 
