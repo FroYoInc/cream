@@ -34,6 +34,11 @@ module Models {
     id: string;
     activationCode: string;
   }
+
+  export interface Activation {
+    id: string;
+    userId: string;
+  }
 }
 
 export = Models;

@@ -12,10 +12,6 @@ var emailValidator = new EmailValidator.EmailValidator();
 
 module UserService {
 
-  // export function updateUser(_user: User): User {
-  //   // TODO: implement
-  //   return new User();
-  // }
 
   var db = 'froyo';
   var table = 'users';
@@ -91,14 +87,14 @@ module UserService {
 
     function generateAndSaveActivationCode(user: models.User) {
       var activationCode = uuid.v4();
-      var userData = {
-        id: user.id,
-        activationCode: activationCode
+      var activation: models.Activation = {
+        id: activationCode,
+        userId: user.id
       }
-      var setActivationQuery = r.db(db)
-        .table(userDataTable)
-        .insert(userData);
-      return q.run(setActivationQuery)().return(user);
+      var saveActivationQuery = r.db(db)
+        .table('activation')
+        .insert(activation);
+      return q.run(saveActivationQuery)().return(user);
     }
 
     return emailValidator.isValid(email)
@@ -158,12 +154,48 @@ module UserService {
     return q.run(getUserByUserNameQuery)()
       .then(returnUser)
   }
-  //
-  //
-  // activateUser(id: string, activationCode: string): boolean {
-  //   // TODO: implement
-  //   return false;
-  // }
+
+  function updateUser(user:models.User):Promise<models.User> {
+    assert.equal((user.id !== null), true,
+      "Trying to update a user that doesn't have an id");
+    var updateUserQuery = r.db(db)
+      .table(table)
+      .update(user);
+    return q.run(updateUserQuery)()
+      .then(() => {
+        return user;
+      });
+  }
+
+  export function activateUser(activationCode: string):Promise<models.User> {
+
+    function getUserIdByActivationCode() {
+      var getActivationQuery = r.db(db)
+        .table('activation')
+        .get(activationCode);
+      return q.run(getActivationQuery)()
+        .then((_result) => {
+          var activation:models.Activation = _result;
+          if (_result === null) {
+            throw new errors.InvalidActivationCodeException()
+          }
+          return activation.userId
+        });
+    }
+
+    function setUserToActivated(user:models.User):models.User {
+      if (user.isAccountActivated) {
+        throw new errors.UserAlreadyActivatedException()
+      }
+      user.isAccountActivated = true;
+      return user;
+    }
+
+    return getUserIdByActivationCode()
+      .then(getUserById)
+      .then(setUserToActivated)
+      .then(updateUser);
+  }
 }
 
 export = UserService;
