@@ -60,6 +60,7 @@ export class EmailService {
     };
 
     return new Promise<nodemailer.SentMessageInfo>((resolve, reject) => {
+
       transporter.sendMail(mailOptions, (error, sent) => {
         if (error)
         {
@@ -80,7 +81,7 @@ export class EmailService {
    *                              off the SMTP settings.
    */
   private buildTransporter(): mailer.Transporter {
-    return mailer.createTransport(config.Config.email);
+    return mailer.createTransport(this._transportConfig);
   }
 }
 
