@@ -129,7 +129,8 @@ module UserService {
 
   function returnUser(result)  {
     assert.equal((result.length <= 1), true,
-    "Expected only 0 or 1 user to return. More than 1 user exist with same email or userName")
+    "Expected only 0 or 1 user to return." +
+    " More than 1 user exist with same email or userName")
     if (result.length === 0) {
       throw new errors.UserNotFoundException();
     }

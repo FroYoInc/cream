@@ -23,11 +23,11 @@ module Models {
     lastName: string;
     userName: string;
     email: string;
-    isAccountActivated?: boolean;
-    carpools?: Array<Models.Carpool>
+    isAccountActivated: boolean;
     passwordHash?: string;
     salt?: string;
     id?: string;
+    carpools?: Array<Models.Carpool>
   }
 
   export interface UserData {
