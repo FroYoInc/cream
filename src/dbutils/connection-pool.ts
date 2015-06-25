@@ -4,7 +4,7 @@ import Promise = require('bluebird');
 import genericPool = require('generic-pool');
 import c = require('../config');
 
-module DBUtils {
+module ConnectionPool {
   export interface Released {};
   export interface Drained {};
 
@@ -61,4 +61,4 @@ module DBUtils {
   }
 }
 
-export = DBUtils;
+export = ConnectionPool;
