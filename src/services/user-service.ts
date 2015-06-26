@@ -1,7 +1,7 @@
 import Promise = require('bluebird');
 import r = require('rethinkdb');
 import uuid = require('uuid');
-import email = require('./email-service');
+import EmailService = require('./email-service');
 import EmailValidator = require('../validation/email.validator');
 import q = require('../dbutils/query');
 import models = require('../models/models');
@@ -96,6 +96,8 @@ module UserService {
         id: activationCode,
         userId: user.id
       }
+      var emailService = new EmailService.EmailService();
+      emailService.sendActivation(user, activationCode).done();
       var saveActivationQuery = r.db(db)
         .table(activationTable)
         .insert(activation);
