@@ -19,7 +19,6 @@
     ],
     "files": [
         "./integration/dbutils/migrator.spec.ts",
-        "./integration/services/email-service.spec.ts",
         "./integration/services/user.service.spec.ts",
         "./src/config.ts",
         "./src/dbutils/connection-pool.ts",
