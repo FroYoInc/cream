@@ -14,11 +14,11 @@ module Errors {
       this.stack = (<any>new Error()).stack;
     }
   }
-
-  export class UserExistException extends Error {
-  }
-
-  export class TestError extends Error {
-  }
+  export class UserExistException extends Error {}
+  export class EmailExistException extends Error {}
+  export class UserNotFoundException extends Error {}
+  export class InvalidActivationCodeException extends Error {}
+  export class UserAlreadyActivatedException extends Error {}
+  export class TestException extends Error {}
 }
 export = Errors

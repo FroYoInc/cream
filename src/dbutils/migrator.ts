@@ -16,6 +16,10 @@ module DBUtils {
       {
         tableName: 'userData',
         indices: []
+      },
+      {
+        tableName: 'activation',
+        indices: []
       }]
     };
     private _conn : r.Connection;
