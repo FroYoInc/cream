@@ -2,6 +2,7 @@ import r = require('rethinkdb');
 import restify = require('restify');
 import DBUtils = require('./dbutils/migrator');
 import c  = require('./config');
+import userService = require('services/user-service');
 
 var migrator = new DBUtils.Migrator();
 migrator.migrate(c.Config.db);
@@ -19,10 +20,20 @@ server.get('/flavors', function(req, res, next) {
   next();
 });
 
+
+//firstName:string, lastName:string,
+//    userName:string, email:string,
+//    passwordHash: string, salt: string):Promise<models.User>
 server.post('/users', function (req, res, next){
 
   console.log(req.body);
-  res.end();
+  var userInfo = req.body;
+
+  //createUser.then()...
+  userService.createUser(userInfo.lastName, userInfo.firstName, userInfo.userName, userInfo.email, userInfo.passwordHash, userInfo.salt).then(res.end());
+  //userService.createUser('Smith','Bill', 'EpicRidezFTW', 'bsmith@email.com', 'password', 'salt').then(res.end());
+
+  //res.end();
 });
 
 server.listen(c.Config.app.port, function() {
