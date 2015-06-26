@@ -1,5 +1,4 @@
-import services = require('../../src/services/user-service');
-var userService = new services.UserService();
+import userService = require('../../src/services/user-service');
 describe('User service', () => {
   it('contains spec with expectation', () => {
   });

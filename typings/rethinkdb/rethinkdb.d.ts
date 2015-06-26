@@ -37,6 +37,7 @@ declare module "rethinkdb" {
   export function branch(test:Expression<boolean>, trueBranch:Expression<any>, falseBranch:Expression<any>):Expression<any>;
 
 
+
   export class Cursor {
     hasNext():boolean;
     each(cb:(err:Error, row:any)=>void, done?:()=>void);
@@ -92,7 +93,8 @@ declare module "rethinkdb" {
     indexList():Expression<any>;
 
     insert(obj:any[], options?:InsertOptions):Operation<WriteResult>;
-    insert(obj:any, options?:InsertOptions):Operation<WriteResult>;
+    //insert(obj:any, options?:InsertOptions):Operation<WriteResult>;
+    insert(obj:any, options?:InsertOptions):Expression<any>;
 
     get(key:string):Sequence; // primary key
     getAll(key:string, index?:Index):Sequence; // without index defaults to primary key
@@ -141,6 +143,7 @@ declare module "rethinkdb" {
     // Manipulation
     pluck(...props:string[]):Sequence;
     without(...props:string[]):Sequence;
+    coerceTo(arg: string):Sequence;
   }
 
   interface ExpressionFunction<U> {
@@ -156,15 +159,16 @@ declare module "rethinkdb" {
   }
 
   interface InsertOptions {
-    upsert: boolean; // true
-    durability: string; // 'soft'
-    return_vals: boolean; // false
+    upsert?: boolean; // true
+    durability?: string;  // 'soft'
+    return_vals?: boolean; // false
+    returnChanges?: boolean;
   }
 
   interface UpdateOptions {
-    non_atomic: boolean;
-    durability: string; // 'soft'
-    return_vals: boolean; // false
+    nonAtomic?: boolean;
+    durability?: string; // 'soft'
+    return_vals?: boolean; // false
   }
 
   interface WriteResult {
@@ -205,7 +209,9 @@ declare module "rethinkdb" {
       contains(expr:Expression<any>):Expression<boolean>;
 
       and(b:boolean):Expression<boolean>;
+      and(b:Expression<boolean>):Expression<boolean>;
       or(b:boolean):Expression<boolean>;
+      or(e:Expression<boolean>):Expression<boolean>;
       eq(v:any):Expression<boolean>;
       ne(v:any):Expression<boolean>;
       not():Expression<boolean>;
