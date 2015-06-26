@@ -16,7 +16,9 @@ describe('The Email Service', () => {
       lastName: 'User',
       userName: 'testuser',
       email: 'me@froyo4life.com',
-      isAccountActivated: false
+      isAccountActivated: false,
+      passwordHash: '12345',
+      salt: 'NaCl'
     };
   });
 
