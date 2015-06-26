@@ -11,10 +11,18 @@ var server = restify.createServer({
   version: '0.0.0'
 });
 
+server.use(restify.bodyParser({mapParams: true}));
+
 server.get('/flavors', function(req, res, next) {
   var flavors : string[] = ['Peanut Butter', 'Cookies N Cream', 'Cake Batter'];
   res.send({'flavors': flavors});
   next();
+});
+
+server.post('/users', function (req, res, next){
+
+  console.log(req.body);
+  res.end();
 });
 
 server.listen(c.Config.app.port, function() {
