@@ -72,9 +72,9 @@ module UserService {
 
     function throwErrorIfUserExistOrEmailExist(result)  {
       if (result === 'user exist') {
-        throw new errors.UserExistException("user already exist");
+        throw new errors.UserExistException();
       } else if (result === 'email exist') {
-        throw new errors.EmailExistException("email already exist");
+        throw new errors.EmailExistException();
       } else {
         return result;
       }
