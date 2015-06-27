@@ -56,10 +56,6 @@ describe('UserAuth', () => {
         salt: 'andPepper'
   };
 
-  query.run(
-      r.db('froyo').table('users').insert(goodUser)
-  )();
-
   var testFalse = (result) => {expect(result).toBe(false);}
   var testTrue = (result) => {expect(result).toBe(true);}
 
@@ -101,10 +97,15 @@ describe('UserAuth', () => {
   });
 
   it('should authenticate a valid user login', (done) => {
-    authUser(bad.req, goodUser.email, password)
-      .then(testTrue)
-      .error(fail)
-      .finally(done);
+
+      query.run(
+          r.db('froyo').table('users').insert(goodUser)
+      )().then(() => {
+        authUser(bad.req, goodUser.email, password)
+          .then(testTrue)
+          .error(fail)
+          .finally(done);
+      });
 
   });
 
@@ -116,10 +117,15 @@ describe('UserAuth', () => {
   });
 
   it('should revoke all of the users sessions', (done) => {
-    revokeSessions(good.req)
-      .then(testTrue)
-      .error(fail)
-      .finally(done);
+    query.run(
+      r.db('froyo').tableCreate('session')
+    )().then(() =>{
+      revokeSessions(good.req)
+        .then(testTrue)
+        .error(fail)
+        .finally(done);
+    });
+
   });
 
   it('should fail to create a user session when required fields are not defined in the user', (done) => {
