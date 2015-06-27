@@ -20,7 +20,7 @@ module userControllers{
             auth.authenticateUser(req, 'higgs@lhc.com', "1234")
                 .then( (success) => {
                     if(success){
-                        res.send(200, "Logged in");
+                        res.send(200);
                     }
                     else{
                         res.send(401);
@@ -45,7 +45,9 @@ module userControllers{
                 res.send(500, {"message": err});
             }
             else{
-                res.send(200, "Logged out");                
+                // res.send(200);
+                res.header('Location', '/');
+                res.send(302);
             }
         });
         next();
