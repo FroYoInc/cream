@@ -1,14 +1,14 @@
 {
   "name": "wafflecone",
   "version": "0.0.0",
-  "description": "Corporate Carpooling API",
+  "description": "Corpool API",
   "private": true,
   "scripts": {
     "test": "gulp build && gulp integrate"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/ianaldrighetti/corporate-carpooling.git"
+    "url": "https://github.com/FroYoInc/wafflecone.git"
   },
   "keywords": [
     "carpooling"
@@ -16,9 +16,9 @@
   "author": "",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ianaldrighetti/corporate-carpooling/issues"
+    "url": "https://github.com/FroYoInc/wafflecone/issues"
   },
-  "homepage": "https://github.com/ianaldrighetti/corporate-carpooling",
+  "homepage": "https://github.com/FroYoInc/wafflecone",
   "dependencies": {
     "bluebird": "^2.9.30",
     "generic-pool": "^2.2.0",
