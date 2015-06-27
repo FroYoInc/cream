@@ -16,8 +16,7 @@ module userControllers{
         var p = req.params;
         var validReq = _verifyParams(p.email, p.password);
         if(validReq){
-            // auth.authenticateUser(req, p.email, p.password)
-            auth.authenticateUser(req, 'higgs@lhc.com', "1234")
+            auth.authenticateUser(req, p.email, p.password)
                 .then( (success) => {
                     if(success){
                         res.send(200);
