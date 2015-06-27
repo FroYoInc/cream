@@ -43,11 +43,21 @@ gulp.task('unit-tests', ['transpile-ts2js'], function() {
     .on('error', handleError);
 });
 
-gulp.task('integration-tests', ['transpile-ts2js'], function() {
-  return gulp.src(config.integrationFiles)
+gulp.task('integration-test-stg0', ['transpile-ts2js'], function() {
+  return gulp.src(config.integrationFiles.stg0)
     .pipe($.jasmine())
     .on('error', handleError);
 });
+
+gulp.task('integration-test-stg1', ['integration-test-stg0',
+'transpile-ts2js'], function() {
+  return gulp.src(config.integrationFiles.stg1)
+    .pipe($.jasmine())
+    .on('error', handleError);
+});
+
+gulp.task('integration-tests', ['integration-test-stg0',
+'integration-test-stg1']);
 
 gulp.task('default', ['unit-tests', 'restart-server'], function() {
    var files = [config.tsFilesGlob, config.tsConfigFile];

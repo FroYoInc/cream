@@ -24,18 +24,32 @@ var dbShape : Shapes.DBShape = {
 };
 
 beforeAll((done) => {
-  migrator.migrate(c.Config.db)
-    .then(() => {return r.connect(c.Config.db);})
-    .then((_conn) => {conn = _conn;})
+  function migrate() {
+    return () => {
+      return migrator.migrate(c.Config.db);
+    }
+  }
+
+  function dropTableIfExist() {
+    var dbExistQ = r.dbList()
+      .contains(dbShape.dbname);
+    var dbDropQ = r.dbDrop(dbShape.dbname);
+    return () => {
+      return r.branch(dbExistQ, dbDropQ, r.now())
+        .run(conn);
+    }
+  }
+
+  r.connect(c.Config.db)
+    .then((_conn) => {conn = _conn})
+    .then(dropTableIfExist())
+    .then(migrate())
     .then(done);
 });
 
 afterAll((done) => {
   if (conn) {
-    r.dbDrop(dbShape.dbname)
-      .run(conn)
-      .then(() => {return conn.close();})
-      .then(done);
+    conn.close().then(done);
   } else {
     throw new Error("No rethinkdb exist to close...");
     done();
