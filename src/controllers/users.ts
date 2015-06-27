@@ -40,16 +40,16 @@ module userControllers{
      * a 200 if the revokation is a success and a 500 otherwise.
      */
     export function logout(req:Restify.Request, res:Restify.Response, next){
-        auth.revokeSession(req, function(err){
-            if(err){
-                res.send(500, {"message": err});
+        auth.revokeSession(req).then( (success) => {
+            if(!success){
+                res.send(500, {"message": "Logout failed.  Unable to revoke session."});
             }
             else{
-                // res.send(200);
                 res.header('Location', '/');
                 res.send(302);
             }
         });
+
         next();
     }
 

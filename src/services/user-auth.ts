@@ -10,8 +10,9 @@ import errors = require('../errors/errors');
 module UserAuth{
 
     /**
-     * Checks if the user has a valid sesson and rerutns true if they do and false otherwise
-     * @param  {Restify.Request} req [The request we are checking for a valid session]
+     * Checks if the user has a valid session
+     * @param  {Restify.Request}  req [The request to be verified]
+     * @return {Promise<boolean>}     [A promise that a boolean will be returned]
      */
     export function checkAuth(req: Restify.Request): Promise<boolean>{
         return new Promise<boolean>((resolve, reject) => {
@@ -25,7 +26,14 @@ module UserAuth{
 
     }
 
-
+    /**
+     * Checks if the user is in the database. If they are in the database, it hashes
+     * the password that is provided and checks it againts the hash in the database.
+     * @param  {Restify.Request}  req  [The rquest of the user to be authenticated]
+     * @param  {string}           em   [The user's email]
+     * @param  {string}           pass [The user's plaintext password]
+     * @return {Promise<boolean>}      [A promise that the function will return a boolean]
+     */
     export function authenticateUser(req:Restify.Request, em:string, pass:string) : Promise<boolean> {
 
         return new Promise<boolean>((resolve, reject) => {
@@ -59,12 +67,10 @@ module UserAuth{
     }
 
     /**
-     * Creates or updates a user session to the values defined in
-     * the user object passed in as an argument
-     * @param {restify.Request} req  [The request for the session you wish to update or create.]
-     * @param {User}            user [The new/updated user object.  This is used to define the values of the session ]
-     * @param {callback}        function [This function takes a callback so that it can pass an error to be handled]
-     * 
+     * Creates or updates a user session to match the fields in the user object provided
+     * @param  {Restify.Request}  req  [The request attached to the session to modified]
+     * @param  {models.User}      user [The user object to use to update]
+     * @return {Promise<boolean>}
      */
     export function userSession(req: Restify.Request, user: models.User) : Promise<boolean> {
         return new Promise<boolean>((resolve, reject) => {
@@ -83,21 +89,27 @@ module UserAuth{
     }
 
     /**
-     * Destroys the users session
-     * @param {Restify.Request} req [The request whose session we wish to destroy]
-     * @param {Function}        callback [This function is passed an error to bubble up]
+     * Rovokes the user's current session
+     * @param {Restify.Request} req [The request atached to the session to be destroyed]
+     * @param {Error)       =>  void}        callback [A callback function that gets passed any error that occur in destruction]
      */
-    export function revokeSession(req: Restify.Request, callback : (err:Error) => void) {
-        req.session.destroy( function (err){
-            callback(err);
+    export function revokeSession(req: Restify.Request) : Promise<boolean> {
+        return new Promise<boolean>((resolve, reject) => {    
+            req.session.destroy( function (err){
+                if(err){
+                    resolve(false);
+                }
+                else{
+                    resolve(true);
+                }
+            });
         });
     }
 
     /**
-     * Destroys the all of the users sessions.  This is to be used on password change/reset, 
-     * user request (Log out all my devices), and account compromise.
-     * @param {Restify.Request} req [The request whose session we wish to destroy]
-     * @param {Function}        callback [This function is passed an error to bubble up]
+     * Rovokes all of the sessions attached to the user
+     * @param  {Restify.Request}  req [The request that houses one of the user's session]
+     * @return {Promise<boolean>} 
      */
     export function revokeSessions(req: Restify.Request) : Promise<boolean>{
         return new Promise<boolean>((resolve, reject) => {
