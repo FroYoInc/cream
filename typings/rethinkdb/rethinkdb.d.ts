@@ -14,7 +14,7 @@ declare module "rethinkdb" {
 
   export function dbCreate(name:string):Expression<any>;
   export function dbCreate(name:string):Operation<CreateResult>;
-  export function dbDrop(name:string):Operation<DropResult>;
+  export function dbDrop(name:string):Expression<any>;
   export function dbList():Expression<any>;
 
   export function db(name:string):Db;

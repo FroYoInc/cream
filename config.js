@@ -20,6 +20,18 @@ var join = function(a, b) {
   return path.join(a, b);
 }
 
+var jo = function(a) {
+  return join(outDir(), a);
+}
+
+var not = function(a) {
+  return '!' + a;
+}
+
+var migratorTest = function() {
+  return jo('integration/dbutils/migrator.spec.js');
+}
+
 module.exports = {
   'tsConfigFile': 'tsconfig.json',
   'tsconfig': tsConfig(),
@@ -27,7 +39,10 @@ module.exports = {
   'package': package,
   'tsOutDir': outDir(),
   'tsFilesGlob': tsConfig().filesGlob,
-  'initFilePath': join(outDir(), 'src/server.js'),
-  'integrationFiles': join(outDir(), 'integration/**/**.spec.js'),
-  'testFiles': join(outDir(), 'test/**/*.spec.js')
+  'initFilePath': jo('src/server.js'),
+  'integrationFiles':  {
+    'stg0': migratorTest(),
+    'stg1': [jo('integration/**/**.spec.js'), not(migratorTest())],
+  },
+  'testFiles': jo('test/**/*.spec.js')
 }
