@@ -1,10 +1,10 @@
 import EmailService = require('../../src/services/email-service');
 import c = require('../../src/config');
 import models = require('../../src/models/models');
+import nodemailer = require('nodemailer');
 
 describe('The Email Service', () => {
   var emailService = null;
-  var mockTransportConfig = null;
   var user : models.User;
 
   beforeEach(() => {
@@ -28,7 +28,7 @@ describe('The Email Service', () => {
 
   it('should allow config options to be changed from the default', () => {
 
-    var emailConfig: EmailService.EmailConfigOptions = {
+    var emailConfig: nodemailer.TransporterConfig = {
       host: 'newhost.com',
       port: 999,
       auth: {

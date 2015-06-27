@@ -2,6 +2,7 @@ import Promise = require('bluebird');
 import r = require('rethinkdb');
 import uuid = require('uuid');
 import EmailService = require('./email-service');
+import nodemailer = require('nodemailer');
 import EmailValidator = require('../validation/email.validator');
 import q = require('../dbutils/query');
 import models = require('../models/models');
@@ -19,6 +20,11 @@ module UserService {
   var userDataTable = 'userData';
   var userNameIndex = 'userName';
   var emailIndex = 'email';
+  var transportConfig : nodemailer.TransporterConfig = null;
+
+  export function setEmailTransportConfig(config: nodemailer.TransporterConfig) {
+  	transportConfig = config;
+  }
 
   function userCreateQuery (user) {
     return r.db(db)
@@ -96,12 +102,25 @@ module UserService {
         id: activationCode,
         userId: user.id
       }
-      var emailService = new EmailService.EmailService();
-      emailService.sendActivation(user, activationCode).done();
+
+
+      function sendActivation() {
+      	var emailService = new EmailService.EmailService();
+
+      	if (transportConfig != null) {
+      	  emailService.transportConfig = transportConfig;
+      	}
+
+      	return () => {
+      	  emailService.sendActivation(user, activationCode).done();
+      	};
+      }
+
       var saveActivationQuery = r.db(db)
         .table(activationTable)
         .insert(activation);
-      return q.run(saveActivationQuery)().return(user);
+
+      return q.run(saveActivationQuery)().then(sendActivation).return(user);
     }
 
     return emailValidator.isValid(email)

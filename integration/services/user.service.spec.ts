@@ -16,6 +16,17 @@ beforeAll((done) => {
     .error(done)
 });
 
+var mailData: any = null;
+beforeEach(() => {
+  // This is set so the email service used within user service does not
+  // actually attempt to send an email.
+  userService.setEmailTransportConfig({
+      send: (mail, callback) => {
+      mailData = mail;
+      }
+    });
+});
+
 afterAll((done) => {
   pool.drain()
     .then(done)
@@ -174,6 +185,7 @@ describe('UserService', () => {
         return _user;
       })
       .then(() => {return activateUser(activationCode)()})
+      .then(() => { expect(mailData).not.toBeNull(); })
       .catch(errors.UserAlreadyActivatedException, _catch)
       .then(checkCaught)
       .catch(fail)
