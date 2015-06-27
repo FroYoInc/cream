@@ -27,3 +27,6 @@ built/
 
 # Vagrant
 .vagrant/
+
+#rethink
+rethinkdb_data/

@@ -18,12 +18,6 @@ var server = restify.createServer({
   version: '0.0.0'
 });
 
-
-//This houses all of the propperties of the session
-// interface MySession extends Restify.Session {
-//   username: string;
-// }
-
 server.use(sessions({
   
   // This should Ideally be random generated on install, that way each
