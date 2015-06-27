@@ -14,8 +14,7 @@ module userControllers{
      */
     export function login(req:Restify.Request,res:Restify.Response,next){
         var p = req.params;
-        // var validReq = _verifyParams(p.email, p.password);
-        var validReq = true;
+        var validReq = _verifyParams(p.email, p.password);
         if(validReq){
             // auth.authenticateUser(req, p.email, p.password)
             auth.authenticateUser(req, 'higgs@lhc.com', "1234")

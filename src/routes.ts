@@ -5,7 +5,7 @@ class routes{
 
     constructor(app:Restify.Server){
         
-        app.get("/users/login/", userControllers.login);
+        app.post("/users/login/", userControllers.login);
         app.get("/users/logout", userControllers.logout);
     }
 }
