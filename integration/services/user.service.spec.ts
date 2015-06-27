@@ -9,13 +9,6 @@ import uuid = require('uuid');
 import r = require('rethinkdb');
 
 enum Caught {Yes};
-var m = new Migrator.Migrator();
-beforeAll((done) => {
-  m.migrate(c.Config.db)
-    .then(done)
-    .error(done)
-});
-
 afterAll((done) => {
   pool.drain()
     .then(done)
