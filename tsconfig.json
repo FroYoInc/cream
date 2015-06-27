@@ -21,6 +21,8 @@
         "./integration/dbutils/migrator.spec.ts",
         "./integration/services/user.service.spec.ts",
         "./src/config.ts",
+        "./src/controllers/controllers.ts",
+        "./src/controllers/create-user.ctrl.ts",
         "./src/dbutils/connection-pool.ts",
         "./src/dbutils/migrator.ts",
         "./src/dbutils/query.ts",

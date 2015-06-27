@@ -2,7 +2,7 @@ import r = require('rethinkdb');
 import restify = require('restify');
 import DBUtils = require('./dbutils/migrator');
 import c  = require('./config');
-import userService = require('services/user-service');
+import Controller = require('./controllers/controllers');
 
 var migrator = new DBUtils.Migrator();
 migrator.migrate(c.Config.db);
