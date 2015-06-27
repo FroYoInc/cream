@@ -1,4 +1,4 @@
-
+import errors = require('../errors/errors');
 import models = require('../models/models');
 import mailer = require('nodemailer');
 import config = require('../config');
@@ -50,7 +50,6 @@ export class EmailService {
 
     var transporter = this.buildTransporter();
 
-
     var mailOptions = {
       from: config.Config.email.name + ' <' + config.Config.email.auth.user + '>',
       to: user.firstName + ' ' + user.lastName + ' <' + user.email + '>',
@@ -64,7 +63,7 @@ export class EmailService {
       transporter.sendMail(mailOptions, (error, sent) => {
         if (error)
         {
-          reject(error);
+          reject(new errors.ActivationCodeSendException(error.message));
           return;
         }
 
