@@ -30,10 +30,10 @@ server.post('/users', function (req, res, next){
   var userInfo = req.body;
 
   //createUser.then()...
-  userService.createUser(userInfo.lastName, userInfo.firstName, userInfo.userName, userInfo.email, userInfo.passwordHash, userInfo.salt).then(res.end());
+  //userService.createUser(userInfo.lastName, userInfo.firstName, userInfo.userName, userInfo.email, userInfo.passwordHash, userInfo.salt).then(res.end());
   //userService.createUser('Smith','Bill', 'EpicRidezFTW', 'bsmith@email.com', 'password', 'salt').then(res.end());
 
-  //res.end();
+  res.end();
 });
 
 server.listen(c.Config.app.port, function() {
