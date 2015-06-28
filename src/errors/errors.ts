@@ -49,5 +49,20 @@ module Errors {
       super('test exception');
     }
   }
+  export class UndefinedUserObject extends Exception {
+    constructor(){
+      super("Used object is undefined.")
+    }
+  }
+  export class InvalidUserObject extends Exception {
+    constructor(){
+      super("User Object is missing one or more required fields")
+    }
+  }
+  export class SessionUserID extends Exception {
+    constructor(){
+      super("Session userID is undefined.")
+    }
+  }
 }
 export = Errors
