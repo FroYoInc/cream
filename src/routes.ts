@@ -1,6 +1,6 @@
 import Restify = require('restify');
 import userControllers = require('./controllers/users');
-import ActivationControllers = require('./controllers/activation.ctrl');
+import ActivationController = require('./controllers/activation.ctrl');
 
 class routes{
 
@@ -8,7 +8,7 @@ class routes{
 
         app.post("/users/login/", userControllers.login);
         app.get("/users/logout", userControllers.logout);
-        app.get('/activate/:activate', ActivationControllers.activate);
+        app.get('/activate/:activate', ActivationController.activate);
     }
 }
 
