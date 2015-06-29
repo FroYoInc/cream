@@ -1,4 +1,5 @@
 import r = require('rethinkdb');
+import uuid = require('uuid');
 import q = require('../src/dbutils/query');
 import models = require('../src/models/models')
 
@@ -12,5 +13,8 @@ module Utils {
     return q.run(findUserActivationCodeQuery)()
       .then((result) => {return result.id})
   }
+
+  export function rs() {return uuid.v4();}
+  export function em() {return rs() + '@example.com';}
 }
 export = Utils;

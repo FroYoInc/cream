@@ -1,8 +1,11 @@
 import restify = require('restify');
+import utils = require('../utils');
 import ac = require('../../src/controllers/activation.ctrl');
+import userService = require('../../src/services/user-service');
 
 describe('Activation controller', () => {
   xit('should activate a user given valid activation code', (done) => {
+
     // var req = {
     //   params: {'activate': 'invalidactivationcode'}
     // };

@@ -52,8 +52,8 @@ describe('UserService', () => {
     }
   }
 
-  function rs() {return uuid.v4();}
-  function em() {return rs() + '@example.com';}
+  function rs() {return utils.rs()}
+  function em() {return utils.em()}
 
   it('should create a user', (done) => {
     doesUserExist('testUser')()
