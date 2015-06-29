@@ -7,22 +7,22 @@ import Promise = require('bluebird');
 
 module ActivationController {
   export function activate (req:Restify.Request,res:Restify.Response,next){
-    var authenticate = req.params.auth;
-    //take out after integration tests have passed 
+    var activate = req.params.activate;
+    //take out after integration tests have passed
     var create_user = userService.createUser (
-      'firstname', 'lastname',
-      'username', 'email@email.com',
+      'bob', 'lino',
+      'username2', 'email2@email3@com',
       'phash', 'salt')
 
 
-    userService.activateUser(authenticate)
+    userService.activateUser(activate)
       .then((user) => {
       console.log(user)
       })
       .catch((err) => {
         console.error(err)
       });
-    console.log("req.params.auth:" + req.params.auth);
+    console.log("req.params.activate:" + req.params.activate);
     res.send(200);
     next();
   }
