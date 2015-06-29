@@ -22,6 +22,7 @@
         "./integration/services/user.auth.spec.ts",
         "./integration/services/user.service.spec.ts",
         "./src/config.ts",
+        "./src/controllers/activation.ctrl.ts",
         "./src/controllers/users.ts",
         "./src/dbutils/connection-pool.ts",
         "./src/dbutils/migrator.ts",
