@@ -27,6 +27,7 @@
     "nodemailer": "^1.3.4",
     "restify": "^3.0.2",
     "rethinkdb": "^2.0.0-1",
+    "session-rethinkdb": "^1.0.5",
     "uuid": "^2.0.1"
   },
   "devDependencies": {
