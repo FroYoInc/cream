@@ -6,9 +6,16 @@
 /// <reference path="../node/node.d.ts" />
 /// <reference path="../bunyan/bunyan.d.ts" />
 
+declare module Restify {
+  export interface Server {}
+  export interface Request {}
+  export interface Response {}
+}
+
 declare module "restify" {
   import http = require('http');
   import bunyan = require('bunyan');
+
 
 
   interface addressInterface {
@@ -17,7 +24,7 @@ declare module "restify" {
     address: string;
   }
 
-  interface Request extends http.ServerRequest {
+  interface Request extends http.ServerRequest, Restify.Request {
     header: (key: string, defaultValue?: string) => any;
     accepts: (type: string) => boolean;
     is: (type: string) => boolean;
@@ -32,12 +39,11 @@ declare module "restify" {
     secure: boolean;
     time: number;
     params: any;
-
     body?: any; //available when bodyParser plugin is used
     isSecure: () => boolean;
   }
 
-  interface Response extends http.ServerResponse {
+  interface Response extends http.ServerResponse, Restify.Response {
     header: (key: string, value ?: any) => any;
     cache: (type?: any, options?: Object) => any;
     status: (code: number) => any;
@@ -51,7 +57,7 @@ declare module "restify" {
     id: string;
   }
 
-  interface Server extends http.Server {
+  interface Server extends http.Server, Restify.Server {
     use(handler: RequestHandler, ...handlers: RequestHandler[]): any;
     use(handler: RequestHandler[], ...handlers: RequestHandler[]): any;
     use(handler: RequestHandler, ...handlers: RequestHandler[][]): any;

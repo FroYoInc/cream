@@ -65,8 +65,6 @@ server.get('/flavors', function(req, res, next) {
   next();
 });
 
-
-
 server.listen(c.Config.app.port, function() {
   console.log('> %s listening on %s', server.name, server.url);
 });

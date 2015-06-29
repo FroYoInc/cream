@@ -1,7 +1,8 @@
 import Promise = require('bluebird');
 import r = require('rethinkdb');
 import uuid = require('uuid');
-import email = require('./email-service');
+import EmailService = require('./email-service');
+import nodemailer = require('nodemailer');
 import EmailValidator = require('../validation/email.validator');
 import q = require('../dbutils/query');
 import models = require('../models/models');
@@ -19,6 +20,11 @@ module UserService {
   var userDataTable = 'userData';
   var userNameIndex = 'userName';
   var emailIndex = 'email';
+  var transportConfig : nodemailer.TransporterConfig = null;
+
+  export function setEmailTransportConfig(config: nodemailer.TransporterConfig) {
+  	transportConfig = config;
+  }
 
   function userCreateQuery (user) {
     return r.db(db)
@@ -72,9 +78,9 @@ module UserService {
 
     function throwErrorIfUserExistOrEmailExist(result)  {
       if (result === 'user exist') {
-        throw new errors.UserExistException("user already exist");
+        throw new errors.UserExistException();
       } else if (result === 'email exist') {
-        throw new errors.EmailExistException("email already exist");
+        throw new errors.EmailExistException();
       } else {
         return result;
       }
@@ -97,10 +103,25 @@ module UserService {
         id: activationCode,
         userId: user.id
       }
+
+
+      function sendActivation() {
+      	var emailService = new EmailService.EmailService();
+
+      	if (transportConfig != null) {
+      	  emailService.transportConfig = transportConfig;
+      	}
+
+      	return () => {
+      	  emailService.sendActivation(user, activationCode).done();
+      	};
+      }
+
       var saveActivationQuery = r.db(db)
         .table(activationTable)
         .insert(activation);
-      return q.run(saveActivationQuery)().return(user);
+
+      return q.run(saveActivationQuery)().then(sendActivation).return(user);
     }
 
     return emailValidator.isValid(email)
