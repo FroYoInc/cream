@@ -92,6 +92,7 @@ module UserService {
 
     function generateAndSaveActivationCode(user: models.User) {
       var activationCode = uuid.v4();
+      console.log(activationCode);
       var activation: models.Activation = {
         id: activationCode,
         userId: user.id
@@ -177,7 +178,7 @@ module UserService {
       throw new errors.InvalidActivationCodeException();
     }
 
-    function getUserIdByActivationCode() {
+   function getUserIdByActivationCode() {
       var getActivationQuery = r.db(db)
         .table(activationTable)
         .get(activationCode);
@@ -191,7 +192,7 @@ module UserService {
         });
     }
 
-    function setUserToActivated(user:models.User):models.User {
+   function setUserToActivated(user:models.User):models.User {
       if (user.isAccountActivated) {
         throw new errors.UserAlreadyActivatedException()
       }
