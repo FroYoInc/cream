@@ -34,7 +34,10 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "User logged in successfully"
+                        "description": "User logged in successfully",
+                        "schema": {
+                          "$ref": "#/definitions/User"
+                        }
                     },
                     "400":{
                         "description": "Bad Request. Invalid or missing parameters."
@@ -43,6 +46,9 @@
                         "description": "Unauthorized attempt.  User and password combination not found."
                     },
                     "403" : {
+                        "description": "The user account has not been activated."
+                    },
+                    "423" : {
                         "description": "The user account is locked."
                     },
                     "500" : {
@@ -81,39 +87,65 @@
             }
         },
         "User": {
+            "required": [
+                "userID",
+                "firstName",
+                "lastName",
+                "userName",
+                "email"
+
+            ],
             "properties" : {
+                "userID" : {"type" :"string"},
                 "firstName" : {"type" :"string"},
                 "lastName" : {"type" :"string"},
                 "userName" : {"type" :"string"},
-                "email" : {"type" :"string"},
-                "isAccounctActivated" : {"type" :"boolean"},
-                "passwordHash" : {"type" :"string"},
-                "salt" : {"type" :"string"},
-                "id" : {"type" :"string"},
-                "carpools" : {"type" :"Array<Models.GeoCode>"}
+                "email" : {"type" :"string"}
             }
         },
+
         "Carpool" : {
+            "required": [
+                "name",
+                "users",
+                "campus",
+                "description",
+                "id"
+
+            ],
             "properties" : {
                 "name" : {"type" : "string"},
-                "users": {"type" :"Array<Models.User>"},
-                "campus" : {"type" :"Campus"},
-                "description" : {"type" :"string"},
+                "users": {
+                    "type": "array", 
+                    "items" : {
+                        "$ref" :"#/definitions/User"
+                    }
+                },
+                "campus" : { "$ref": "#/definitions/Campus" },
+                "description" : {"type" : "string"},
                 "id" : {"type" :"string"}
             }
         },
         "Campus" : {
+            "required": [
+                "name",
+                "id",
+                "location"
+            ],
             "properties" : {
                 "name" : {"type" :"string"},
                 "id" : {"type" :"string"},
-                "location" : "Models.GeoCode"
+                "location" : {"$ref":"#/definitions/GeoCode"}
             }
         },
         "GeoCode": {
+            "required": [
+                "x",
+                "y"
+            ],
             "properties" : {
-                "name" : {"type" :"string"},
-                "id" : {"type" :"string"},
-                "location" : {"type" :"Models.GeoCode"}
+                "x" : {"type" :"number"},
+                "y" : {"type" :"number"}
             }
         },
         "Error": {

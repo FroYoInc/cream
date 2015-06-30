@@ -11,25 +11,38 @@ class Session {
 }
 
 class Request {
-  session: Session
+  session: Session;
 }
+
+class Response {
+  session: Session;
+}
+
 class Restify {
-  req: Request
+  req: Request;
+  res: Response;
 }
 
 describe('UserAuth', () => {
 
   var good =  new Restify();
-  good.req = new Request()
+  good.req = new Request();
+  good.req = new Response();
   good.req.session = new Session();
   good.req.session["userID"] = 1;
+  good.req.session["firstName"] = "Peter";
+  good.req.session["lastName"] = "Higgs";
+  good.req.session["userName"] = "pHiggs";
+  good.req.session["email"] = "pHiggs@lhc.com";
+
 
   var bad = new Restify();
   bad.req = new Request();
   bad.req.session = new Session();
   
   var goodUser: models.User;
-  var badUser: models.User;
+  var nonExistantUser: models.User;
+  var unactivatedUser: models.User;
   var userData : models.UserData;
 
   var password = "1234";
@@ -42,12 +55,22 @@ describe('UserAuth', () => {
         lastName: 'Higgs',
         userName: 'pHiggs',
         email: 'higgs@lhc.com',
-        isAccountActivated: false,
+        isAccountActivated: true,
         passwordHash: hash,
         salt: salt
   };
 
-  badUser = {
+  unactivatedUser = {
+        id: '234567890',
+        firstName: 'Bill',
+        lastName: 'Nye',
+        userName: 'bNye',
+        email: 'bNye@lhc.com',
+        isAccountActivated: false,
+        passwordHash: hash,
+        salt: salt
+  };
+  nonExistantUser = {
         id: undefined,
         firstName: 'Peter',
         lastName: 'Higgs',
@@ -72,6 +95,7 @@ describe('UserAuth', () => {
   var test400 = (result) => {expect(result).toBe(400);}
   var test401 = (result) => {expect(result).toBe(401);}
   var test403 = (result) => {expect(result).toBe(403);}
+  var test423 = (result) => {expect(result).toBe(423);}
   var test500 = (result) => {expect(result).toBe(500);}
 
 
@@ -145,7 +169,7 @@ describe('UserAuth', () => {
       userServ.updateUserData(userData)
         .then( () => {
           authUser(bad.req, goodUser.email, "thisIsNotMyPassword")
-            .then(test403)
+            .then(test423)
             .error(fail)
             .finally(done); 
         });
@@ -153,10 +177,21 @@ describe('UserAuth', () => {
   });
 
   it('should reject a login for a non existent user.', (done) => {
-    authUser(bad.req, badUser.email, password)
+    authUser(bad.req, nonExistantUser.email, password)
       .then(test500)
       .error(fail)
       .finally(done);
+  });
+
+  it('should reject a login for an unactivated user.', (done) => {
+    query.run(
+        r.db('froyo').table('users').insert(unactivatedUser)
+    )().then( () => {
+        authUser(bad.req, unactivatedUser.email, password)
+          .then(test403)
+          .error(fail)
+          .finally(done);
+      });
   });
 
   it('should revoke all of the users sessions', (done) => {
@@ -172,7 +207,7 @@ describe('UserAuth', () => {
   });
 
   it('should fail to create a user session when required fields are not defined in the user', (done) => {
-      createUserSession(bad.req, badUser)
+      createUserSession(bad.req, nonExistantUser)
       .then(fail)
       .catch(errors.InvalidUserObject, done)
   });

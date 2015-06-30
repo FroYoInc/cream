@@ -6,7 +6,9 @@ import models = require('../models/models');
 import Promise = require('bluebird');
 import bcrypt = require("bcrypt");
 import errors = require('../errors/errors');
-import c = require('../config')
+import c = require('../config');
+import pv = require('../validation/parameter-validator');
+
 module UserAuth{
 
     /**
@@ -16,11 +18,14 @@ module UserAuth{
      */
     export function checkAuth(req: Restify.Request): Promise<boolean>{
         return new Promise<boolean>((resolve, reject) => {
-            if (req.session === undefined || req.session['userID'] === undefined){
+            if (req.session === undefined){
                 resolve(false)
             }
             else{
-                resolve(true);
+                var s = req.session;
+                var result = pv.verifyParams(s['userID'], s["firstName"], s["lastName"], 
+                                                 s['userName'], s["email"]);
+                resolve(result);
             }
         });
 
@@ -39,19 +44,22 @@ module UserAuth{
         return new Promise<number>((resolve, reject) => {
             userSer.getUserByEmail(em)
               .then( (user) => {
-                if(user.salt !== undefined){
+                if(user.isAccountActivated === false){
+                    resolve(403);
+                }
+                else if(user.salt !== undefined){
 
                     _checkLock(user).then( (unlocked) => {
                         if(unlocked){
                             _hashHandler(req, pass, user, resolve, reject);
                         }
                         else{
-                            resolve(403);
+                            resolve(423);
                         }
                     });
                     
                 }
-                else{
+                else {
                     throw new errors.InvalidUserObject();
                 }
 
@@ -60,7 +68,6 @@ module UserAuth{
             });
 
         });
-
     }
 
     function _hashHandler(req : Restify.Request, pass:String, user:models.User, resolve, reject){
@@ -81,6 +88,7 @@ module UserAuth{
             }
         });
     }
+
     function _checkLock(user: models.User ) : Promise<boolean>{
         return new Promise<boolean>((resolve, reject) => {
         
@@ -102,6 +110,7 @@ module UserAuth{
                     // The user has exceeeded their allowed number of failed attempts
                     if(userData.numLoginAttempts >= c.Config.loginLock.max){
                         
+                        // Set the lock
                         if(userData.lockoutExpiration === 0 || userData.lockoutExpiration === undefined){
                             userData.lockoutExpiration = now + c.Config.loginLock.lockoutTime;
                             userSer.updateUserData(userData).then( (userData) => {
@@ -162,13 +171,21 @@ module UserAuth{
             if (user == undefined){
                 throw new errors.UndefinedUserObject();
             }
-            else if( user.id == undefined){
-                throw new errors.InvalidUserObject();
-            }
             else{
-                req.session["userID"] = user.id;
+                var valid = pv.verifyParams(user.id, user.firstName, user.lastName, 
+                                                user.userName, user.email)
+                if(valid){
+                    req.session["userID"] = user.id;
+                    req.session["firstName"] = user.firstName;
+                    req.session["lastName"] = user.lastName;
+                    req.session["userName"] = user.userName;
+                    req.session["email"] = user.email;
+                    resolve(true);
+                }
+                else{
+                    throw new errors.InvalidUserObject();
+                }
 
-                resolve(true);
             }
         });
     }
