@@ -7,8 +7,6 @@ class routes{
 
         server.post("/users/login/", userControllers.login);
         server.get("/users/logout", userControllers.logout);
-
-        
         
         /*********** Documentation routes ***********/
         
@@ -17,6 +15,7 @@ class routes{
             res.header('Location', '/docs/');
             res.send(302);
         });
+
         server.get(/\/docs\/?.*/, Restify.serveStatic({directory: './swagger',default: 'index.html'}));
 
     }

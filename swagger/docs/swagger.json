@@ -42,6 +42,9 @@
                     "401" : {
                         "description": "Unauthorized attempt.  User and password combination not found."
                     },
+                    "403" : {
+                        "description": "The user account is locked."
+                    },
                     "500" : {
                         "description" : "Internal Server error."
                     }

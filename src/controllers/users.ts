@@ -17,13 +17,8 @@ module userControllers{
         var validReq = _verifyParams(p.email, p.password);
         if(validReq){
             auth.authenticateUser(req, p.email, p.password)
-                .then( (success) => {
-                    if(success){
-                        res.send(200);
-                    }
-                    else{
-                        res.send(401);
-                    }
+                .then( (status) => {
+                    res.send(status);
                 }).catch(Error, (err)=> {
                     res.send(500,{"message": err});
                 });
@@ -59,7 +54,7 @@ module userControllers{
      */
     function _verifyParams(...args:any[]) : boolean{
         for(var i = 0; i < arguments.length; ++i){
-            if(arguments[i] == undefined){
+            if(arguments[i] === undefined){
                 return false;
             }
         }

@@ -1,5 +1,6 @@
 import models = require('../../src/models/models');
 import userAuth = require('../../src/services/user-auth');
+import userServ = require('../../src/services/user-service');
 import errors = require('../../src/errors/errors');
 import bcrypt = require("bcrypt");
 import r = require('rethinkdb');
@@ -29,6 +30,7 @@ describe('UserAuth', () => {
   
   var goodUser: models.User;
   var badUser: models.User;
+  var userData : models.UserData;
 
   var password = "1234";
   var salt = bcrypt.genSaltSync(10);
@@ -46,7 +48,7 @@ describe('UserAuth', () => {
   };
 
   badUser = {
-        id: null,
+        id: undefined,
         firstName: 'Peter',
         lastName: 'Higgs',
         userName: 'pHiggs',
@@ -56,8 +58,24 @@ describe('UserAuth', () => {
         salt: 'andPepper'
   };
 
+  userData = {
+    id: goodUser.id,
+    activationCode: "thisDoesn'tMatter",
+    numLoginAttempts: 0,
+    lockoutExpiration: 0,
+  }
+
   var testFalse = (result) => {expect(result).toBe(false);}
   var testTrue = (result) => {expect(result).toBe(true);}
+
+  var test200 = (result) => {expect(result).toBe(200);}
+  var test400 = (result) => {expect(result).toBe(400);}
+  var test401 = (result) => {expect(result).toBe(401);}
+  var test403 = (result) => {expect(result).toBe(403);}
+  var test500 = (result) => {expect(result).toBe(500);}
+
+
+
 
   function checkAuth(req){
     return userAuth.checkAuth(req);
@@ -100,18 +118,43 @@ describe('UserAuth', () => {
 
       query.run(
           r.db('froyo').table('users').insert(goodUser)
-      )().then(() => {
-        authUser(bad.req, goodUser.email, password)
-          .then(testTrue)
-          .error(fail)
-          .finally(done);
-      });
+      )()
+        .then( () => {
+          query.run(
+              r.db('froyo').table('userData').insert(userData)
+          )()
+        })
+        .then(() => {
+          authUser(bad.req, goodUser.email, password)
+            .then(test200)
+            .error(fail)
+            .finally(done);
+        });
 
   });
 
-  it('should reject an invalid user login', (done) => {
+  it('should reject an invalid user/password combination', (done) => {
+    authUser(bad.req, goodUser.email, "thisIsNotMyPassword")
+      .then(test401)
+      .error(fail)
+      .finally(done);
+  });
+
+  it('should reject an lockout a user after 5 attempts', (done) => {
+      userData.numLoginAttempts = 5;
+      userServ.updateUserData(userData)
+        .then( () => {
+          authUser(bad.req, goodUser.email, "thisIsNotMyPassword")
+            .then(test403)
+            .error(fail)
+            .finally(done); 
+        });
+
+  });
+
+  it('should reject a login for a non existent user.', (done) => {
     authUser(bad.req, badUser.email, password)
-      .then(testFalse)
+      .then(test500)
       .error(fail)
       .finally(done);
   });
