@@ -29,6 +29,11 @@ module Errors {
       super('user not found');
     }
   }
+  export class UserNameValidationException extends Exception {
+    constructor(message: string) {
+      super(message);
+    }
+  }
   export class InvalidActivationCodeException extends Exception {
     constructor() {
       super('invalid activation code');
