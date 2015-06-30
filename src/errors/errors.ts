@@ -39,6 +39,11 @@ module Errors {
       super('user already activated');
     }
   }
+  export class ActivationCodeSendException extends Exception {
+    constructor(public message : string) {
+      super(message);
+    }
+  }
   export class TestException extends Exception {
     constructor() {
       super('test exception');

@@ -40,6 +40,7 @@
         "./src/validation/email.validator.ts",
         "./src/validation/validation.ts",
         "./test/serverTest.ts",
+        "./test/services/email-service.spec.ts",
         "./test/services/user-service.spec.ts",
         "./typings/bluebird/bluebird.d.ts",
         "./typings/bcrypt/bcrypt.d.ts",
