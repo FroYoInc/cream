@@ -15,6 +15,9 @@ function getValidActivationCode():Promise<string> {
     .then(utils.findUserActivationCode)
 }
 
+// A wrapper around ActivationCtrl.activate(). This returns a Promise
+// and it is only fufilled when, ActivationCtrl.activate() method calls
+// its next() function
 function activate(req: restify.Request, res: restify.Response):Promise<void> {
   return new Promise<void>((resolve, reject) => {
     function next() {resolve(null);}
@@ -23,15 +26,19 @@ function activate(req: restify.Request, res: restify.Response):Promise<void> {
 }
 
 describe('Activation controller', () => {
-  it('should activate a user given valid activation code', (done) => {
+  it('should activate a user and redirect request to login page', (done) => {
 
-    function test(arg) {
-      console.log(arg)
-      expect(arg).toBe(200);
+    function test0(statusCode) {
+      expect(statusCode).toBe(302);
+    }
+
+    function test1(header, location) {
+      expect(header).toBe('Location');
+      expect(location).toBe('/login');
     }
 
     var req = <restify.Request> {params: {'activate': ''}};
-    var res = <restify.Response> {send: test};
+    var res = <restify.Response> {send: test0, header: test1};
 
     getValidActivationCode()
       .then((activationCode) => {
@@ -45,11 +52,23 @@ describe('Activation controller', () => {
       .finally(done)
   });
 
-  xit('should redirect to login page given valid activation code', (done) => {
-    done();
-  });
+  it('should redirect to an error page given invalid activation code', (done) => {
 
-  xit('should redirect to an error page given invalid activation code', (done) => {
-    done();
+    function test0(statusCode) {
+      expect(statusCode).toBe(302);
+    }
+
+    function test1(header, location) {
+      expect(header).toBe('Location');
+      expect(location).toBe('/invalid-activation');
+    }
+
+    var req = <restify.Request> {params: {'activate': 'invalidcode'}};
+    var res = <restify.Response> {send: test0, header: test1};
+
+    activate(req, res)
+      .catch(fail)
+      .error(fail)
+      .finally(done);
   })
 })

@@ -19,6 +19,7 @@ module ActivationController {
       .then((user) => {
         //TODO: Activation was successfull. Refirect request to
         // url /login
+        // Checkout here for redirection: http://stackoverflow.com/questions/18613953/redirecting-client-with-nodejs-and-restify
         console.log(user);
       })
       .catch((err) => {
