@@ -1,0 +1,131 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "Corpool",
+        "description": "Get to know your co-workers while saving the world.",
+        "version": "1.0.0"
+    },
+    "host": "localhost:8080",
+    "schemes": [
+        "http"
+    ],
+
+    "produces": [
+        "application/json"
+    ],
+    "paths": {
+        "/users/login": {
+            "post": {
+                "summary": "Log the user in.",
+                "description": "\n This end point takes a user's email and password in a JSON object and then attempts to log them in and create a session object for them.",
+                "parameters": [
+                    {
+                        "name": "LoginInfo",
+                        "in": "body",
+                        "description": "JSON object containing the email and password for the user to log in.",
+                        "required": true,
+                        "schema": {
+                          "$ref": "#/definitions/LoginInfo"
+                        }
+                    }
+                ],
+                "tags": [
+                    "User"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User logged in successfully"
+                    },
+                    "400":{
+                        "description": "Bad Request. Invalid or missing parameters."
+                    },
+                    "401" : {
+                        "description": "Unauthorized attempt.  User and password combination not found."
+                    },
+                    "500" : {
+                        "description" : "Internal Server error."
+                    }
+                }
+            }
+        },
+        "/users/logout": {
+            "get": {
+                "summary": "Logout the user.",
+                "description": "\nDestroys the current user's session and redirects them to '/' ",
+                "tags": [
+                    "User"
+                ],
+                "responses": {
+                    "302": {
+                        "description": "Logout successful, redirecting to '/' "
+                    },
+                    "500" : {
+                        "description" : "Internal Server error."
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "LoginInfo" : {
+            "required": [
+                "email",
+                "password"
+            ],
+            "properties" : {
+                "email" : { "required": true, "type" :"string"},
+                "password" : { "required": true, "type" :"string"}
+            }
+        },
+        "User": {
+            "properties" : {
+                "firstName" : {"type" :"string"},
+                "lastName" : {"type" :"string"},
+                "userName" : {"type" :"string"},
+                "email" : {"type" :"string"},
+                "isAccounctActivated" : {"type" :"boolean"},
+                "passwordHash" : {"type" :"string"},
+                "salt" : {"type" :"string"},
+                "id" : {"type" :"string"},
+                "carpools" : {"type" :"Array<Models.GeoCode>"}
+            }
+        },
+        "Carpool" : {
+            "properties" : {
+                "name" : {"type" : "string"},
+                "users": {"type" :"Array<Models.User>"},
+                "campus" : {"type" :"Campus"},
+                "description" : {"type" :"string"},
+                "id" : {"type" :"string"}
+            }
+        },
+        "Campus" : {
+            "properties" : {
+                "name" : {"type" :"string"},
+                "id" : {"type" :"string"},
+                "location" : "Models.GeoCode"
+            }
+        },
+        "GeoCode": {
+            "properties" : {
+                "name" : {"type" :"string"},
+                "id" : {"type" :"string"},
+                "location" : {"type" :"Models.GeoCode"}
+            }
+        },
+        "Error": {
+            "properties": {
+                "code": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "fields": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}
