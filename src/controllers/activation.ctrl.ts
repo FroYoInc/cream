@@ -9,20 +9,24 @@ module ActivationController {
   export function activate (req:Restify.Request,res:Restify.Response,next){
     var activate = req.params.activate;
     //take out after integration tests have passed
-    var create_user = userService.createUser (
-      'bob', 'lino',
-      'username2', 'email2@email3@com',
-      'phash', 'salt')
+    // var create_user = userService.createUser (
+    //   'bob', 'lino',
+    //   'username2', 'email2@email3@com',
+    //   'phash', 'salt')
 
 
     userService.activateUser(activate)
       .then((user) => {
-      console.log(user)
+        //TODO: Activation was successfull. Refirect request to
+        // url /login
+        console.log(user);
       })
       .catch((err) => {
+        //TODO: Activation was unsuccessful. Redirect request
+        // to url /activation-invalid
         console.error(err)
       });
-    console.log("req.params.activate:" + req.params.activate);
+    // console.log("req.params.activate:" + req.params.activate);
     res.send(200);
     next();
   }

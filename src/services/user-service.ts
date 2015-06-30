@@ -98,7 +98,7 @@ module UserService {
 
     function generateAndSaveActivationCode(user: models.User) {
       var activationCode = uuid.v4();
-      console.log(activationCode);
+      // console.log(activationCode);
       var activation: models.Activation = {
         id: activationCode,
         userId: user.id
