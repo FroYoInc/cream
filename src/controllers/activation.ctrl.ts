@@ -11,7 +11,7 @@ module ActivationController {
     //take out after integration tests have passed
     var create_user = userService.createUser (
       'bob', 'lino',
-      'username2', 'email2@email3@com',
+      'username5', 'email5@email3@com',
       'phash', 'salt')
 
 
