@@ -18,8 +18,10 @@
         "!./node_modules/**/*.ts"
     ],
     "files": [
+        "./integration/controllers/create-user.ctrl.spec.ts",
         "./integration/dbutils/migrator.spec.ts",
         "./integration/services/user.service.spec.ts",
+        "./integration/utils.ts",
         "./src/config.ts",
         "./src/controllers/controllers.ts",
         "./src/controllers/create-user.ctrl.ts",
