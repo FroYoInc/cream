@@ -9,6 +9,11 @@ export class Config {
     'baseurl' : 'http://localhost'
   };
 
+  static validator = {
+    minUserNameLength: 3,
+    maxUserNameLength: 255
+  };
+
   /**
    * Email options, this is used for now until the administration story.
    * All available options can be found here:
