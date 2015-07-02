@@ -18,7 +18,7 @@ module ActivationController {
     userService.activateUser(activate)
       .then((user) => {
         //TODO: Activation was successfull. Refirect request to
-        req.header('Location', '/login');
+        res.header('Location', '/login');
         res.send(302);
         // url /login
         // Checkout here for redirection: http://stackoverflow.com/questions/18613953/redirecting-client-with-nodejs-and-restify
@@ -26,7 +26,7 @@ module ActivationController {
       })
       .catch((err) => {
         //TODO: Activation was unsuccessful. Redirect request
-        req.header ('Location', '/invalid-activation');
+        res.header ('Location', '/invalid-activation');
         res.send(302);
         // to url /activation-invalid
         console.error(err)
