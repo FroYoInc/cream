@@ -6,6 +6,8 @@ import models = require('../models/models');
 import Promise = require('bluebird');
 import bcrypt = require("bcrypt");
 import errors = require('../errors/errors');
+import c = require('../config');
+import pv = require('../validation/parameter-validator');
 
 module UserAuth{
 
@@ -16,11 +18,14 @@ module UserAuth{
      */
     export function checkAuth(req: Restify.Request): Promise<boolean>{
         return new Promise<boolean>((resolve, reject) => {
-            if (req.session == undefined || req.session['userID'] == undefined){
+            if (req.session === undefined){
                 resolve(false)
             }
             else{
-                resolve(true);
+                var s = req.session;
+                var result = pv.verifyParams(s['userID'], s["firstName"], s["lastName"], 
+                                                 s['userName'], s["email"]);
+                resolve(result);
             }
         });
 
@@ -34,38 +39,127 @@ module UserAuth{
      * @param  {string}           pass [The user's plaintext password]
      * @return {Promise<boolean>}      [A promise that the function will return a boolean]
      */
-    export function authenticateUser(req:Restify.Request, em:string, pass:string) : Promise<boolean> {
+    export function authenticateUser(req:Restify.Request, em:string, pass:string) : Promise<number> {
 
-        return new Promise<boolean>((resolve, reject) => {
+        return new Promise<number>((resolve, reject) => {
             userSer.getUserByEmail(em)
               .then( (user) => {
-                if(user.salt !== undefined){
+                if(user.isAccountActivated === false){
+                    resolve(403);
+                }
+                else if(user.salt !== undefined){
 
-                    bcrypt.hash(pass, user.salt , (err, hash) => {
-                        if(err){
-                            reject(err);
+                    _checkLock(user).then( (unlocked) => {
+                        if(unlocked){
+                            _hashHandler(req, pass, user, resolve, reject);
                         }
-                        else if(hash == user.passwordHash){ // Check if the hashes match
-                            userSession(req, user).then( () => {
-                                resolve(true);
-                            }).catch(Error, (err) => {
-                                reject(err);
-                            });
+                        else{
+                            resolve(423);
                         }
                     });
+                    
                 }
-                else{
+                else {
                     throw new errors.InvalidUserObject();
                 }
 
             }).catch(errors.UserNotFoundException, (err) => {
-                resolve(false);
+                resolve(500);
             });
+
+        });
+    }
+
+    function _hashHandler(req : Restify.Request, pass:String, user:models.User, resolve, reject){
+        bcrypt.hash(pass, user.salt, (err, hash) => {
+            if(err){
+                reject(err);
+            }
+            else if(hash === user.passwordHash){ // Check if the hashes match
+                _clearLock(user);
+                userSession(req, user).then( () => {
+                    resolve(200);
+                }).catch(Error, (err) => {
+                    reject(err);
+                });
+            }
+            else {
+                resolve(401);
+            }
+        });
+    }
+
+    function _checkLock(user: models.User ) : Promise<boolean>{
+        return new Promise<boolean>((resolve, reject) => {
+        
+            userSer.getUserData(user.id)
+              .then( (userData) => {
+                // The user has never logged in before.
+                if (userData.numLoginAttempts === undefined){
+                    
+                    userData.numLoginAttempts = 1;
+                    userSer.updateUserData(userData).then( () => {
+                        resolve(true)
+                    });
+                }
+                // The user has logged in before
+                else{
+                    var today = new Date();
+                    var now = today.getTime() ; // The current epoch time
+
+                    // The user has exceeeded their allowed number of failed attempts
+                    if(userData.numLoginAttempts >= c.Config.loginLock.max){
+                        
+                        // Set the lock
+                        if(userData.lockoutExpiration === 0 || userData.lockoutExpiration === undefined){
+                            userData.lockoutExpiration = now + c.Config.loginLock.lockoutTime;
+                            userSer.updateUserData(userData).then( (userData) => {
+                                resolve(false);
+                            });
+                        }
+                        // The lock has expired
+                        else if(userData.lockoutExpiration <= now){
+                            userData.lockoutExpiration = 0;
+                            userData.numLoginAttempts = 1;
+                            userSer.updateUserData(userData).then( (userData) => {
+                                resolve(true);
+                            });
+                        }
+                        // The user account is still locked
+                        else {
+                            resolve(false);
+                        }
+                    }
+                    // The user has yet to exceed the allowed login attempts
+                    else{
+                        userData.numLoginAttempts += 1;
+                        userSer.updateUserData(userData).then( (userData) => {
+                            resolve(true)
+                        });
+                    }
+
+                }
+
+              }).catch(errors.UserDataNotFound, (err) => {
+                  resolve(err);
+              });
 
         });
 
     }
 
+    function _clearLock(user: models.User) {
+        userSer.getUserData(user.id)
+          .then( (userData) => {
+              userData.lockoutExpiration = 0;
+              userData.numLoginAttempts = 0;
+              userSer.updateUserData(userData);
+
+          }).catch(errors.UserDataNotFound, (err) => {
+
+        });
+
+    }
     /**
      * Creates or updates a user session to match the fields in the user object provided
      * @param  {Restify.Request}  req  [The request attached to the session to modified]
@@ -77,13 +171,21 @@ module UserAuth{
             if (user == undefined){
                 throw new errors.UndefinedUserObject();
             }
-            else if( user.id == undefined){
-                throw new errors.InvalidUserObject();
-            }
             else{
-                req.session["userID"] = user.id;
+                var valid = pv.verifyParams(user.id, user.firstName, user.lastName, 
+                                                user.userName, user.email)
+                if(valid){
+                    req.session["userID"] = user.id;
+                    req.session["firstName"] = user.firstName;
+                    req.session["lastName"] = user.lastName;
+                    req.session["userName"] = user.userName;
+                    req.session["email"] = user.email;
+                    resolve(true);
+                }
+                else{
+                    throw new errors.InvalidUserObject();
+                }
 
-                resolve(true);
             }
         });
     }
@@ -113,7 +215,7 @@ module UserAuth{
      */
     export function revokeSessions(req: Restify.Request) : Promise<boolean>{
         return new Promise<boolean>((resolve, reject) => {
-            if(req.session['userID'] != undefined){
+            if(req.session['userID'] !== undefined){
                 var uid = req.session["userID"];
                 query.run(
                     r.db('froyo').table('session').filter({

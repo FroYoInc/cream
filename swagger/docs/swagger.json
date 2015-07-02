@@ -1,0 +1,166 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "Corpool",
+        "description": "Get to know your co-workers while saving the world.",
+        "version": "1.0.0"
+    },
+    "host": "localhost:8080",
+    "schemes": [
+        "http"
+    ],
+
+    "produces": [
+        "application/json"
+    ],
+    "paths": {
+        "/users/login": {
+            "post": {
+                "summary": "Log the user in.",
+                "description": "\n This end point takes a user's email and password in a JSON object and then attempts to log them in and create a session object for them.",
+                "parameters": [
+                    {
+                        "name": "LoginInfo",
+                        "in": "body",
+                        "description": "JSON object containing the email and password for the user to log in.",
+                        "required": true,
+                        "schema": {
+                          "$ref": "#/definitions/LoginInfo"
+                        }
+                    }
+                ],
+                "tags": [
+                    "User"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User logged in successfully",
+                        "schema": {
+                          "$ref": "#/definitions/User"
+                        }
+                    },
+                    "400":{
+                        "description": "Bad Request. Invalid or missing parameters."
+                    },
+                    "401" : {
+                        "description": "Unauthorized attempt.  User and password combination not found."
+                    },
+                    "403" : {
+                        "description": "The user account has not been activated."
+                    },
+                    "423" : {
+                        "description": "The user account is locked."
+                    },
+                    "500" : {
+                        "description" : "Internal Server error."
+                    }
+                }
+            }
+        },
+        "/users/logout": {
+            "get": {
+                "summary": "Logout the user.",
+                "description": "\nDestroys the current user's session and redirects them to '/' ",
+                "tags": [
+                    "User"
+                ],
+                "responses": {
+                    "302": {
+                        "description": "Logout successful, redirecting to '/' "
+                    },
+                    "500" : {
+                        "description" : "Internal Server error."
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "LoginInfo" : {
+            "required": [
+                "email",
+                "password"
+            ],
+            "properties" : {
+                "email" : { "required": true, "type" :"string"},
+                "password" : { "required": true, "type" :"string"}
+            }
+        },
+        "User": {
+            "required": [
+                "userID",
+                "firstName",
+                "lastName",
+                "userName",
+                "email"
+
+            ],
+            "properties" : {
+                "userID" : {"type" :"string"},
+                "firstName" : {"type" :"string"},
+                "lastName" : {"type" :"string"},
+                "userName" : {"type" :"string"},
+                "email" : {"type" :"string"}
+            }
+        },
+
+        "Carpool" : {
+            "required": [
+                "name",
+                "users",
+                "campus",
+                "description",
+                "id"
+
+            ],
+            "properties" : {
+                "name" : {"type" : "string"},
+                "users": {
+                    "type": "array", 
+                    "items" : {
+                        "$ref" :"#/definitions/User"
+                    }
+                },
+                "campus" : { "$ref": "#/definitions/Campus" },
+                "description" : {"type" : "string"},
+                "id" : {"type" :"string"}
+            }
+        },
+        "Campus" : {
+            "required": [
+                "name",
+                "id",
+                "location"
+            ],
+            "properties" : {
+                "name" : {"type" :"string"},
+                "id" : {"type" :"string"},
+                "location" : {"$ref":"#/definitions/GeoCode"}
+            }
+        },
+        "GeoCode": {
+            "required": [
+                "x",
+                "y"
+            ],
+            "properties" : {
+                "x" : {"type" :"number"},
+                "y" : {"type" :"number"}
+            }
+        },
+        "Error": {
+            "properties": {
+                "code": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "fields": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

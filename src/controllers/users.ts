@@ -4,6 +4,8 @@ import auth = require('../services/user-auth');
 import userSer = require('../services/user-service');
 import models = require('../models/models');
 import Promise = require('bluebird');
+import pv = require('../validation/parameter-validator');
+
 
 module userControllers{
 
@@ -14,16 +16,23 @@ module userControllers{
      */
     export function login(req:Restify.Request,res:Restify.Response,next){
         var p = req.params;
-        var validReq = _verifyParams(p.email, p.password);
+        var validReq = pv.verifyParams(p.email, p.password);
         if(validReq){
             auth.authenticateUser(req, p.email, p.password)
-                .then( (success) => {
-                    if(success){
-                        res.send(200);
+                .then( (status) => {
+                    if(status === 200){
+                       res.send(status, {
+                           userID : req.session["userID"],
+                           firstName: req.session["firstName"],
+                           lastName: req.session["lastName"],
+                           userName: req.session["userName"],
+                           email: req.session["email"]
+                       }); 
                     }
                     else{
-                        res.send(401);
+                        res.send(status);
                     }
+
                 }).catch(Error, (err)=> {
                     res.send(500,{"message": err});
                 });
@@ -52,19 +61,7 @@ module userControllers{
         next();
     }
 
-    /**
-     * Takes an unrestricted number of arguments and checks it they are undefined.
-     * @param  {any[]}   ...args [A list of arguments]
-     * @return {boolean}         [This will return true if all of the agruments passed are defined and false otherwise]
-     */
-    function _verifyParams(...args:any[]) : boolean{
-        for(var i = 0; i < arguments.length; ++i){
-            if(arguments[i] == undefined){
-                return false;
-            }
-        }
-        return true;
-    }
+
 }
 
 export = userControllers;

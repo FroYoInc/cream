@@ -38,6 +38,7 @@
         "./src/services/user-auth.ts",
         "./src/services/user-service.ts",
         "./src/validation/email.validator.ts",
+        "./src/validation/parameter-validator.ts",
         "./src/validation/username.validator.ts",
         "./src/validation/validation.ts",
         "./test/serverTest.ts",
