@@ -20,16 +20,15 @@ module Validation {
      * An array of domain names allowed by the validator.
      * @type {Array<string>}
      */
-    private domainWhitelist : Array<string>;
+    public static domainWhitelist : Array<string> = null;
 
     /**
      * Initializes the Email validator.
-     * @param  {Array<string>} domainWhitelist A list of domains that are allowed.
-     *                                         If not specified, the config will
-     *                                         be used.
      */
-    constructor(domainWhitelist?: Array<string>) {
-      this.domainWhitelist = typeof domainWhitelist !== 'undefined' ? domainWhitelist : config.Config.validator.domainWhitelist;
+    constructor() {
+      if (EmailValidator.domainWhitelist == null) {
+        EmailValidator.domainWhitelist = config.Config.validator.domainWhitelist;
+      }
     }
 
     /**
@@ -61,15 +60,15 @@ module Validation {
      *                         false otherwise.
      */
     private isDomainValid(email: string) : boolean {
-      if (this.domainWhitelist.length == 0) {
+      if (EmailValidator.domainWhitelist.length == 0) {
         return true;
       }
-      
+
       var emailDomain = this.getEmailDomain(email);
 
-      for (var index = 0; index < this.domainWhitelist.length; index++)
+      for (var index = 0; index < EmailValidator.domainWhitelist.length; index++)
       {
-        if (this.domainWhitelist[index].toLowerCase() != emailDomain) {
+        if (EmailValidator.domainWhitelist[index].toLowerCase() != emailDomain) {
           continue;
         }
 
