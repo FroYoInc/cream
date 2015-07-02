@@ -11,7 +11,8 @@ export class Config {
 
   static validator = {
     minUserNameLength: 3,
-    maxUserNameLength: 255
+    maxUserNameLength: 255,
+    domainWhitelist: ['froyo.com']
   };
 
   /**

@@ -33,10 +33,11 @@ describe('Username validator', () => {
 		return result;
 	}
 
-	it('should reject empty an empty string', (done) => {
+	it('should reject an empty string', (done) => {
 		validator.isValid('')
 			.then(expectFalse)
 			.catch(errors.UserNameValidationException, done)
+			.error(done)
 			.finally(done);
 	});
 
@@ -44,6 +45,7 @@ describe('Username validator', () => {
 		validator.isValid('        ')
 			.then(expectFalse)
 			.catch(errors.UserNameValidationException, done)
+			.error(done)
 			.finally(done);
 	});
 

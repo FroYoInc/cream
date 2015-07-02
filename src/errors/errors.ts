@@ -34,6 +34,11 @@ module Errors {
       super(message);
     }
   }
+  export class EmailValidationException extends Exception {
+    constructor(message: string) {
+      super(message);
+    }
+  }
   export class InvalidActivationCodeException extends Exception {
     constructor() {
       super('invalid activation code');
