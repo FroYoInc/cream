@@ -225,6 +225,37 @@ module UserService {
       .then(setUserToActivated)
       .then(updateUser);
   }
+
+  export function getUserData(userID: string) : Promise<models.UserData> {
+    var getUserDataQuery = r.db(db)
+      .table(userDataTable)
+      .get(userID);
+    return q.run(getUserDataQuery)()
+      .then((_result) => {
+        var userData:models.UserData = _result;
+        
+        if(_result === null){
+          throw new errors.UserDataNotFound();
+        }
+
+        return userData;
+      });
+  }
+
+  export function updateUserData(userData:models.UserData):Promise<models.UserData> {
+    assert.equal((userData.id !== null), true,
+      "Trying to update a userData without an id");
+    var updateUserDataQuery = r.db(db)
+      .table(userDataTable)
+      .get(userData.id)
+      .update(userData, {durability: 'hard'});
+    return q.run(updateUserDataQuery)().then(() => {return userData});
+  }
+
+  export function createUserData(userData:models.UserData): Promise<models.UserData> {
+    var insertUserData = r.db(db).table(userDataTable).insert(userData);
+    return q.run(insertUserData)().then(() => {return userData});
+  }
 }
 
 export = UserService;

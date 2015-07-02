@@ -56,17 +56,23 @@ module Errors {
   }
   export class UndefinedUserObject extends Exception {
     constructor(){
-      super("Used object is undefined.")
+      super("Used object is undefined.");
     }
   }
   export class InvalidUserObject extends Exception {
     constructor(){
-      super("User Object is missing one or more required fields")
+      super("User Object is missing one or more required fields");
     }
   }
   export class SessionUserID extends Exception {
     constructor(){
-      super("Session userID is undefined.")
+      super("Session userID is undefined.");
+    }
+  }
+
+  export class UserDataNotFound extends Exception {
+    constructor(){
+      super("No user data found for the corresponding user ID");
     }
   }
 }
