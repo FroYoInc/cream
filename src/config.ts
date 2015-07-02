@@ -37,4 +37,9 @@ export class Config {
     service: 'Gmail',
     //ignoreTLS: false,
   };
+
+  static docs = {
+    dir:"./swagger",
+    defaultFile:"index.html"
+  }
 }
