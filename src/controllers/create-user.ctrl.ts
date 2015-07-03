@@ -8,9 +8,10 @@ import utils = require('../utils/utils');
 import errors = require('../errors/errors');
 
 module CreateUserController {
-  export function createUser(req:restify.Request, res:restify.Response, next:restify.Next) {
+  export function createUser(
+    req:restify.Request, res:restify.Response, next:restify.Next) {
     var userInfo = req.body;
-    
+
     var salt: string;
     function generateAndSetSalt() {
       return utils.genSalt()
