@@ -27,12 +27,14 @@ module Models {
     passwordHash: string;
     salt: string;
     id?: string;
-    carpools?: Array<Models.Carpool>
+    carpools?: Array<Models.Carpool>;
   }
 
   export interface UserData {
     id: string;
     activationCode: string;
+    numLoginAttempts: number;
+    lockoutExpiration: number;
   }
 
   export interface Activation {
