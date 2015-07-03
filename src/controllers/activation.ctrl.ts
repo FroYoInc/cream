@@ -8,31 +8,20 @@ import Promise = require('bluebird');
 module ActivationController {
   export function activate (req:Restify.Request,res:Restify.Response,next){
     var activate = req.params.activate;
-    //take out after integration tests have passed
-    // var create_user = userService.createUser (
-    //   'bob', 'lino',
-    //   'username2', 'email2@email3@com',
-    //   'phash', 'salt')
 
-
-    userService.activateUser(activate)
+     userService.activateUser(activate)
       .then((user) => {
-        //TODO: Activation was successfull. Refirect request to
+        //Activation was successfull. Refirect request to
         res.header('Location', '/login');
         res.send(302);
-        // url /login
-        // Checkout here for redirection: http://stackoverflow.com/questions/18613953/redirecting-client-with-nodejs-and-restify
         console.log(user);
       })
       .catch((err) => {
-        //TODO: Activation was unsuccessful. Redirect request
+       //Activation was unsuccessful. Redirect request
         res.header ('Location', '/invalid-activation');
         res.send(302);
-        // to url /activation-invalid
         console.error(err)
       });
-    // console.log("req.params.activate:" + req.params.activate);
-    //res.send(200);
     next();
   }
 }
