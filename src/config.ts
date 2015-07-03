@@ -9,6 +9,24 @@ export class Config {
     'baseurl' : 'http://localhost'
   };
 
+  /*
+    The maximum number of login attempts and the amount of time
+    to lock the account in minutes.
+   */
+  static loginLock = {
+    max: 5,
+    lockoutTime: 30 * 60000 // Num of minutes times ms in a minute
+  };
+
+  /**
+   * Validator specific configurations, should be moved elsewhere so they can be managed by an administrator.
+   */
+  static validator = {
+    minUserNameLength: 3,
+    maxUserNameLength: 255,
+    domainWhitelist: ['froyo.com']
+  };
+
   /**
    * Email options, this is used for now until the administration story.
    * All available options can be found here:
@@ -28,4 +46,9 @@ export class Config {
     service: 'Gmail',
     //ignoreTLS: false,
   };
+
+  static docs = {
+    dir:"./swagger",
+    defaultFile:"index.html"
+  }
 }

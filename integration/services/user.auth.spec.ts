@@ -1,5 +1,6 @@
 import models = require('../../src/models/models');
 import userAuth = require('../../src/services/user-auth');
+import userServ = require('../../src/services/user-service');
 import errors = require('../../src/errors/errors');
 import bcrypt = require("bcrypt");
 import r = require('rethinkdb');
@@ -10,25 +11,39 @@ class Session {
 }
 
 class Request {
-  session: Session
+  session: Session;
 }
+
+class Response {
+  session: Session;
+}
+
 class Restify {
-  req: Request
+  req: Request;
+  res: Response;
 }
 
 describe('UserAuth', () => {
 
   var good =  new Restify();
-  good.req = new Request()
+  good.req = new Request();
+  good.req = new Response();
   good.req.session = new Session();
   good.req.session["userID"] = 1;
+  good.req.session["firstName"] = "Peter";
+  good.req.session["lastName"] = "Higgs";
+  good.req.session["userName"] = "pHiggs";
+  good.req.session["email"] = "pHiggs@lhc.com";
+
 
   var bad = new Restify();
   bad.req = new Request();
   bad.req.session = new Session();
   
   var goodUser: models.User;
-  var badUser: models.User;
+  var nonExistantUser: models.User;
+  var unactivatedUser: models.User;
+  var userData : models.UserData;
 
   var password = "1234";
   var salt = bcrypt.genSaltSync(10);
@@ -40,13 +55,23 @@ describe('UserAuth', () => {
         lastName: 'Higgs',
         userName: 'pHiggs',
         email: 'higgs@lhc.com',
-        isAccountActivated: false,
+        isAccountActivated: true,
         passwordHash: hash,
         salt: salt
   };
 
-  badUser = {
-        id: null,
+  unactivatedUser = {
+        id: '234567890',
+        firstName: 'Bill',
+        lastName: 'Nye',
+        userName: 'bNye',
+        email: 'bNye@lhc.com',
+        isAccountActivated: false,
+        passwordHash: hash,
+        salt: salt
+  };
+  nonExistantUser = {
+        id: undefined,
         firstName: 'Peter',
         lastName: 'Higgs',
         userName: 'pHiggs',
@@ -56,8 +81,25 @@ describe('UserAuth', () => {
         salt: 'andPepper'
   };
 
+  userData = {
+    id: goodUser.id,
+    activationCode: "thisDoesn'tMatter",
+    numLoginAttempts: 0,
+    lockoutExpiration: 0,
+  }
+
   var testFalse = (result) => {expect(result).toBe(false);}
   var testTrue = (result) => {expect(result).toBe(true);}
+
+  var test200 = (result) => {expect(result).toBe(200);}
+  var test400 = (result) => {expect(result).toBe(400);}
+  var test401 = (result) => {expect(result).toBe(401);}
+  var test403 = (result) => {expect(result).toBe(403);}
+  var test423 = (result) => {expect(result).toBe(423);}
+  var test500 = (result) => {expect(result).toBe(500);}
+
+
+
 
   function checkAuth(req){
     return userAuth.checkAuth(req);
@@ -100,20 +142,56 @@ describe('UserAuth', () => {
 
       query.run(
           r.db('froyo').table('users').insert(goodUser)
-      )().then(() => {
-        authUser(bad.req, goodUser.email, password)
-          .then(testTrue)
-          .error(fail)
-          .finally(done);
-      });
+      )()
+        .then( () => {
+          query.run(
+              r.db('froyo').table('userData').insert(userData)
+          )()
+        })
+        .then(() => {
+          authUser(bad.req, goodUser.email, password)
+            .then(test200)
+            .error(fail)
+            .finally(done);
+        });
 
   });
 
-  it('should reject an invalid user login', (done) => {
-    authUser(bad.req, badUser.email, password)
-      .then(testFalse)
+  it('should reject an invalid user/password combination', (done) => {
+    authUser(bad.req, goodUser.email, "thisIsNotMyPassword")
+      .then(test401)
       .error(fail)
       .finally(done);
+  });
+
+  it('should reject an lockout a user after 5 attempts', (done) => {
+      userData.numLoginAttempts = 5;
+      userServ.updateUserData(userData)
+        .then( () => {
+          authUser(bad.req, goodUser.email, "thisIsNotMyPassword")
+            .then(test423)
+            .error(fail)
+            .finally(done); 
+        });
+
+  });
+
+  it('should reject a login for a non existent user.', (done) => {
+    authUser(bad.req, nonExistantUser.email, password)
+      .then(test500)
+      .error(fail)
+      .finally(done);
+  });
+
+  it('should reject a login for an unactivated user.', (done) => {
+    query.run(
+        r.db('froyo').table('users').insert(unactivatedUser)
+    )().then( () => {
+        authUser(bad.req, unactivatedUser.email, password)
+          .then(test403)
+          .error(fail)
+          .finally(done);
+      });
   });
 
   it('should revoke all of the users sessions', (done) => {
@@ -129,7 +207,7 @@ describe('UserAuth', () => {
   });
 
   it('should fail to create a user session when required fields are not defined in the user', (done) => {
-      createUserSession(bad.req, badUser)
+      createUserSession(bad.req, nonExistantUser)
       .then(fail)
       .catch(errors.InvalidUserObject, done)
   });
