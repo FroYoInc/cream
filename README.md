@@ -25,3 +25,5 @@ The backend API
 1. Make sure you have [`VirtualBox`](https://www.virtualbox.org/wiki/Downloads) and [`Vagrant`](https://www.vagrantup.com/downloads.html) installed
 2. Run `vagrant up` inside `wafflecone/vagrant/`. (Note: the first time you run `vagrant up` it will take some time to download the ubuntu image. After that subsequent `vagrant` commands should be fast)
 3. Optional: to stop the virtual machine run `vagrant halt`. To start the virtual machine from scratch, run `vagrant destroy`. See `vagrant help` for more options
+
+Note: Running on Windows also requires [Python 2.7 for Windows](https://www.python.org/downloads/).  If you encounter any issues with the bcrypt module, there is a helpful Stack Overflow post [here.](http://stackoverflow.com/questions/14573488/error-compiling-bcrypt-node-js)
