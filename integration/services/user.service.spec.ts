@@ -10,13 +10,12 @@ import r = require('rethinkdb');
 
 enum Caught {Yes};
 
-var mailData: any = null;
 beforeEach(() => {
   // This is set so the email service used within user service does not
   // actually attempt to send an email.
   userService.setEmailTransportConfig({
     send: (mail, callback) => {
-      mailData = mail;
+      callback();
     }
   });
 });
