@@ -26,16 +26,22 @@ function activate(req: restify.Request, res: restify.Response):Promise<void> {
 }
 
 describe('Activation controller', () => {
+
+  function test0(statusCode) {
+    expect(statusCode).toBe(302);
+  }
+
+  function test1(header, location) {
+    expect(header).toBe('Location');
+    expect(location).toBe('/login');
+  }
+
+  function test2(header,location) {
+    expect(header).toBe('Location');
+    expect(location).toBe('/invalid-activation');
+  }
+
   it('should activate a user and redirect request to login page', (done) => {
-
-    function test0(statusCode) {
-      expect(statusCode).toBe(302);
-    }
-
-    function test1(header, location) {
-      expect(header).toBe('Location');
-      expect(location).toBe('/login');
-    }
 
     var req = <restify.Request> {params: {'activate': ''}};
     var res = <restify.Response> {send: test0, header: test1};
@@ -54,17 +60,8 @@ describe('Activation controller', () => {
 
   it('should redirect to an error page given invalid activation code', (done) => {
 
-    function test0(statusCode) {
-      expect(statusCode).toBe(302);
-    }
-
-    function test1(header, location) {
-      expect(header).toBe('Location');
-      expect(location).toBe('/invalid-activation');
-    }
-
     var req = <restify.Request> {params: {'activate': 'invalidcode'}};
-    var res = <restify.Response> {send: test0, header: test1};
+    var res = <restify.Response> {send: test0, header: test2};
 
     activate(req, res)
       .catch(fail)

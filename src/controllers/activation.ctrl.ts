@@ -14,13 +14,13 @@ module ActivationController {
         //Activation was successfull. Refirect request to
         res.header('Location', '/login');
         res.send(302);
-        console.log(user);
+        
       })
       .catch((err) => {
        //Activation was unsuccessful. Redirect request
         res.header ('Location', '/invalid-activation');
         res.send(302);
-        console.error(err)
+
       });
     next();
   }
