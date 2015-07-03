@@ -9,6 +9,11 @@ export class Config {
     'baseurl' : 'http://localhost'
   };
 
+  static password = {
+    salt: {
+      rounds: 10
+    }
+  };
   /*
     The maximum number of login attempts and the amount of time
     to lock the account in minutes.

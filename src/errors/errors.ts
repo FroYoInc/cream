@@ -70,5 +70,17 @@ module Errors {
       super("No user data found for the corresponding user ID");
     }
   }
+
+  export class BcryptSaltError extends Exception {
+    constructor(message: string){
+      super(message);
+    }
+  }
+
+  export class BcryptHashError extends Exception {
+    constructor(message: string){
+      super(message);
+    }
+  }
 }
 export = Errors
