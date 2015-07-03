@@ -42,16 +42,8 @@ module CreateUserController {
         });
         next();
       })
-      .catch(errors.UserExistException, (err) => {
+      .catch(errors.UserExistException, errors.EmailExistException, (err) => {
         res.send(409, err)
-        next();
-      })
-      .catch(errors.EmailExistException, (err) => {
-        res.send(409, err)
-        next();
-      })
-      .catch(errors.ActivationCodeSendException, (err) => {
-        res.send(500, err)
         next();
       })
       .catch((err) => {
