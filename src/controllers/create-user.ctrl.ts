@@ -43,12 +43,10 @@ module CreateUserController {
         next();
       })
       .catch(errors.UserExistException, errors.EmailExistException, (err) => {
-        res.send(new restify.ConflictError(err.message))
-        next();
+        next(new restify.ConflictError(err.message))
       })
       .catch((err) => {
-        res.send(new restify.InternalServerError(err.message))
-        next();
+        next(new restify.InternalServerError(err.message))
       });
   }
 }
