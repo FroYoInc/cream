@@ -19,6 +19,15 @@ export class Config {
   };
 
   /**
+   * Validator specific configurations, should be moved elsewhere so they can be managed by an administrator.
+   */
+  static validator = {
+    minUserNameLength: 3,
+    maxUserNameLength: 255,
+    domainWhitelist: ['froyo.com']
+  };
+
+  /**
    * Email options, this is used for now until the administration story.
    * All available options can be found here:
    * https://github.com/andris9/nodemailer-smtp-transport#usage
