@@ -64,7 +64,7 @@ declare class Promise<R> implements Promise.Thenable<R>, Promise.Inspection<R> {
 	catch<U>(ec0:Function, ec1:Function, onReject: (error: any) => U): Promise<U>;
 	catch<U>(ec0:Function, ec1:Function, ec2:Function, onReject: (error: any) => U): Promise<U>;
 	catch<U>(ec0:Function, ec1:Function, ec2:Function, ec3:Function, onReject: (error: any) => U): Promise<U>;
-	catch<U>(ec0:Function, ec1:Function, ec2:Function, ec3:Function, ec4:Function, onReject: (error: any) => U): Promise<U>;
+	catch<U>(ec0:Function, ec1:Function, ec2:Function, ec3:Function, ec4:Function, onReject: (error: Error) => U): Promise<U>;
 	/**
 	 * Like `.catch` but instead of catching all types of exceptions, it only catches those that don't originate from thrown errors but rather from explicit rejections.
 	 */

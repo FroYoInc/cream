@@ -25,7 +25,7 @@ var server = restify.createServer({
 
 //noinspection JSValidateTypes
 server.use(sessions({
-  
+
   // This should Ideally be random generated on install, that way each
   // server will have a different key
   secret: 'thisIsOurSecretKeyDontLoseIt',
@@ -46,8 +46,8 @@ server.use(sessions({
 
 
   // Setting resave to false prevents the session from being saved to
-  // the store when to changes have been made. 
-  resave:false, 
+  // the store when to changes have been made.
+  resave:false,
 
   // This prevents empty sessions from being stored.
   saveUninitialized:false
