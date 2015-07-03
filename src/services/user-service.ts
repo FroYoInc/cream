@@ -110,10 +110,7 @@ module UserService {
       	if (transportConfig != null) {
       	  emailService.transportConfig = transportConfig;
       	}
-
-      	return () => {
-      	  emailService.sendActivation(user, activationCode).done();
-      	};
+    	  return emailService.sendActivation(user, activationCode);
       }
 
       var saveActivationQuery = r.db(db)
@@ -233,7 +230,7 @@ module UserService {
     return q.run(getUserDataQuery)()
       .then((_result) => {
         var userData:models.UserData = _result;
-        
+
         if(_result === null){
           throw new errors.UserDataNotFound();
         }
