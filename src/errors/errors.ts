@@ -29,6 +29,16 @@ module Errors {
       super('user not found', 'UserNotFoundException');
     }
   }
+  export class UserNameValidationException extends Exception {
+    constructor(message: string) {
+      super(message, 'UserNameValidationException');
+    }
+  }
+  export class EmailValidationException extends Exception {
+    constructor(message: string) {
+      super(message, 'EmailValidationException');
+    }
+  }
   export class InvalidActivationCodeException extends Exception {
     constructor() {
       super('invalid activation code', 'InvalidActivationCodeException');
