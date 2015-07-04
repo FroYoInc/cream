@@ -1,4 +1,3 @@
-import EmailValidator = require('../../src/validation/email.validator');
 import userService = require('../../src/services/user-service');
 import Migrator = require('../../src/dbutils/migrator');
 import c = require('../../src/config');
@@ -28,8 +27,7 @@ afterAll((done) => {
 });
 
 describe('UserService', () => {
-  EmailValidator.EmailValidator.domainWhitelist = [];
-
+  userService.setDomainWhiteList([]);
   var fail = (error) => {expect(error).toBeUndefined();}
   var testTrue = (result) => {expect(result).toBe(true);}
   var testFalse = (result) => {expect(result).toBe(false);}

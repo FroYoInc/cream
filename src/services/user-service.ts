@@ -7,9 +7,9 @@ import EmailValidator = require('../validation/email.validator');
 import q = require('../dbutils/query');
 import models = require('../models/models');
 import errors = require('../errors/errors');
+import config = require('../config');
 import assert = require('assert');
 
-var emailValidator = new EmailValidator.EmailValidator();
 
 module UserService {
 
@@ -21,9 +21,16 @@ module UserService {
   var userNameIndex = 'userName';
   var emailIndex = 'email';
   var transportConfig : nodemailer.TransporterConfig = null;
+  var domainWhiteList = config.Config.validator.domainWhitelist;
+  var emailValidator = new EmailValidator.EmailValidator(domainWhiteList);
 
   export function setEmailTransportConfig(config: nodemailer.TransporterConfig) {
   	transportConfig = config;
+  }
+
+  export function setDomainWhiteList(_domainWhiteList:Array<string>) {
+    domainWhiteList = _domainWhiteList;
+    emailValidator = new EmailValidator.EmailValidator(domainWhiteList);
   }
 
   function userCreateQuery (user) {
