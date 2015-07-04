@@ -73,9 +73,62 @@
                     }
                 }
             }
+        },
+        "/users": {
+            "post": {
+                "summary": "Creates a user account.",
+                "description": "\nThis endpoint takes the user's userName, firstName, lastName, email and password in a JSON object and creates an account for them.",
+                "parameters": [
+                    {
+                        "name": "NewAccountInfo",
+                        "in": "body",
+                        "description": "JSON object containing the userName, firstName, lastName, email and password for the account to be created.",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/NewAccountInfo"
+                        }
+                    }
+                ],
+                "tags": [
+                    "User"
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Account created successfully.",
+                        "schema": {
+                            "$ref": "#/definitions/User"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request. Not a valid email or userName."
+                    },
+                    "409": {
+                        "description": "Conflict error.  Email or userName already exists."
+                    },
+                    "500": {
+                        "description": "Internal server error."
+                    }
+                }
+            }
         }
     },
     "definitions": {
+        "NewAccountInfo": {
+            "required": [
+                "userName",
+                "firstName",
+                "lastName",
+                "email",
+                "password"
+            ],
+            "properties": {
+                "userName": {"required": true, "type": "string"},
+                "firstName": {"required": true, "type": "string"},
+                "lastName": {"required": true, "type": "string"},
+                "email": {"required": true, "type": "string"},
+                "password": {"required": true, "type": "string"}
+            }
+        },
         "LoginInfo" : {
             "required": [
                 "email",
