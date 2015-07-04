@@ -18,10 +18,14 @@
         "!./node_modules/**/*.ts"
     ],
     "files": [
+        "./integration/controllers/create-user.ctrl.spec.ts",
         "./integration/dbutils/migrator.spec.ts",
         "./integration/services/user.auth.spec.ts",
         "./integration/services/user.service.spec.ts",
+        "./integration/utils.ts",
         "./src/config.ts",
+        "./src/controllers/controllers.ts",
+        "./src/controllers/create-user.ctrl.ts",
         "./src/controllers/users.ts",
         "./src/dbutils/connection-pool.ts",
         "./src/dbutils/migrator.ts",
@@ -37,6 +41,7 @@
         "./src/services/email-service.ts",
         "./src/services/user-auth.ts",
         "./src/services/user-service.ts",
+        "./src/utils/utils.ts",
         "./src/validation/email.validator.ts",
         "./src/validation/parameter-validator.ts",
         "./src/validation/username.validator.ts",

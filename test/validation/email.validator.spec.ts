@@ -9,8 +9,7 @@ describe('Email Validator', () => {
   var accountNames = ['test.user', 'employee', 'Another_Us.er', 'first+last'];
 
   beforeEach(() => {
-    EmailValidator.EmailValidator.domainWhitelist = whitelistDomains;
-    validator = new EmailValidator.EmailValidator();
+    validator = new EmailValidator.EmailValidator(whitelistDomains);
   });
 
   var expectTrue = (result: any) => {
