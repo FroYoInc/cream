@@ -15,7 +15,7 @@ module Utils {
       .then((result) => {return result.id})
   }
 
-  export function rs() {return uuid.v4();}
+  export function rs() {return uuid.v4().replace(/-/g, '');}
   function vem() {
     return config.Config.validator.domainWhitelist[0];
   }

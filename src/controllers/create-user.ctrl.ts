@@ -38,6 +38,12 @@ module CreateUserController {
         });
         next();
       })
+      .catch(
+        errors.EmailValidationException,
+        errors.UserNameValidationException,
+        (err) => {
+          next(new restify.BadRequestError(err.message));
+      })
       .catch(errors.UserExistException, errors.EmailExistException, (err) => {
         next(new restify.ConflictError(err.message))
       })

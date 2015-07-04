@@ -4,6 +4,7 @@ import uuid = require('uuid');
 import EmailService = require('./email-service');
 import nodemailer = require('nodemailer');
 import EmailValidator = require('../validation/email.validator');
+import UserNameValidator = require('../validation/username.validator');
 import q = require('../dbutils/query');
 import models = require('../models/models');
 import errors = require('../errors/errors');
@@ -23,6 +24,7 @@ module UserService {
   var transportConfig : nodemailer.TransporterConfig = null;
   var domainWhiteList = config.Config.validator.domainWhitelist;
   var emailValidator = new EmailValidator.EmailValidator(domainWhiteList);
+  var userNameValidator = new UserNameValidator.UserNameValidator();
 
   export function setEmailTransportConfig(config: nodemailer.TransporterConfig) {
   	transportConfig = config;
@@ -122,7 +124,12 @@ module UserService {
       return q.run(saveActivationQuery)().then(sendActivation).return(user);
     }
 
+    function isValidUserName() {
+      return userNameValidator.isValid(userName);
+    }
+
     return emailValidator.isValid(email)
+      .then(isValidUserName)
       .then(createUserIfUserOrEmailDoesNotExist)
       .then(throwErrorIfUserExistOrEmailExist)
       .then(setUserID)
