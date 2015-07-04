@@ -6,16 +6,16 @@ module Models {
 
   export interface Campus {
     name: string;
-    id: string;
-    location: Models.GeoCode
+    location: GeoCode;
+    id?: string;
   }
 
   export interface Carpool {
     name: string;
-    users: Array<Models.User>;
+    users: Array<User>;
     campus: Campus;
     description: string;
-    id: string;
+    id?: string;
   }
 
   export interface User {
@@ -27,7 +27,7 @@ module Models {
     passwordHash: string;
     salt: string;
     id?: string;
-    carpools?: Array<Models.Carpool>;
+    // carpools?: Array<Models.Carpool>;
   }
 
   export interface UserData {

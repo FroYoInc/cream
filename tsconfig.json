@@ -19,6 +19,7 @@
     ],
     "files": [
         "./integration/dbutils/migrator.spec.ts",
+        "./integration/services/carpool.svc.spec.ts",
         "./integration/services/user.auth.spec.ts",
         "./integration/services/user.service.spec.ts",
         "./src/config.ts",
@@ -34,6 +35,7 @@
         "./src/models/user.ts",
         "./src/routes.ts",
         "./src/server.ts",
+        "./src/services/carpool.svc.ts",
         "./src/services/email-service.ts",
         "./src/services/user-auth.ts",
         "./src/services/user-service.ts",
