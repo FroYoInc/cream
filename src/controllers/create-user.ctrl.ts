@@ -1,7 +1,3 @@
-/**
- *
- *
- */
 import restify = require('restify')
 import userService = require('../services/user-service')
 import utils = require('../utils/utils');
