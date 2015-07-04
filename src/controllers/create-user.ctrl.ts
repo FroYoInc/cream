@@ -25,7 +25,7 @@ module CreateUserController {
 
     function createUser(passwordHash) {
       return userService.createUser(
-        userInfo.lastName, userInfo.firstName, userInfo.userName,
+        userInfo.firstName, userInfo.lastName, userInfo.userName,
         userInfo.email, passwordHash, salt);
     }
 

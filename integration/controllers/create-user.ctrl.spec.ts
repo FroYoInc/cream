@@ -6,13 +6,19 @@ import CreateUserController = require('../../src/controllers/create-user.ctrl');
 
 function createUser(req:Restify.Request, res:Restify.Response):Promise<void> {
   return new Promise<void>((resolve, reject) => {
-    function next() {resolve(null)};
+    function next(err) {
+      if (err) {
+        reject(err)
+      } else {
+        resolve(null)
+      }
+    };
     CreateUserController.createUser(req, res, next);
   });
 }
 
 describe('CreateUserController', () => {
-  xit('should create a user', (done) => {
+  it('should create a user', (done) => {
 
     var userName = utils.rs();
     var email = utils.em();
@@ -25,20 +31,48 @@ describe('CreateUserController', () => {
       'password': 'somePassword'
     }
 
-    var outputJSON = {
-      'firstName': 'John',
-      'lastName': 'Doe',
-      'userName': userName,
-      'email': email
-    }
-
-    function test(status, json) {
+    function test0(status, outputJson) {
       expect(status).toBe(201);
-      expect(json).toBe(outputJSON);
+      expect(outputJson.firstName).toBe('John');
+      expect(outputJson.lastName).toBe('Doe');
+      expect(outputJson.userName).toBe(userName);
+      expect(outputJson.email).toBe(email);
+      expect(outputJson.href).toBeDefined();
+      var hasHref = (outputJson.href.indexOf('/users/') > -1);
+      expect(hasHref).toEqual(true);
     }
 
-    // var req = <Restify.Request> {body: inputJSON, query: 'asd'};
-    var res = <Restify.Response> {json: test};
-    done();
+
+    var res = <Restify.Response> {send: test0};
+    var req = <Restify.Request> {};
+    req.body = inputJSON;
+
+    createUser(req, res)
+      .then(() => {
+        res.send = () => {}
+        return createUser(req, res);
+      })
+      .catch(Restify.ConflictError, (err) => {
+        expect(err.statusCode).toBe(409);
+        var msg = 'UserExistException: user already exist';
+        expect(err.message).toBe(msg);
+        expect(err.body.message).toBe(msg);
+        expect(err.body.code).toBe('ConflictError');
+
+        inputJSON.userName = utils.rs()
+        req.body = inputJSON;
+
+        return createUser(req, res)
+      })
+      .catch(Restify.ConflictError, (err) => {
+        expect(err.statusCode).toBe(409);
+        var msg = 'EmailExistException: email already exist';
+        expect(err.message).toBe(msg);
+        expect(err.body.message).toBe(msg);
+        expect(err.body.code).toBe('ConflictError');
+      })
+      .catch(fail)
+      .error(fail)
+      .finally(done);
   });
 });
