@@ -11,13 +11,12 @@ import r = require('rethinkdb');
 
 enum Caught {Yes};
 
-var mailData: any = null;
 beforeEach(() => {
   // This is set so the email service used within user service does not
   // actually attempt to send an email.
   userService.setEmailTransportConfig({
     send: (mail, callback) => {
-      mailData = mail;
+      callback();
     }
   });
 });
@@ -52,13 +51,13 @@ describe('UserService', () => {
     }
   }
 
-  function rs() {return utils.rs()}
-  function em() {return utils.em()}
+  var rs = utils.rs;
+  var em = utils.em;
 
   it('should create a user', (done) => {
     doesUserExist('testUser')()
       .then(testFalse)
-      .then(createUser('_', '_', 'testUser', '_', '_', '_'))
+      .then(createUser('_', '_', 'testUser', em(), '_', '_'))
       .then(doesUserExist('testUser'))
       .then(testTrue)
       .error(fail)
@@ -68,9 +67,9 @@ describe('UserService', () => {
 
   it('should not create user if userName exist', (done) => {
     createUser(
-      '_', '_', 'orio0', 'a@example.com', '_', '_')()
+      '_', '_', 'orio0', em(), '_', '_')()
       .then(createUser(
-        '_', '_', 'orio0', 'b@example.com', '_', '_'))
+        '_', '_', 'orio0', em(), '_', '_'))
       .catch(errors.UserExistException, done)
       .then(fail)
       .error(fail)
@@ -79,9 +78,10 @@ describe('UserService', () => {
   });
 
   it('should not create user if email exist', (done) => {
-    createUser('_', '_', 'foo', 'foo@example.com', '_', '_')()
+    var email = em();
+    createUser('_', '_', 'foo', email, '_', '_')()
       .then(createUser(
-        '_', '_', 'bar', 'foo@example.com', '_', '_'))
+        '_', '_', 'bar', email, '_', '_'))
       .catch(errors.EmailExistException, done)
       .then(fail)
       .catch(fail)
@@ -91,7 +91,7 @@ describe('UserService', () => {
 
   it('should return user given user id', (done) => {
     var user: models.User;
-    createUser('_', '_', 'orio1', 'c@example.com', '_', '_')()
+    createUser('_', '_', 'orio1', em(), '_', '_')()
       .then((_user) => {
         user = _user;
         return _user.id;

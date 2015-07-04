@@ -4,17 +4,16 @@ import r = require('rethinkdb');
 import restify = require('restify');
 import DBUtils = require('./dbutils/migrator');
 import c  = require('./config');
+import Controller = require('./controllers/controllers');
 import EmailService = require('./services/email-service');
 import models = require('./models/models');
 import user = require('./models/user');
 import Promise = require('bluebird');
-
 import sessions = require('express-session');
 import auth = require('./services/user-auth');
 import userSer = require('./services/user-service');
 
 var RDBStore = new (require('session-rethinkdb'))(sessions);
-
 
 var migrator = new DBUtils.Migrator();
 migrator.migrate(c.Config.db);
@@ -24,6 +23,7 @@ var server = restify.createServer({
   version: '0.0.0'
 });
 
+//noinspection JSValidateTypes
 server.use(sessions({
 
   // This should Ideally be random generated on install, that way each
@@ -64,6 +64,8 @@ server.get('/flavors', function(req, res, next) {
   res.send({'flavors': flavors});
   next();
 });
+
+server.post('/users', Controller.createUser);
 
 server.listen(c.Config.app.port, function() {
   console.log('> %s listening on %s', server.name, server.url);
