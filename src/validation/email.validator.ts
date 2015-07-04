@@ -2,7 +2,6 @@
 import Promise = require('bluebird');
 import v = require('./validation');
 import errors = require('../errors/errors');
-import config = require('../config');
 
 module Validation {
   /**
@@ -20,14 +19,16 @@ module Validation {
      * An array of domain names allowed by the validator.
      * @type {Array<string>}
      */
-    public static domainWhitelist : Array<string> = null;
+    private domainWhitelist : Array<string> = null;
 
     /**
      * Initializes the Email validator.
      */
-    constructor() {
-      if (EmailValidator.domainWhitelist == null) {
-        EmailValidator.domainWhitelist = config.Config.validator.domainWhitelist;
+    constructor(_domainWhitelist?: Array<string>) {
+      if (_domainWhitelist == null) {
+        this.domainWhitelist = []
+      } else {
+        this.domainWhitelist = _domainWhitelist;
       }
     }
 
@@ -60,15 +61,15 @@ module Validation {
      *                         false otherwise.
      */
     private isDomainValid(email: string) : boolean {
-      if (EmailValidator.domainWhitelist.length == 0) {
+      if (this.domainWhitelist.length == 0) {
         return true;
       }
 
       var emailDomain = this.getEmailDomain(email);
 
-      for (var index = 0; index < EmailValidator.domainWhitelist.length; index++)
+      for (var index = 0; index < this.domainWhitelist.length; index++)
       {
-        if (EmailValidator.domainWhitelist[index].toLowerCase() != emailDomain) {
+        if (this.domainWhitelist[index].toLowerCase() != emailDomain) {
           continue;
         }
 

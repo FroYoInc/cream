@@ -4,12 +4,13 @@ import uuid = require('uuid');
 import EmailService = require('./email-service');
 import nodemailer = require('nodemailer');
 import EmailValidator = require('../validation/email.validator');
+import UserNameValidator = require('../validation/username.validator');
 import q = require('../dbutils/query');
 import models = require('../models/models');
 import errors = require('../errors/errors');
+import config = require('../config');
 import assert = require('assert');
 
-var emailValidator = new EmailValidator.EmailValidator();
 
 module UserService {
 
@@ -21,6 +22,9 @@ module UserService {
   var userNameIndex = 'userName';
   var emailIndex = 'email';
   var transportConfig : nodemailer.TransporterConfig = null;
+  var domainWhiteList = config.Config.validator.domainWhitelist;
+  var emailValidator = new EmailValidator.EmailValidator(domainWhiteList);
+  var userNameValidator = new UserNameValidator.UserNameValidator();
 
   export function setEmailTransportConfig(config: nodemailer.TransporterConfig) {
   	transportConfig = config;
@@ -110,10 +114,7 @@ module UserService {
       	if (transportConfig != null) {
       	  emailService.transportConfig = transportConfig;
       	}
-
-      	return () => {
-      	  emailService.sendActivation(user, activationCode).done();
-      	};
+    	  return emailService.sendActivation(user, activationCode);
       }
 
       var saveActivationQuery = r.db(db)
@@ -123,7 +124,12 @@ module UserService {
       return q.run(saveActivationQuery)().then(sendActivation).return(user);
     }
 
+    function isValidUserName() {
+      return userNameValidator.isValid(userName);
+    }
+
     return emailValidator.isValid(email)
+      .then(isValidUserName)
       .then(createUserIfUserOrEmailDoesNotExist)
       .then(throwErrorIfUserExistOrEmailExist)
       .then(setUserID)
@@ -233,7 +239,7 @@ module UserService {
     return q.run(getUserDataQuery)()
       .then((_result) => {
         var userData:models.UserData = _result;
-        
+
         if(_result === null){
           throw new errors.UserDataNotFound();
         }
