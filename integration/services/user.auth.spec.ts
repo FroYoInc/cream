@@ -5,6 +5,7 @@ import errors = require('../../src/errors/errors');
 import bcrypt = require("bcrypt");
 import r = require('rethinkdb');
 import query = require('../../src/dbutils/query');
+import utils = require('../utils');
 
 class Session {
   [key: string] : any;
@@ -33,13 +34,13 @@ describe('UserAuth', () => {
   good.req.session["firstName"] = "Peter";
   good.req.session["lastName"] = "Higgs";
   good.req.session["userName"] = "pHiggs";
-  good.req.session["email"] = "pHiggs@lhc.com";
+  good.req.session["email"] = utils.validEmail("pHiggs");
 
 
   var bad = new Restify();
   bad.req = new Request();
   bad.req.session = new Session();
-  
+
   var goodUser: models.User;
   var nonExistantUser: models.User;
   var unactivatedUser: models.User;
@@ -54,7 +55,7 @@ describe('UserAuth', () => {
         firstName: 'Peter',
         lastName: 'Higgs',
         userName: 'pHiggs',
-        email: 'higgs@lhc.com',
+        email: utils.validEmail('higgs'),
         isAccountActivated: true,
         passwordHash: hash,
         salt: salt
@@ -65,7 +66,7 @@ describe('UserAuth', () => {
         firstName: 'Bill',
         lastName: 'Nye',
         userName: 'bNye',
-        email: 'bNye@lhc.com',
+        email: utils.validEmail('bNye'),
         isAccountActivated: false,
         passwordHash: hash,
         salt: salt
@@ -75,7 +76,7 @@ describe('UserAuth', () => {
         firstName: 'Peter',
         lastName: 'Higgs',
         userName: 'pHiggs',
-        email: 'thisEmailIsNotInTheDB@lhc.com',
+        email: utils.validEmail('thisEmailIsNotInTheDB'),
         isAccountActivated: false,
         passwordHash: '12345',
         salt: 'andPepper'
@@ -171,7 +172,7 @@ describe('UserAuth', () => {
           authUser(bad.req, goodUser.email, "thisIsNotMyPassword")
             .then(test423)
             .error(fail)
-            .finally(done); 
+            .finally(done);
         });
 
   });

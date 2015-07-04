@@ -2,6 +2,7 @@ import r = require('rethinkdb');
 import uuid = require('uuid');
 import q = require('../src/dbutils/query');
 import models = require('../src/models/models')
+import config = require('../src/config');
 
 module Utils {
   export function findUserActivationCode(_user:models.User) {
@@ -15,6 +16,12 @@ module Utils {
   }
 
   export function rs() {return uuid.v4();}
-  export function em() {return rs() + '@example.com';}
+  function vem() {
+    return config.Config.validator.domainWhitelist[0];
+  }
+  export function em() {return rs() + '@' + vem();}
+  export function validEmail(userName) {
+    return userName + '@' + vem();
+  }
 }
 export = Utils;

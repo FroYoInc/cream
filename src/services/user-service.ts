@@ -28,11 +28,6 @@ module UserService {
   	transportConfig = config;
   }
 
-  export function setDomainWhiteList(_domainWhiteList:Array<string>) {
-    domainWhiteList = _domainWhiteList;
-    emailValidator = new EmailValidator.EmailValidator(domainWhiteList);
-  }
-
   function userCreateQuery (user) {
     return r.db(db)
       .table(table)

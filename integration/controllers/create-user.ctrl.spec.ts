@@ -4,6 +4,7 @@ import Promise = require('bluebird');
 import utils = require('../utils');
 import CreateUserController = require('../../src/controllers/create-user.ctrl');
 import userService = require('../../src/services/user-service');
+import config = require('../../src/config');
 
 function createUser(req:Restify.Request, res:Restify.Response):Promise<void> {
   return new Promise<void>((resolve, reject) => {
@@ -19,7 +20,7 @@ function createUser(req:Restify.Request, res:Restify.Response):Promise<void> {
 }
 
 beforeAll(() => {
-  userService.setDomainWhiteList([])
+  // userService.setDomainWhiteList(config.Config.validator.domainWhitelist)
 })
 
 describe('CreateUserController', () => {
