@@ -83,7 +83,7 @@ describe('CreateUserController', () => {
       'firstName': 'John',
       'lastName': 'Doe',
       'userName': utils.rs(),
-      'email': 'foo@invaliddomain.com',
+      'email': 'invalidemail',
       'password': 'somePassword'
     }
     var res = <Restify.Response> {send: fail};
@@ -93,9 +93,9 @@ describe('CreateUserController', () => {
     createUser(req, res)
       .catch(Restify.BadRequestError, (err) => {
         expect(err.statusCode).toBe(400);
-        var msg = 'EmailValidationException: The email address\'s domain is not allowed.';
-        expect(err.message).toBe(msg);
-        expect(err.body.message).toBe(msg);
+        var msg = 'EmailValidationException:';
+        expect(err.message).toContain(msg);
+        expect(err.body.message).toContain(msg);
         expect(err.body.code).toBe('BadRequestError');
       })
       .catch(fail)
