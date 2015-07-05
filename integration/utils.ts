@@ -17,7 +17,12 @@ module Utils {
 
   export function rs() {return uuid.v4().replace(/-/g, '');}
   function vem() {
-    return config.Config.validator.domainWhitelist[0];
+    var domainWhiteList = config.Config.validator.domainWhitelist;
+    if (domainWhiteList.length == 0) {
+      return 'example.com';
+    } else {
+      return domainWhiteList[0];
+    }
   }
   export function em() {return rs() + '@' + vem();}
   export function validEmail(userName) {
