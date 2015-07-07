@@ -110,6 +110,43 @@
                     }
                 }
             }
+        },
+        "/carpools/request": {
+            "post": {
+                "summary": "Request to join carpool",
+                "description": "\nMakes a request for the user to join a carpool ",
+                "parameters": [
+                    {
+                        "name": "carpoolRequest",
+                        "in": "body",
+                        "description": "The id of the carpool that the user wishes to join",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/carpoolRequest"
+                        }
+                    }
+                ],
+                "tags": [
+                    "Carpool"
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Request successfully created."
+                    },
+                    "400": {
+                        "description": "No carpool id provided."
+                    },
+                    "401": {
+                        "description": "Unauthorized attempt, user must be logged in to make a request."
+                    },
+                    "409": {
+                        "description": "Conflict error.  User already has a request to join this carpool."
+                    },
+                    "500" : {
+                        "description" : "Internal Server error. Unable to make request"
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -127,6 +164,14 @@
                 "lastName": {"required": true, "type": "string"},
                 "email": {"required": true, "type": "string"},
                 "password": {"required": true, "type": "string"}
+            }
+        },
+        "carpoolRequest" : {
+            "required": [
+                "carpoolID"
+            ],
+            "properties" : {
+                "carpoolID" : { "required": true, "type" :"string"}
             }
         },
         "LoginInfo" : {

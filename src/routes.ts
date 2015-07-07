@@ -1,6 +1,7 @@
 import Restify = require('restify');
 import userControllers = require('./controllers/users');
 import CreateUserCtrl = require('./controllers/create-user.ctrl');
+import carpoolCtrl = require('./controllers/carpools');
 import c = require("./config");
 
 class routes{
@@ -15,7 +16,12 @@ class routes{
         server.post("/users", CreateUserCtrl.createUser);
 
 
+        /*********** Carppool Routes ***********/
+        server.post("/carpools/request", carpoolCtrl.requestToJoin);
+
+
         /*********** Documentation routes ***********/
+
 
         // /docs does not render the css correctly, so redirect to /docs/
         server.get('/docs', function(req, res, next){

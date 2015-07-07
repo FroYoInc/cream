@@ -20,6 +20,10 @@ module DBUtils {
       {
         tableName: 'activation',
         indices: []
+      },
+      {
+        tableName : "requests",
+        indices: ["userID", "carpoolID"]
       }]
     };
     private _conn : r.Connection;

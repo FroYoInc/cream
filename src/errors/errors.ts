@@ -94,5 +94,19 @@ module Errors {
       super(message, 'BcryptHashError');
     }
   }
+
+  export class CarpoolRequestConflict extends Exception {
+    constructor(){
+      super("User already has a pending request to join this carpool",
+      'CarpoolRequestConflict');
+    }
+  }
+  export class CarpoolRequestNotFound extends Exception {
+    constructor(){
+      super("The user request to join a carpool is not found",
+      'CarpoolRequestNotFound');
+    }
+  }
+
 }
 export = Errors
