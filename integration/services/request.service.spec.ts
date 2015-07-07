@@ -29,20 +29,6 @@ describe('UserAuth', () => {
   good.req = new Response();
   good.req.session = new Session();
   good.req.session["userID"] = "123456789";
-  good.req.session["firstName"] = "Peter";
-  good.req.session["lastName"] = "Higgs";
-  good.req.session["userName"] = "pHiggs";
-  good.req.session["email"] = utils.validEmail("pHiggs");
-
-
-  var bad = new Restify();
-  bad.req = new Request();
-  bad.req.session = new Session();
-
-  var goodUser: models.User;
-  var nonExistantUser: models.User;
-  var unactivatedUser: models.User;
-  var userData : models.UserData;
 
   var joinRequest = {
     userID: good.req.session["userID"],
