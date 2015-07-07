@@ -18,11 +18,10 @@ module carpoolControllers{
         next();
     }
 
-    function joinRequest(req: Restify.Request) : Promise<number> {
+    export function joinRequest(req: Restify.Request) : Promise<number> {
         return new Promise<number>((resolve, reject) => {
         
-            var p = req.params;
-            var validReq = pv.verifyParams(p.carpoolID);
+            var validReq = pv.verifyParams(req.params.carpoolID);
             if(validReq){
                 auth.checkAuth(req)
                   .then( (isAuth) => {

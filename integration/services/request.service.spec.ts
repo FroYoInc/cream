@@ -22,7 +22,7 @@ class Restify {
   res: Response;
 }
 
-describe('UserAuth', () => {
+describe('RequestService', () => {
 
   var good =  new Restify();
   good.req = new Request();
@@ -70,8 +70,7 @@ describe('UserAuth', () => {
       getByUserID(joinRequest.userID)
       .then( (_request) => {
         if(_request[0]){
-          return (_request[0].userID == joinRequest.userID && 
-                  _request[0].carpoolID == joinRequest.carpoolID);
+          return (_request[0].userID == joinRequest.userID);
         }
         else{
           return false;
@@ -86,8 +85,7 @@ describe('UserAuth', () => {
       getByCarpoolID(joinRequest.carpoolID)
       .then( (_request) => {
         if(_request[0]){
-          return (_request[0].userID == joinRequest.userID && 
-                  _request[0].carpoolID == joinRequest.carpoolID);
+          return (_request[0].carpoolID == joinRequest.carpoolID);
         }
         else{
           return false;
