@@ -67,4 +67,11 @@ describe('CarpoolService', () => {
       .error(fail)
       .finally(done);
   });
+
+  xit('should get a carpool by id', (done) => {
+    carpoolSvc.getCarpoolByID("carpoolID")
+      .finally(done);
+  });
+  
+
 });

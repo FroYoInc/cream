@@ -80,6 +80,12 @@ module CarpoolService {
         return result === true
       });
   }
+
+  // This should take an id as an argument and return the carpool it is associated with.
+  export function getCarpoolByID(carpoolID: string) :  Promise<models.Carpool> {
+    throw new Error("Not Implemented");
+  }
+
 }
 
 export = CarpoolService;
