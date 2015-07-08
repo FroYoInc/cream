@@ -12,7 +12,10 @@ module Models {
 
   export interface Carpool {
     name: string;
-    users: Array<User>;
+    owner: User;
+    // Owner is a participant by default. Hence participants have at least 1
+    // user
+    participants: [User];
     campus: Campus;
     description: string;
     id?: string;

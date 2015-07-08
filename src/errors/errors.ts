@@ -39,6 +39,11 @@ module Errors {
       super(message, 'EmailValidationException');
     }
   }
+  export class CarpoolNameValidationException extends Exception {
+    constructor() {
+      super('invalid carpool name', 'CarpoolNameValidationException');
+    }
+  }
   export class InvalidActivationCodeException extends Exception {
     constructor() {
       super('invalid activation code', 'InvalidActivationCodeException');

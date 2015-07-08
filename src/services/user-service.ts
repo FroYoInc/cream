@@ -36,7 +36,7 @@ module UserService {
       .insert(user);
   }
 
-  function userExistQuery(userName) {
+  export function userExistQuery(userName) {
     return r.db(db)
       .table(table)
       .getAll(userName, {index: userNameIndex})

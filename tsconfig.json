@@ -44,6 +44,7 @@
         "./src/services/user-auth.ts",
         "./src/services/user-service.ts",
         "./src/utils/utils.ts",
+        "./src/validation/carpoolname.validator.ts",
         "./src/validation/email.validator.ts",
         "./src/validation/parameter-validator.ts",
         "./src/validation/username.validator.ts",
