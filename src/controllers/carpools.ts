@@ -5,6 +5,8 @@ import models = require('../models/models');
 import Promise = require('bluebird');
 import pv = require('../validation/parameter-validator');
 import requestServ = require('../services/request-service');
+import emailServ = require('../services/email-service');
+import carpoolServ = require('../services/carpool.svc');
 import errors = require('../errors/errors');
 
 
@@ -28,13 +30,26 @@ module carpoolControllers{
                     if(isAuth){
                         requestServ.createRequest(req.session["userID"], req.params.carpoolID)
                           .then( (result) => {
-                                if(result){
-                                    // Notify the members of the carpool that someone wises to join
-                                    resolve(201);
-                                }
-                                else{
-                                    resolve(500);
-                                }
+                              if(result){
+                                  // Notify the members of the carpool that someone wises to join
+                                  // carpoolServ.getCarpoolByID(req.params.carpoolID)
+                                  //   .then( (carpool) => {
+                                  //     var mailingList = "";
+
+                                  //     for(var i = 0; i < carpool.users.length; ++i{
+                                  //       mailingList += carpool.users[i].email;
+                                  //       if(i != carpool.users.length - 1{
+                                  //         mailingList += ","
+                                  //       }
+                                  //     }
+                                  //     // send the email to the mailing list
+
+                                  //   });
+                                  resolve(201);
+                              }
+                              else{
+                                  resolve(500);
+                              }
                           }).catch(errors.CarpoolRequestConflict, (err) => {
                               resolve(409);
                           });
