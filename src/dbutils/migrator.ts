@@ -18,6 +18,10 @@ module DBUtils {
         indices: []
       },
       {
+        tableName: 'carpools',
+        indices: ['name']
+      },
+      {
         tableName: 'activation',
         indices: []
       }]
