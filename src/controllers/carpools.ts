@@ -6,7 +6,7 @@ import Promise = require('bluebird');
 import pv = require('../validation/parameter-validator');
 import requestServ = require('../services/request-service');
 import emailServ = require('../services/email-service');
-import carpoolServ = require('../services/carpool.svc');
+// import carpoolServ = require('../services/carpool.svc');
 import errors = require('../errors/errors');
 
 
