@@ -112,6 +112,27 @@
             }
         }
     },
+    "/activation/:activation": {
+      "get": {
+        "summary" : "Activates User account from email address",
+        "description" : "\nThis endpoint takes random generated activation code from email link and switches the _isAccountActivated value from false to true",
+        "tags" : "User",
+        "response" : {
+          "302" : {
+            "description" : "Redirect to /login on successful activation and redirect to /invalid-activation otherwise"
+                  }
+             },
+             "parameters": [
+                 {
+                     "name": "activationCode",
+                     "in": "query",
+                     "description": "Activation hash",
+                     "required": true
+                     }
+             ],
+          }
+    },
+
     "definitions": {
         "NewAccountInfo": {
             "required": [
@@ -169,7 +190,7 @@
             "properties" : {
                 "name" : {"type" : "string"},
                 "users": {
-                    "type": "array", 
+                    "type": "array",
                     "items" : {
                         "$ref" :"#/definitions/User"
                     }
