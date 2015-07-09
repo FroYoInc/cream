@@ -1,17 +1,91 @@
 /// <reference path="../../typings/bluebird/bluebird.d.ts"/>
 import Promise = require('bluebird');
 import v = require('./validation');
+import errors = require('../errors/errors');
 
 module Validation {
+  /**
+   * Email validator.
+   */
   export class EmailValidator implements v.Validator {
-    isValid(s: string) {
+
+    /**
+     * The regular expression for email addresses... A very simple one.
+     * @type {RegExp}
+     */
+    private emailRegex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
+
+    /**
+     * An array of domain names allowed by the validator.
+     * @type {Array<string>}
+     */
+    private domainWhitelist : Array<string> = null;
+
+    /**
+     * Initializes the Email validator.
+     */
+    constructor(_domainWhitelist?: Array<string>) {
+      if (_domainWhitelist == null) {
+        this.domainWhitelist = []
+      } else {
+        this.domainWhitelist = _domainWhitelist;
+      }
+    }
+
+    /**
+     * Determines whether the email address is valid.
+     *
+     * @param  {string}           email The email address to validate.
+     * @return {Promise<boolean>}       Returns a Promise<boolean>.
+     */
+    public isValid(email: string) : Promise<boolean> {
       return new Promise<boolean>((resolve, reject) => {
-        if (s != '') {
-          resolve(true);
-        } else {
-          reject(new Error("email cannot be empty"));
+
+        if (email.match(this.emailRegex) === null) {
+          reject(new errors.EmailValidationException('The email address is invalid.'));
+          return;
         }
+        else if (!this.isDomainValid(email)) {
+          reject(new errors.EmailValidationException('The email address\'s domain is not allowed.'));
+          return;
+        }
+
+        resolve(true);
       });
+    }
+
+    /**
+     * Indicates whether the domain of the email address is allowed.
+     * @param  {string}  email The email address.
+     * @return {boolean}       Returns true if the domain is on the whitelist,
+     *                         false otherwise.
+     */
+    private isDomainValid(email: string) : boolean {
+      if (this.domainWhitelist.length == 0) {
+        return true;
+      }
+
+      var emailDomain = this.getEmailDomain(email);
+
+      for (var index = 0; index < this.domainWhitelist.length; index++)
+      {
+        if (this.domainWhitelist[index].toLowerCase() != emailDomain) {
+          continue;
+        }
+
+        return true;
+      }
+
+      return false;
+    }
+
+    /**
+     * Returns the domain name of the email address.
+     * @param  {string} email The email address.
+     * @return {string}       The domain name of the email address.
+     */
+    private getEmailDomain(email: string) : string {
+      return email.split('@').pop().toLowerCase();
     }
   }
 }
