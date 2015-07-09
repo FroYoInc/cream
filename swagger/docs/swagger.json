@@ -74,6 +74,29 @@
                 }
             }
         },
+        "/activation/:activation": {
+                "get": {
+                    "summary": "Activates User account from email address",
+                    "description": "\nThis endpoint takes random generated activation code from email link and switches the _isAccountActivated value from false to true",
+                    "parameters": [
+                        {
+                            "name": "activationCode",
+                            "in": "query",
+                            "description": "Activation hash",
+                            "required": true
+                        }
+                    ],
+                    "tags": [
+                        "User"
+                    ],
+                    "responses": {
+                        "302": {
+                            "description": "Redirect to /login on successful activation and redirect to /invalid-activation otherwise"
+                        }
+                    }
+
+            }
+        },
         "/users": {
             "post": {
                 "summary": "Creates a user account.",
@@ -111,28 +134,8 @@
                 }
             }
         }
-    },
-    "/activation/:activation": {
-      "get": {
-        "summary" : "Activates User account from email address",
-        "description" : "\nThis endpoint takes random generated activation code from email link and switches the _isAccountActivated value from false to true",
-        "tags" : "User",
-        "response" : {
-          "302" : {
-            "description" : "Redirect to /login on successful activation and redirect to /invalid-activation otherwise"
-                  }
-             },
-             "parameters": [
-                 {
-                     "name": "activationCode",
-                     "in": "query",
-                     "description": "Activation hash",
-                     "required": true
-                     }
-             ],
-          }
-    },
 
+    },
     "definitions": {
         "NewAccountInfo": {
             "required": [
