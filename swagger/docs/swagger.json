@@ -110,29 +110,30 @@
                     }
                 }
             }
+        },
+
+        "/activation/:activation": {
+            "get": {
+                "summary" : "Activates User account",
+                "description" : "\nThis endpoint takes random generated activation code from email link and switches the _isAccountActivated value from false to true, to call this endpoint make a get request to /activation/activationCode where activationCode is the code you wish to user for activation.",
+                "parameters": [
+                    {
+                        "name": "activationCode",
+                        "in": "query",
+                        "description": "Activation code",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "tags" : ["User"],
+                "responses" : {
+                    "302" : {
+                        "description" : "Redirect to /login on successful activation and redirect to /invalid-activation otherwise"
+                    }
+                }
+            }
         }
     },
-    "/activation/:activation": {
-      "get": {
-        "summary" : "Activates User account from email address",
-        "description" : "\nThis endpoint takes random generated activation code from email link and switches the _isAccountActivated value from false to true",
-        "tags" : "User",
-        "response" : {
-          "302" : {
-            "description" : "Redirect to /login on successful activation and redirect to /invalid-activation otherwise"
-                  }
-             },
-             "parameters": [
-                 {
-                     "name": "activationCode",
-                     "in": "query",
-                     "description": "Activation hash",
-                     "required": true
-                     }
-             ],
-          }
-    },
-
     "definitions": {
         "NewAccountInfo": {
             "required": [
