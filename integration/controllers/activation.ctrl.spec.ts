@@ -27,19 +27,19 @@ function activate(req: restify.Request, res: restify.Response):Promise<void> {
 
 describe('Activation controller', () => {
 
-  function test0(statusCode) {
-    expect(statusCode).toBe(302);
-  }
+   function test0(statusCode) {
+     expect(statusCode).toBe(302);
+   }
 
-  function test1(header, location) {
-    expect(header).toBe('Location');
-    expect(location).toBe('/login');
-  }
+   function test1(header, location) {
+     expect(header).toBe('Location');
+     expect(location).toBe('/login');
+   }
 
-  function test2(header,location) {
-    expect(header).toBe('Location');
-    expect(location).toBe('/invalid-activation');
-  }
+   function test2(header,location) {
+     expect(header).toBe('Location');
+     expect(location).toBe('/invalid-activation');
+   }
 
   it('should activate a user and redirect request to login page', (done) => {
 
