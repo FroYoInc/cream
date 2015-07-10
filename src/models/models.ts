@@ -1,12 +1,18 @@
 module Models {
+
   export interface GeoCode {
-    x: number;
-    y: number;
+    lat: number;
+    long: number;
+  }
+
+  export interface Address {
+    address: string;
+    geoCode: GeoCode;
   }
 
   export interface Campus {
     name: string;
-    location: GeoCode;
+    address: Address;
     id?: string;
   }
 

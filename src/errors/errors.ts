@@ -44,6 +44,21 @@ module Errors {
       super('invalid carpool name', 'CarpoolNameValidationException');
     }
   }
+  export class CampusNameValidationException extends Exception {
+    constructor() {
+      super('invalid campus name', 'CampusNameValidationException');
+    }
+  }
+  export class CampusNotFoundException extends Exception {
+    constructor() {
+      super('No campus found with the specified name or ID.', 'CampusNotFoundException');
+    }
+  }
+  export class CampusNameExistsException extends Exception {
+      constructor() {
+          super('The campus name is already in use.', 'CampusNameExistsException');
+      }
+  }
   export class InvalidActivationCodeException extends Exception {
     constructor() {
       super('invalid activation code', 'InvalidActivationCodeException');

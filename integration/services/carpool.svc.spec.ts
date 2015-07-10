@@ -47,7 +47,13 @@ describe('CarpoolService', () => {
 
     var campus:models.Campus = {
       name: 'FroYoCampus',
-      location: {x: 100, y: 100},
+      address: {
+            address: '123 Elm St',
+            geoCode: {
+                lat: 100,
+                long: 100
+            }
+          },
     };
 
     doesCarpoolExist('fropool')()
@@ -82,7 +88,7 @@ describe('CarpoolService', () => {
       .error(fail)
       .finally(done);
   });
-  
+
   it('should get all of the emails for the users', (done) => {
 
     carpoolSvc.getUserEmails(carpoolID)
