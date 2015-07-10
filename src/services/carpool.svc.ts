@@ -126,6 +126,23 @@ module CarpoolService {
 
   }
 
+  export function getOwnerEmail(carpoolID: string, notThisUser?:string) :  Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      getCarpoolByID(carpoolID)
+        .then( (_carpool) => {
+          var emails:Array<string> = [];
+
+          userSvc.getUserById(_carpool.owner)
+            .then((user) => {
+              resolve(user.email);
+            })
+            .catch(errors.UserNotFoundException, (err) => {throw err;});
+
+        });
+    });
+
+  }
+
 }
 
 export = CarpoolService;

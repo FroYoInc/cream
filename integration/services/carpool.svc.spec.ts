@@ -89,6 +89,18 @@ describe('CarpoolService', () => {
       .finally(done);
   });
 
+
+  it('should get the carpool owner\'s email', (done) => {
+
+    carpoolSvc.getOwnerEmail(carpoolID)
+      .then( (emailString) =>{
+        expect(emailString).toBe(owner.email);
+      })
+      .catch(fail)
+      .error(fail)
+      .finally(done);
+  });
+
   it('should get all of the emails for the users', (done) => {
 
     carpoolSvc.getUserEmails(carpoolID)
