@@ -64,6 +64,10 @@ module UserAuth{
                 }
 
             }).catch(errors.UserNotFoundException, (err) => {
+                resolve(401);
+            }).catch(errors.EmailValidationException, (err) => {
+                resolve(401);
+            }).catch(Error, (err) => {
                 resolve(500);
             });
 

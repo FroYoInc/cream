@@ -179,7 +179,7 @@ describe('UserAuth', () => {
 
   it('should reject a login for a non existent user.', (done) => {
     authUser(bad.req, nonExistantUser.email, password)
-      .then(test500)
+      .then(test401)
       .error(fail)
       .finally(done);
   });
