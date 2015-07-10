@@ -28,6 +28,7 @@ function doesCarpoolExist(carpoolName: string): () => Promise<boolean> {
 }
 
 var owner:models.User;
+var carpoolID: string;
 // Create a user first
 
 describe('CarpoolService', () => {
@@ -62,9 +63,10 @@ describe('CarpoolService', () => {
         expect(carpool.name).toBe('fropool');
         expect(carpool.description).toBe('first carpool');
         expect(carpool.campus).toBe(campus);
-        expect(carpool.owner).toEqual(owner);
+        expect(carpool.owner).toEqual(owner.id);
         expect(carpool.participants.length).toBe(1);
-        expect(carpool.participants[0]).toEqual(owner);
+        expect(carpool.participants[0]).toEqual(owner.id);
+        carpoolID = carpool.id;
         expect(carpool.id).toBeDefined();
       })
       .then(doesCarpoolExist('fropool'))
@@ -74,10 +76,38 @@ describe('CarpoolService', () => {
       .finally(done);
   });
 
-  xit('should get a carpool by id', (done) => {
-    carpoolSvc.getCarpoolByID("carpoolID")
+  it('should get a carpool by id', (done) => {
+
+    carpoolSvc.getCarpoolByID(carpoolID)
+      .then( (carpool) =>{
+        expect(carpool.name).toBe('fropool');
+        expect(carpool.description).toBe('first carpool');
+        expect(carpool.id).toBeDefined();
+      })
+      .catch(fail)
+      .error(fail)
       .finally(done);
   });
 
+  it('should get all of the emails for the users', (done) => {
 
+    carpoolSvc.getUserEmails(carpoolID)
+      .then( (emailString) =>{
+        expect(emailString).toBe(owner.email);
+      })
+      .catch(fail)
+      .error(fail)
+      .finally(done);
+  });
+
+  it('should get all of the emails except the email provided', (done) => {
+
+    carpoolSvc.getUserEmails(carpoolID, owner.email)
+      .then( (emailString) =>{
+        expect(emailString).toBe("");
+      })
+      .catch(fail)
+      .error(fail)
+      .finally(done);
+  });
 });

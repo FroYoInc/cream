@@ -8,6 +8,7 @@ import models = require('../models/models');
 import errors = require('../errors/errors');
 import userSvc = require('./user-service');
 import v = require('../validation/carpoolname.validator');
+import userService = require('../../src/services/user-service');
 
 var db = 'froyo';
 var table = 'carpools';
@@ -27,8 +28,8 @@ module CarpoolService {
       carpool.campus = campus;
       return userSvc.getUserByUserName(owner)
         .then((user) => {
-          carpool.owner = user;
-          carpool.participants = [user];
+          carpool.owner = user.id;
+          carpool.participants = [user.id];
         });
     }
 
@@ -45,8 +46,8 @@ module CarpoolService {
         .table(table)
         .insert({
           'name': carpool.name,
-          'owner': carpool.owner.id,
-          'participants': [carpool.owner.id],
+          'owner': carpool.owner,
+          'participants': [carpool.owner],
           'campus': carpool.campus,
           'description': carpool.description
         });
@@ -83,7 +84,46 @@ module CarpoolService {
 
   // This should take an id as an argument and return the carpool it is associated with.
   export function getCarpoolByID(carpoolID: string) :  Promise<models.Carpool> {
-    throw new Error("Not Implemented");
+      var query = r.db(db).table(table).filter({id:carpoolID}).coerceTo('array');
+      return q.run(query)()
+        .then((_carpool) => {
+          assert.equal(_carpool.length, 1,
+            "Exactly one carpool should have been found");
+            var carpool:models.Carpool = _carpool[0];
+            return carpool;
+        })
+  }
+
+  // Gets all of the emails for the carpool with the provided id, minues the email provided
+  // in the notThisUser string
+  export function getUserEmails(carpoolID: string, notThisUser?:string) :  Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      getCarpoolByID(carpoolID)
+        .then( (_carpool) => {
+          var emails:Array<string> = [];
+
+          function appendToArray(email, max){
+            var length = (notThisUser ? max - 1 : max);
+            if(email != notThisUser){
+              emails.push(email);
+            }
+            if(emails.length == length){
+              resolve(emails.join(", "));
+            }
+          }
+          
+          for (var i = 0; i < _carpool.participants.length; ++i){
+
+            userSvc.getUserById(_carpool.participants[i])
+              .then((user) => {
+                appendToArray(user.email,_carpool.participants.length);
+              })
+              .catch(errors.UserNotFoundException, (err) => {});
+
+          }
+        });
+    });
+
   }
 
 }
