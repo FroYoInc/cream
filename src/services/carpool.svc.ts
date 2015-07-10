@@ -84,14 +84,14 @@ module CarpoolService {
 
   // This should take an id as an argument and return the carpool it is associated with.
   export function getCarpoolByID(carpoolID: string) :  Promise<models.Carpool> {
-      var query = r.db(db).table(table).filter({id:carpoolID}).coerceTo('array');
-      return q.run(query)()
-        .then((_carpool) => {
-          assert.equal(_carpool.length, 1,
-            "Exactly one carpool should have been found");
-            var carpool:models.Carpool = _carpool[0];
-            return carpool;
-        })
+    var query = r.db(db).table(table).filter({id:carpoolID}).coerceTo('array');
+    return q.run(query)()
+      .then((_carpool) => {
+        assert.equal(_carpool.length, 1,
+          "Exactly one carpool should have been found");
+          var carpool:models.Carpool = _carpool[0];
+          return carpool;
+      })
   }
 
   // Gets all of the emails for the carpool with the provided id, minues the email provided
@@ -139,6 +139,31 @@ module CarpoolService {
             .catch(errors.UserNotFoundException, (err) => {throw err;});
 
         });
+    });
+  }
+
+  export function addUserToCarpool(carpoolID:string, owner:string, userToAdd:string) : Promise<models.Carpool> {
+    return new Promise<models.Carpool>((resolve, reject) => {
+      var query = r.db(db).table(table).get(carpoolID).update({
+                    participants: r.row("participants").append(userToAdd)
+                  });
+
+      getCarpoolByID(carpoolID)
+        .then( (_carpool) => {
+            if(_carpool.owner == owner){
+              q.run(query)()
+                .then( (result) => {
+                  getCarpoolByID(carpoolID)
+                    .then((carpool) => {
+                      resolve(carpool)
+                    })
+                })
+            }
+            else{
+              throw new errors.NotCarpoolOwner("Must be carpool owner to add a user");
+            }
+        }).catch(Error, (err) => {reject(err);})
+
     });
 
   }

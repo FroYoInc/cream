@@ -114,5 +114,11 @@ module Errors {
       super(message, 'BcryptHashError');
     }
   }
+
+  export class NotCarpoolOwner extends Exception {
+    constructor(message:string){
+      super(message, 'NotCarpoolOwner');
+    }
+  }
 }
 export = Errors

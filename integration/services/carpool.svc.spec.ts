@@ -122,4 +122,23 @@ describe('CarpoolService', () => {
       .error(fail)
       .finally(done);
   });
+
+  it('should add a user to a carpool for a valid owner', (done) => {
+
+    carpoolSvc.addUserToCarpool(carpoolID, owner.id, "123456789")
+      .then( (_carpool) =>{
+        expect(_carpool.participants).toEqual([owner.id, "123456789"]);
+      })
+      .catch(fail)
+      .error(fail)
+      .finally(done);
+  });
+
+  it('should not add a user to a carpool for an invalid owner', (done) => {
+
+    carpoolSvc.addUserToCarpool(carpoolID, "123456789", owner.id)
+      .then(fail)
+      .catch(errors.NotCarpoolOwner, done)
+  });
+
 });
