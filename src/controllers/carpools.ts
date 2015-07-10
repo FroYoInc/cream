@@ -33,12 +33,10 @@ module carpoolControllers{
                           .then( (result) => {
                               if(result){
                                   // Notify the members of the carpool that someone wises to join
-                                  // carpoolServ.getOwnerEmails(req.params.carpoolID)
+                                  // carpoolServ.getOwnerEmail(req.params.carpoolID)
                                   //   .then(emailSvc.sendRequestToJoin})
-                                  //   .then( () => {
-                                  //     resolve(201)
-                                  //   });
-                                      resolve(201)
+                                  //   .catch(Error, (err) => {});
+                                  resolve(201);
 
                               }
                               else{
