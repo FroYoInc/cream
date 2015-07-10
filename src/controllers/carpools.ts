@@ -59,8 +59,38 @@ module carpoolControllers{
 
     }
 
-    export function approveRequest(req:Restify.Request, res:Restify.Response, next){
-        next();
+    export function approveRequest(req: Restify.Request, res:Restify.Response, next){
+      approveUserRequest(req)
+        .then( (status) => {
+            res.send(status);
+        });
+      next();
+    }
+
+    export function approveUserRequest(req:Restify.Request){
+      return new Promise<number>((resolve, reject) => {
+      
+          var validReq = pv.verifyParams(req.params.carpoolID, req.params.userToAdd);
+          if(validReq){
+              auth.checkAuth(req)
+                .then( (isAuth) => {
+                  if(isAuth){
+                    // Make a call to the add user to carpool function and 
+                    // send a 200 on success, a 403 if the use making the request is not the owner
+                    // and a 500 on some internal error
+                    // Make sure to remove the request once it is processed.
+                    resolve(200)
+                  }
+                  else{
+                      resolve(401);
+                  }
+                });
+          }
+
+          else {
+              resolve(400);
+          }
+      });
     }
 
 }

@@ -18,6 +18,8 @@ class routes{
 
         /*********** Carppool Routes ***********/
         server.post("/carpools/request", carpoolCtrl.requestToJoin);
+        server.post("/carpools/approve", carpoolCtrl.approveRequest);
+
 
 
         /*********** Documentation routes ***********/
