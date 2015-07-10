@@ -94,6 +94,14 @@ module CarpoolService {
       })
   }
 
+  export function getCarpools(limit: number) :  Promise<models.Carpool[]> {
+    var query = r.db(db).table(table).limit(limit).coerceTo('array');
+    return q.run(query)()
+      .then((_carpools) => {
+        return _carpools;
+      });
+  }
+
   // Gets all of the emails for the carpool with the provided id, minues the email provided
   // in the notThisUser string
   export function getUserEmails(carpoolID: string, notThisUser?:string) :  Promise<string> {
