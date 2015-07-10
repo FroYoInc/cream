@@ -72,6 +72,39 @@ export class EmailService {
     });
   }
 
+
+  /**
+   * Sends the activation email to the specified user.
+   *
+   * @param  {models.User}                         user           The user.
+   * @param  {string}                              activationCode Their activation code.
+   * @return {Promise<nodemailer.SentMessageInfo>}                A Promise.
+   */
+  public sendRequestToJoin(user: models.User, recipient:string): Promise<nodemailer.SentMessageInfo> {
+
+    var transporter = this.buildTransporter();
+
+    var mailOptions = {
+      from: config.Config.email.name + ' <' + config.Config.email.auth.user + '>',
+      to: recipient,
+      subject: 'A user is requesting to join your carpool',
+      text: user.firstName + " " + user.lastName + " wants to join your carpool.  Please log in and approve or deny their request"
+    };
+
+    return new Promise<nodemailer.SentMessageInfo>((resolve, reject) => {
+
+      transporter.sendMail(mailOptions, (error, sent) => {
+        if (error)
+        {
+          reject(new errors.ActivationCodeSendException(error.message));
+          return;
+        }
+
+        resolve(sent);
+      });
+    });
+  }
+
   /**
    * Builds an instance of a Transporter to be used with nodemailer to send
    * an email.

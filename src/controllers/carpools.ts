@@ -9,6 +9,7 @@ import emailServ = require('../services/email-service');
 // import carpoolServ = require('../services/carpool.svc');
 import errors = require('../errors/errors');
 
+var emailSvc = new emailServ.EmailService();
 
 module carpoolControllers{
 
@@ -32,20 +33,11 @@ module carpoolControllers{
                           .then( (result) => {
                               if(result){
                                   // Notify the members of the carpool that someone wises to join
-                                  // carpoolServ.getCarpoolByID(req.params.carpoolID)
-                                  //   .then( (carpool) => {
-                                  //     var mailingList = "";
-
-                                  //     for(var i = 0; i < carpool.users.length; ++i{
-                                  //       mailingList += carpool.users[i].email;
-                                  //       if(i != carpool.users.length - 1{
-                                  //         mailingList += ","
-                                  //       }
-                                  //     }
-                                  //     // send the email to the mailing list
-
+                                  // carpoolServ.getOwnerEmails(req.params.carpoolID)
+                                  //   .then(emailSvc.sendRequestToJoin})
+                                  //   .then( () => {
+                                  //     resolve(201)
                                   //   });
-                                  resolve(201);
                               }
                               else{
                                   resolve(500);
