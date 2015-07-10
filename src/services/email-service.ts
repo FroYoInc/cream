@@ -88,7 +88,7 @@ export class EmailService {
       from: config.Config.email.name + ' <' + config.Config.email.auth.user + '>',
       to: recipient,
       subject: 'A user is requesting to join your carpool',
-      text: user.firstName + " " + user.lastName + " wants to join your carpool.  Please log in and approve or deny their request"
+      text: "A user has requested to join your carpool.  Please log in and approve or deny their request."
     };
 
     return new Promise<nodemailer.SentMessageInfo>((resolve, reject) => {
