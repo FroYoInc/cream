@@ -10,20 +10,20 @@ class routes{
 
         /*********** User routes ***********/
 
-        server.post("/users/login/", userControllers.login);
-        server.get("/users/logout", userControllers.logout);
-        server.post("/users", CreateUserCtrl.createUser);
+        server.post("/api/users/login/", userControllers.login);
+        server.get("/api/users/logout", userControllers.logout);
+        server.post("/api/users", CreateUserCtrl.createUser);
 
 
         /*********** Documentation routes ***********/
 
         // /docs does not render the css correctly, so redirect to /docs/
-        server.get('/docs', function(req, res, next){
-            res.header('Location', '/docs/');
+        server.get('/api/docs/', function(req, res, next){
+            res.header('Location', '/api/docs/');
             res.send(302);
         });
 
-        server.get(/\/docs\/?.*/, Restify.serveStatic({
+        server.get(/\/api\/docs\/?.*/, Restify.serveStatic({
           directory: c.Config.docs.dir,
           default: c.Config.docs.defaultFile
         }));
