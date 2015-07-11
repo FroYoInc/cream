@@ -55,7 +55,7 @@ export class EmailService {
       to: user.firstName + ' ' + user.lastName + ' <' + user.email + '>',
       subject: 'Activate Your Carpooling Account',
       text: 'Hello ' + user.firstName + ', ' + "\r\n"
-            + 'You need to activate your account here: ' + config.Config.app.baseurl + '/activate?code=' + activationCode
+            + 'You need to activate your account here: ' + config.Config.app.baseurl + '/activate/' + activationCode
     };
 
     return new Promise<nodemailer.SentMessageInfo>((resolve, reject) => {
