@@ -44,6 +44,11 @@ module Errors {
       super('invalid carpool name', 'CarpoolNameValidationException');
     }
   }
+  export class CarpoolNotFoundException extends Exception {
+    constructor() {
+      super('carpool not found', 'CarpoolNotFoundException');
+    }
+  }
   export class CampusNameValidationException extends Exception {
     constructor() {
       super('invalid campus name', 'CampusNameValidationException');

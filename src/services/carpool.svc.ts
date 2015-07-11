@@ -87,10 +87,14 @@ module CarpoolService {
     var query = r.db(db).table(table).filter({id:carpoolID}).coerceTo('array');
     return q.run(query)()
       .then((_carpool) => {
-        assert.equal(_carpool.length, 1,
-          "Exactly one carpool should have been found");
+        assert.equal(true, (_carpool.length <= 1),
+          "DB should not have returned more than 1 carpool");
+        if (_carpool.length == 0) {
+          throw new errors.CarpoolNotFoundException();
+        } else {
           var carpool:models.Carpool = _carpool[0];
           return carpool;
+        }
       })
   }
 
@@ -120,7 +124,7 @@ module CarpoolService {
               resolve(emails.join(", "));
             }
           }
-          
+
           var length = _carpool.participants.length;
           for (var i = 0; i < length; ++i){
 

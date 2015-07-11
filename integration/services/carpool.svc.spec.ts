@@ -79,8 +79,10 @@ describe('CarpoolService', () => {
 
   it('should get a carpool by id', (done) => {
 
-    carpoolSvc.getCarpoolByID(carpoolID)
-      .then( (carpool) =>{
+    carpoolSvc.getCarpoolByID('non-existantCarpoolID')
+      .catch(errors.CarpoolNotFoundException, () => {})
+      .then(() => {return carpoolSvc.getCarpoolByID(carpoolID)})
+      .then((carpool) =>{
         expect(carpool.name).toBe('fropool');
         expect(carpool.description).toBe('first carpool');
         expect(carpool.id).toBeDefined();
