@@ -103,19 +103,6 @@ module CarpoolService {
       });
   }
 
-
-  // This should take an id as an argument and return the carpool it is associated with.
-  export function getCarpoolByID(carpoolID: string) :  Promise<models.Carpool> {
-    var query = r.db(db).table(table).filter({id:carpoolID}).coerceTo('array');
-    return q.run(query)()
-      .then((_carpool) => {
-        assert.equal(_carpool.length, 1,
-          "Exactly one carpool should have been found");
-          var carpool:models.Carpool = _carpool[0];
-          return carpool;
-      })
-  }
-
   // Gets all of the emails for the carpool with the provided id, minues the email provided
   // in the notThisUser string
   export function getUserEmails(carpoolID: string, notThisUser?:string) :  Promise<string> {
