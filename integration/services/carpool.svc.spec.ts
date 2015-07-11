@@ -11,6 +11,13 @@ import utils = require('../utils');
 var db = 'froyo';
 var table = 'carpools';
 
+enum Caught {Yes};
+function _catch() {return Caught.Yes}
+function checkCaught(arg: Caught) {
+  if (arg !== Caught.Yes) {
+    fail(new Error("Expected an exception to be caught"))
+  }
+}
 function expectFalse(arg) {
   expect(arg).toBe(false);
 }
@@ -70,8 +77,9 @@ describe('CarpoolService', () => {
         carpoolID = carpool.id;
         expect(carpool.id).toBeDefined();
       })
-      .then(doesCarpoolExist('fropool'))
-      .then(expectTrue)
+      .then(createCarpool('fropool', campus, 'second carpool', owner.userName))
+      .catch(errors.CarpoolExistException, _catch)
+      .then(checkCaught)
       .catch(fail)
       .error(fail)
       .finally(done);
@@ -80,7 +88,8 @@ describe('CarpoolService', () => {
   it('should get a carpool by id', (done) => {
 
     carpoolSvc.getCarpoolByID('non-existantCarpoolID')
-      .catch(errors.CarpoolNotFoundException, () => {})
+      .catch(errors.CarpoolNotFoundException, _catch)
+      .then(checkCaught)
       .then(() => {return carpoolSvc.getCarpoolByID(carpoolID)})
       .then((carpool) =>{
         expect(carpool.name).toBe('fropool');
