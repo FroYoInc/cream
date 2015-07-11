@@ -153,13 +153,8 @@ describe('UserService', () => {
     var user:models.User;
     var activationCode:string;
     function findUserActivationCode(_user:models.User) {
-      var findUserActivationCodeQuery = r.db('froyo')
-        .table('activation')
-        .coerceTo('array')
-        .filter({'userId': _user.id})
-        .nth(0);
-      return q.run(findUserActivationCodeQuery)()
-        .then((result) => { activationCode = result.id})
+      return utils.findUserActivationCode(_user)
+        .then((ac) => {activationCode = ac;})
         .return(_user);
     }
     createUser(rs(), rs(), rs(), em(), rs(), rs())()
