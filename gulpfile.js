@@ -1,13 +1,15 @@
-var gulp   = require('gulp');
-var $      = require('gulp-load-plugins')();
-var spawn  = require('child_process').spawn;
-var path   = require('path');
-var config = require('./config.js');
+var gulp       = require('gulp');
+var $          = require('gulp-load-plugins')();
+var spawn      = require('child_process').spawn;
+var path       = require('path');
+var SMTPServer = require('smtp-server').SMTPServer;
+var config     = require('./config.js');
 
 
 var ts           = $.typescript;
 var tsProject    = ts.createProject(config.tsConfigFile);
 var server       = null;
+var smtpServer   = null;
 var failOnErrors = false;
 
 $.del = require('del');
@@ -32,10 +34,39 @@ gulp.task('transpile-ts2js', ['clean-js'], function () {
                   .pipe(gulp.dest(config.tsOutDir));
 });
 
-gulp.task('restart-server', ['transpile-ts2js'], function() {
+gulp.task('restart-smtp-server', function(cb) {
+  var smtpOpts = {
+    disabledCommands: ['STARTTLS'],
+    logger: false,
+    onAuth: function (auth, session, callback) {
+      if (auth.username !== config.smtp.user ||
+        auth.password !== config.smtp.pass) {
+        return callback(new Error('Invalid username or password'));
+      }
+      callback(null, {user: config.smtp.user});
+    },
+    onData: function (stream, session, callback) {
+      stream.pipe(process.stdout);
+      stream.on('end', callback);
+    },
+  };
+  if (smtpServer) {
+    smtpServer.close(function() {
+      smtpServer = new SMTPServer(smtpOpts);
+      smtpServer.listen(config.smtp.port, cb);
+    });
+  } else {
+    smtpServer = new SMTPServer(smtpOpts);
+    smtpServer.listen(config.smtp.port, cb);
+  }
+});
+
+gulp.task('restart-app-server', ['transpile-ts2js'], function() {
   if (server) server.kill()
   return server = spawn('node', [config.initFilePath], {stdio: 'inherit'});
 });
+
+gulp.task('restart-servers', ['restart-app-server', 'restart-smtp-server']);
 
 gulp.task('unit-tests', ['transpile-ts2js'], function() {
   return gulp.src(config.testFiles)
@@ -59,9 +90,10 @@ gulp.task('integration-test-stg1', ['integration-test-stg0',
 gulp.task('integration-tests', ['integration-test-stg0',
 'integration-test-stg1']);
 
-gulp.task('default', ['unit-tests', 'restart-server'], function() {
+
+gulp.task('default', ['unit-tests', 'restart-servers'], function() {
    var files = [config.tsFilesGlob, config.tsConfigFile];
-   gulp.watch(files, ['unit-tests', 'restart-server']);
+   gulp.watch(files, ['unit-tests', 'restart-servers']);
 });
 
 gulp.task('test', function() {
