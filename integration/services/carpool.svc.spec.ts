@@ -28,6 +28,7 @@ function doesCarpoolExist(carpoolName: string): () => Promise<boolean> {
 }
 
 var owner:models.User;
+
 var carpoolID: string;
 // Create a user first
 
@@ -136,9 +137,15 @@ describe('CarpoolService', () => {
 
   it('should not add a user to a carpool for an invalid owner', (done) => {
 
-    carpoolSvc.addUserToCarpool(carpoolID, "123456789", owner.id)
+    carpoolSvc.addUserToCarpool(carpoolID, "123456789", "1234")
       .then(fail)
       .catch(errors.NotCarpoolOwner, done)
+  });
+
+  it('should not add a user to a carpool if that user is already in the carpool', (done) => {
+    carpoolSvc.addUserToCarpool(carpoolID, owner.id, "123456789")
+      .then(fail)
+      .catch(errors.UserAlreadyInCarpool, done)
   });
 
 });

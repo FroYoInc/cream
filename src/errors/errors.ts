@@ -116,8 +116,14 @@ module Errors {
   }
 
   export class NotCarpoolOwner extends Exception {
-    constructor(message:string){
-      super(message, 'NotCarpoolOwner');
+    constructor(){
+      super("User must be the carpool owner to add a user.", 'NotCarpoolOwner');
+    }
+  }
+
+  export class UserAlreadyInCarpool extends Exception {
+    constructor(){
+      super("The user is already in the carpool.", 'UserAlreadyInCarpool');
     }
   }
 }

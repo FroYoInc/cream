@@ -103,6 +103,19 @@ module CarpoolService {
       });
   }
 
+
+  // This should take an id as an argument and return the carpool it is associated with.
+  export function getCarpoolByID(carpoolID: string) :  Promise<models.Carpool> {
+    var query = r.db(db).table(table).filter({id:carpoolID}).coerceTo('array');
+    return q.run(query)()
+      .then((_carpool) => {
+        assert.equal(_carpool.length, 1,
+          "Exactly one carpool should have been found");
+          var carpool:models.Carpool = _carpool[0];
+          return carpool;
+      })
+  }
+
   // Gets all of the emails for the carpool with the provided id, minues the email provided
   // in the notThisUser string
   export function getUserEmails(carpoolID: string, notThisUser?:string) :  Promise<string> {
@@ -121,15 +134,17 @@ module CarpoolService {
             }
           }
           
-          for (var i = 0; i < _carpool.participants.length; ++i){
+          var length = _carpool.participants.length;
+          for (var i = 0; i < length; ++i){
 
             userSvc.getUserById(_carpool.participants[i])
               .then((user) => {
-                appendToArray(user.email,_carpool.participants.length);
+                appendToArray(user.email,length);
               })
               .catch(errors.UserNotFoundException, (err) => {});
 
           }
+
         });
     });
 
@@ -160,16 +175,21 @@ module CarpoolService {
       getCarpoolByID(carpoolID)
         .then( (_carpool) => {
             if(_carpool.owner == owner){
-              q.run(query)()
-                .then( (result) => {
-                  getCarpoolByID(carpoolID)
-                    .then((carpool) => {
-                      resolve(carpool)
-                    })
-                })
+              if(_carpool.participants.indexOf(userToAdd) < 0){ // Make sure the user is not already in the carpool
+                q.run(query)()
+                  .then( (result) => {
+                    getCarpoolByID(carpoolID)
+                      .then((carpool) => {
+                        resolve(carpool)
+                      })
+                  })
+              }
+              else{
+                throw new errors.UserAlreadyInCarpool();
+              }
             }
             else{
-              throw new errors.NotCarpoolOwner("Must be carpool owner to add a user");
+              throw new errors.NotCarpoolOwner();
             }
         }).catch(Error, (err) => {reject(err);})
 
