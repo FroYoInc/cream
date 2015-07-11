@@ -20,6 +20,7 @@
     "files": [
         "./integration/controllers/create-user.ctrl.spec.ts",
         "./integration/dbutils/migrator.spec.ts",
+        "./integration/services/campus.svc.spec.ts",
         "./integration/services/carpool.svc.spec.ts",
         "./integration/services/user.auth.spec.ts",
         "./integration/services/user.service.spec.ts",

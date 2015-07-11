@@ -47,13 +47,7 @@ describe('CarpoolService', () => {
 
     var campus:models.Campus = {
       name: 'FroYoCampus',
-      address: {
-            address: '123 Elm St',
-            geoCode: {
-                lat: 100,
-                long: 100
-            }
-          },
+      location: {x: 100, y: 100},
     };
 
     doesCarpoolExist('fropool')()
