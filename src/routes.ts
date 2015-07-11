@@ -1,5 +1,6 @@
 import Restify = require('restify');
 import userControllers = require('./controllers/users');
+import ActivationController = require('./controllers/activation.ctrl');
 import CreateUserCtrl = require('./controllers/create-user.ctrl');
 import c = require("./config");
 
@@ -13,6 +14,7 @@ class routes{
         server.post("/users/login/", userControllers.login);
         server.get("/users/logout", userControllers.logout);
         server.post("/users", CreateUserCtrl.createUser);
+        server.get('/activate/:activate', ActivationController.activate);
 
 
         /*********** Documentation routes ***********/
