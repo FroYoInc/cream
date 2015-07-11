@@ -1,5 +1,5 @@
 import createUserCtrl = require('./create-user.ctrl');
-import carpoolCtrl = require('./carpools.ctrl');
+import carpoolCtrl = require('./carpool.ctrl');
 
 module Controllers {
   export var createUser = createUserCtrl.createUser;
