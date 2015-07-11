@@ -123,11 +123,11 @@ module CarpoolService {
   }
 
   // This should take a limit as an argument and return no more than that number of carpools.
-  export function getCarpools(limit: number) :  Promise<models.Carpool[]> {
+  export function getCarpools(limit: number) :  Promise<Array<models.Carpool>> {
     var query = r.db(db).table(table).limit(limit).coerceTo('array');
     return q.run(query)()
       .then((_carpools) => {
-        return _carpools;
+        return <Array<models.Carpool>> _carpools;
       });
   }
 
