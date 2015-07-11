@@ -49,6 +49,16 @@ module Errors {
       super('carpool not found', 'CarpoolNotFoundException');
     }
   }
+  export class CarpoolOwnerNotFoundException extends Exception {
+    constructor() {
+      super('carpool owner user not found', 'CarpoolOwnerNotFoundException');
+    }
+  }
+  export class CarpoolExistException extends Exception {
+    constructor() {
+      super('carpool already exist', 'CarpoolExistException');
+    }
+  }
   export class CampusNameValidationException extends Exception {
     constructor() {
       super('invalid campus name', 'CampusNameValidationException');

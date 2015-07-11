@@ -66,6 +66,7 @@ describe('CarpoolService', () => {
 
     doesCarpoolExist('fropool')()
       .then(expectFalse)
+      // Test carpool can be created
       .then(createCarpool('fropool', campus, 'first carpool', owner.userName))
       .then((carpool) => {
         expect(carpool.name).toBe('fropool');
@@ -77,9 +78,15 @@ describe('CarpoolService', () => {
         carpoolID = carpool.id;
         expect(carpool.id).toBeDefined();
       })
-      .then(createCarpool('fropool', campus, 'second carpool', owner.userName))
+      // Test that carpool cannot be created if one exist with same name
+      .then(createCarpool('fropool', campus, 'second', owner.userName))
       .catch(errors.CarpoolExistException, _catch)
       .then(checkCaught)
+      // Test that carpool cannot be created if owner does not exist
+      .then(createCarpool('yopool', campus, 'second', 'non-existantowner'))
+      .catch(errors.CarpoolOwnerNotFoundException, _catch)
+      .then(checkCaught)
+      // Fail if any other error was thrown
       .catch(fail)
       .error(fail)
       .finally(done);

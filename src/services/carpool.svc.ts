@@ -16,6 +16,13 @@ var carpoolNameIndex = 'name';
 
 module CarpoolService {
   var carpoolNameValidator = new v.CarpoolNameValidator();
+  function getCarpoolExistQuery(carpoolName):r.Expression<boolean> {
+    return r.db(db)
+      .table(table)
+      .getAll(carpoolName, {index: carpoolNameIndex})
+      .isEmpty().not();
+  }
+
   export function createCarpool(name: string,
     campus: models.Campus, description: string, owner: string)
     :Promise<models.Carpool> {
@@ -30,6 +37,9 @@ module CarpoolService {
         .then((user) => {
           carpool.owner = user.id;
           carpool.participants = [user.id];
+        })
+        .catch(errors.UserNotFoundException, () => {
+          throw new errors.CarpoolOwnerNotFoundException();
         });
     }
 
@@ -42,6 +52,10 @@ module CarpoolService {
 
     function insertCarpoolModel() {
       var ownerExistQuery = userSvc.userExistQuery(owner);
+      var carpoolDoesNotExistQuery = getCarpoolExistQuery(name).not();
+      var ownerExistAndCarpoolDoesNotExistQuery = ownerExistQuery
+        .and(carpoolDoesNotExistQuery);
+
       var createCarpoolQuery = r.db(db)
         .table(table)
         .insert({
@@ -51,13 +65,28 @@ module CarpoolService {
           'campus': carpool.campus,
           'description': carpool.description
         });
-      var createCarpoolIfOwnerExistQuery = r.branch(
-        ownerExistQuery, createCarpoolQuery, r.expr('user does not exist'));
 
-      return q.run(createCarpoolIfOwnerExistQuery)()
+      // Note: Even though buildCarpoolModel check to see if user exist
+      // there can be a race condition where a user get removed right after
+      // buildCarpoolModel method is completed. So we need to check if user
+      // exist before actually inserting the carpool model.
+      var createCarpoolIfOwnerExistAndCarpoolDoesNotExistQuery =
+        r.branch(
+          ownerExistAndCarpoolDoesNotExistQuery,
+          createCarpoolQuery,
+          r.branch(
+              getCarpoolExistQuery(name),
+              r.expr('carpool with same name exist'),
+              r.expr('owner not found')
+          )
+        );
+
+      return q.run(createCarpoolIfOwnerExistAndCarpoolDoesNotExistQuery)()
         .then((result) => {
-          if (result == 'user does not exist') {
-            throw new errors.UserNotFoundException();
+          if (result == 'owner not found') {
+            throw new errors.CarpoolOwnerNotFoundException();
+          } else if (result == 'carpool with same name exist') {
+            throw new errors.CarpoolExistException();
           } else {
             setCarpoolID(result);
             return carpool;
@@ -71,12 +100,7 @@ module CarpoolService {
   }
 
   export function doesCarpoolExist(carpoolName: string): Promise<boolean> {
-    var carpoolExistQuery = r.db(db)
-      .table(table)
-      .getAll(carpoolName, {index: carpoolNameIndex})
-      .isEmpty().not();
-
-    return q.run(carpoolExistQuery)()
+    return q.run(getCarpoolExistQuery(carpoolName))()
       .then((result) => {
         return result === true
       });
