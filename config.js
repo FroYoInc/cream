@@ -33,6 +33,11 @@ var migratorTest = function() {
 }
 
 module.exports = {
+  'smtp': {
+    'port': 8081,
+    'user': 'no-reply@froyo.com',
+    'pass': 'froyo'
+  },
   'tsConfigFile': 'tsconfig.json',
   'tsconfig': tsConfig(),
   'tsd': tsd(),
