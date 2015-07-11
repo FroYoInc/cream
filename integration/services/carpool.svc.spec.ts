@@ -35,6 +35,7 @@ function doesCarpoolExist(carpoolName: string): () => Promise<boolean> {
 }
 
 var owner:models.User;
+var owner2:models.User;
 
 var carpoolID: string;
 // Create a user first
@@ -45,6 +46,12 @@ describe('CarpoolService', () => {
     userSvc.createUser('_', '_', utils.rs(), utils.em(), '_', '_')
       .then((user) => {
         owner = user;
+      })
+      .then(() => {
+        return userSvc.createUser('fro', 'do', utils.rs(), utils.em(), '_', '_');
+      })
+      .then((_owner2) => {
+        owner2 = _owner2;
       })
       .catch(fail)
       .error(fail)
@@ -86,6 +93,7 @@ describe('CarpoolService', () => {
       .then(createCarpool('yopool', campus, 'second', 'non-existantowner'))
       .catch(errors.CarpoolOwnerNotFoundException, _catch)
       .then(checkCaught)
+      .then(createCarpool('frodo', campus, 'first carpool', owner2.userName))
       // Fail if any other error was thrown
       .catch(fail)
       .error(fail)
