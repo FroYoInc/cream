@@ -125,6 +125,13 @@ module CarpoolService {
   // This should take a limit as an argument and return no more than that number of carpools.
   export function getCarpools(limit: number) :  Promise<Array<models.Carpool>> {
     var query = r.db(db).table(table).limit(limit).coerceTo('array');
+    //var query = r.db('froyo').table('carpools').merge(function (carpool) {
+    //  return {owner: r.db('froyo').table('users').get(carpool('owner')) };
+    //}).limit(1).coerceTo('array');
+
+    //eqJoin, restructure the object without left/right fields
+
+
     return q.run(query)()
       .then((_carpools) => {
         return <Array<models.Carpool>> _carpools;
