@@ -22,6 +22,10 @@ module DBUtils {
         indices: ['name']
       },
       {
+        tableName: 'campuses',
+        indices: ['name']
+      },
+      {
         tableName: 'activation',
         indices: []
       }]

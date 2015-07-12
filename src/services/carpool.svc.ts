@@ -7,8 +7,8 @@ import q = require('../dbutils/query');
 import models = require('../models/models');
 import errors = require('../errors/errors');
 import userSvc = require('./user-service');
+import campusSvc = require('./campus.svc');
 import v = require('../validation/carpoolname.validator');
-import userService = require('../../src/services/user-service');
 
 var db = 'froyo';
 var table = 'carpools';
@@ -24,17 +24,23 @@ module CarpoolService {
   }
 
   export function createCarpool(name: string,
-    campus: models.Campus, description: string, owner: string)
+    campusName: string, description: string, owner: string)
     :Promise<models.Carpool> {
 
     var carpool:models.Carpool = <models.Carpool>{};
 
     function buildCarpoolModel() {
-      carpool.name = name;
-      carpool.description = description;
-      carpool.campus = campus;
-      return userSvc.getUserByUserName(owner)
-        .then((user) => {
+      /*carpool.campus = campus;*/
+      return Promise.resolve()
+        .then(() => {
+          var p1 = userSvc.getUserByUserName(owner);
+          var p2 = campusSvc.getCampusByName(campusName);
+          return [p1, p2]
+        })
+        .spread((user:models.User, campus:models.Campus) => {
+          carpool.name = name;
+          carpool.description = description;
+          carpool.campus = campus;
           carpool.owner = user.id;
           carpool.participants = [user.id];
         })
