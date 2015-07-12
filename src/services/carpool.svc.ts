@@ -76,6 +76,8 @@ module CarpoolService {
       // there can be a race condition where a user get removed right after
       // buildCarpoolModel method is completed. So we need to check if user
       // exist before actually inserting the carpool model.
+      //TODO: Make this query be createCarpoolIfOwnerExistAndCampusExistAndCarpoolDoesNotExist
+      //TODO: There can be a race conditioj here if we do not check the existant of a campus
       var createCarpoolIfOwnerExistAndCarpoolDoesNotExistQuery =
         r.branch(
           ownerExistAndCarpoolDoesNotExistQuery,
