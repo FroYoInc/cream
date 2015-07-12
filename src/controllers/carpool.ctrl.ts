@@ -2,6 +2,10 @@ import restify = require('restify')
 import carpoolService = require('../services/carpool.svc')
 
 module CarpoolController {
+  export function createCarpool(
+    req:restify.Request, res:restify.Response, next:restify.Next) {
+  }
+
   export function getCarpools(
     req:restify.Request, res:restify.Response, next:restify.Next) {
 
