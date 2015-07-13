@@ -29,8 +29,7 @@ module CarpoolService {
 
     var carpool:models.Carpool = <models.Carpool>{};
 
-    function buildCarpoolModel() {
-      /*carpool.campus = campus;*/
+    function buildCarpoolModel():Promise<void> {
       return Promise.resolve()
         .then(() => {
           var p1 = userSvc.getUserByUserName(owner);
@@ -57,11 +56,9 @@ module CarpoolService {
     }
 
     function insertCarpoolModel() {
-      var ownerExistQuery = userSvc.userExistQuery(owner);
-      var carpoolDoesNotExistQuery = getCarpoolExistQuery(name).not();
-      var ownerExistAndCarpoolDoesNotExistQuery = ownerExistQuery
-        .and(carpoolDoesNotExistQuery);
-
+      var ownerExistQ = userSvc.userExistQuery(owner);
+      var campusExistQ = campusSvc.campusExistsQuery(campusName);
+      var carpoolExistQ = getCarpoolExistQuery(name);
       var createCarpoolQuery = r.db(db)
         .table(table)
         .insert({
@@ -72,28 +69,33 @@ module CarpoolService {
           'description': carpool.description
         });
 
-      // Note: Even though buildCarpoolModel check to see if user exist
+      // Note: Even though buildCarpoolModel ensure campus and user exist,
       // there can be a race condition where a user get removed right after
       // buildCarpoolModel method is completed. So we need to check if user
       // exist before actually inserting the carpool model.
-      //TODO: Make this query be createCarpoolIfOwnerExistAndCampusExistAndCarpoolDoesNotExist
-      //TODO: There can be a race conditioj here if we do not check the existant of a campus
-      var createCarpoolIfOwnerExistAndCarpoolDoesNotExistQuery =
+      var createCarpoolIfOwnerExistAndCampusExistAndCarpoolDoesNotExist =
         r.branch(
-          ownerExistAndCarpoolDoesNotExistQuery,
-          createCarpoolQuery,
+          ownerExistQ,
           r.branch(
-              getCarpoolExistQuery(name),
-              r.expr('carpool with same name exist'),
-              r.expr('owner not found')
-          )
+            campusExistQ,
+            r.branch(
+              carpoolExistQ,
+              r.expr('carpool already exist'),
+              createCarpoolQuery
+            ),
+            r.expr('campus not found')
+          ),
+          r.expr('owner not found')
         );
 
-      return q.run(createCarpoolIfOwnerExistAndCarpoolDoesNotExistQuery)()
+      return q.run(
+        createCarpoolIfOwnerExistAndCampusExistAndCarpoolDoesNotExist)()
         .then((result) => {
           if (result == 'owner not found') {
             throw new errors.CarpoolOwnerNotFoundException();
-          } else if (result == 'carpool with same name exist') {
+          } else if (result == 'campus not found') {
+            throw new errors.CampusNotFoundException();
+          } else if (result == 'carpool already exist') {
             throw new errors.CarpoolExistException();
           } else {
             setCarpoolID(result);

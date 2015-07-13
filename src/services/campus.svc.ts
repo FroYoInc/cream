@@ -29,7 +29,7 @@ module CampusService {
    * @param  {string} campusName [description]
    * @return {[type]}            [description]
    */
-  function campusExistsQuery(campusName: string) {
+  export function campusExistsQuery(campusName: string) {
     return r.db(db)
       .table(table)
       .getAll(campusName, { index: campusNameIndex })
