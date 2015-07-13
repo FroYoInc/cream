@@ -7,8 +7,8 @@ import q = require('../dbutils/query');
 import models = require('../models/models');
 import errors = require('../errors/errors');
 import userSvc = require('./user-service');
+import campusSvc = require('./campus.svc');
 import v = require('../validation/carpoolname.validator');
-import userService = require('../../src/services/user-service');
 
 var db = 'froyo';
 var table = 'carpools';
@@ -24,17 +24,22 @@ module CarpoolService {
   }
 
   export function createCarpool(name: string,
-    campus: models.Campus, description: string, owner: string)
+    campusName: string, description: string, owner: string)
     :Promise<models.Carpool> {
 
     var carpool:models.Carpool = <models.Carpool>{};
 
-    function buildCarpoolModel() {
-      carpool.name = name;
-      carpool.description = description;
-      carpool.campus = campus;
-      return userSvc.getUserByUserName(owner)
-        .then((user) => {
+    function buildCarpoolModel():Promise<void> {
+      return Promise.resolve()
+        .then(() => {
+          var p1 = userSvc.getUserByUserName(owner);
+          var p2 = campusSvc.getCampusByName(campusName);
+          return [p1, p2]
+        })
+        .spread((user:models.User, campus:models.Campus) => {
+          carpool.name = name;
+          carpool.description = description;
+          carpool.campus = campus;
           carpool.owner = user.id;
           carpool.participants = [user.id];
         })
@@ -51,11 +56,9 @@ module CarpoolService {
     }
 
     function insertCarpoolModel() {
-      var ownerExistQuery = userSvc.userExistQuery(owner);
-      var carpoolDoesNotExistQuery = getCarpoolExistQuery(name).not();
-      var ownerExistAndCarpoolDoesNotExistQuery = ownerExistQuery
-        .and(carpoolDoesNotExistQuery);
-
+      var ownerExistQ = userSvc.userExistQuery(owner);
+      var campusExistQ = campusSvc.campusExistsQuery(campusName);
+      var carpoolExistQ = getCarpoolExistQuery(name);
       var createCarpoolQuery = r.db(db)
         .table(table)
         .insert({
@@ -66,26 +69,33 @@ module CarpoolService {
           'description': carpool.description
         });
 
-      // Note: Even though buildCarpoolModel check to see if user exist
+      // Note: Even though buildCarpoolModel ensure campus and user exist,
       // there can be a race condition where a user get removed right after
       // buildCarpoolModel method is completed. So we need to check if user
       // exist before actually inserting the carpool model.
-      var createCarpoolIfOwnerExistAndCarpoolDoesNotExistQuery =
+      var createCarpoolIfOwnerExistAndCampusExistAndCarpoolDoesNotExist =
         r.branch(
-          ownerExistAndCarpoolDoesNotExistQuery,
-          createCarpoolQuery,
+          ownerExistQ,
           r.branch(
-              getCarpoolExistQuery(name),
-              r.expr('carpool with same name exist'),
-              r.expr('owner not found')
-          )
+            campusExistQ,
+            r.branch(
+              carpoolExistQ,
+              r.expr('carpool already exist'),
+              createCarpoolQuery
+            ),
+            r.expr('campus not found')
+          ),
+          r.expr('owner not found')
         );
 
-      return q.run(createCarpoolIfOwnerExistAndCarpoolDoesNotExistQuery)()
+      return q.run(
+        createCarpoolIfOwnerExistAndCampusExistAndCarpoolDoesNotExist)()
         .then((result) => {
           if (result == 'owner not found') {
             throw new errors.CarpoolOwnerNotFoundException();
-          } else if (result == 'carpool with same name exist') {
+          } else if (result == 'campus not found') {
+            throw new errors.CampusNotFoundException();
+          } else if (result == 'carpool already exist') {
             throw new errors.CarpoolExistException();
           } else {
             setCarpoolID(result);

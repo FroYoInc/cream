@@ -29,7 +29,7 @@ module CampusService {
    * @param  {string} campusName [description]
    * @return {[type]}            [description]
    */
-  function campusExistsQuery(campusName: string) {
+  export function campusExistsQuery(campusName: string) {
     return r.db(db)
       .table(table)
       .getAll(campusName, { index: campusNameIndex })
@@ -82,7 +82,8 @@ module CampusService {
   export function getCampusByName(campusName: string) : Promise<models.Campus> {
     var getCampusByNameQuery = r.db(db)
       .table(table)
-      .getAll(campusName, { index: campusNameIndex });
+      .getAll(campusName, { index: campusNameIndex })
+      .coerceTo('array');
 
     function throwErrorIfCampusNotFound(_campus) {
       if (_campus == null || _campus.length == 0) {
@@ -93,9 +94,14 @@ module CampusService {
     }
 
     function returnCampus(_campus) : models.Campus {
-      var campusList : models.Campus[] = <models.Campus[]> _campus;
-
-      return campusList[0];
+      assert.equal((_campus.length <= 1), true,
+      "Expected only 0 or 1 campus to return.")
+      if (_campus.length === 0) {
+        throw new errors.UserNotFoundException();
+      } else {
+        var campus:models.Campus = _campus[0]
+        return campus;
+      }
     }
 
     return q.run(getCampusByNameQuery)()
@@ -149,3 +155,4 @@ module CampusService {
       .then(returnCampusList);
   }
 }
+export = CampusService;
