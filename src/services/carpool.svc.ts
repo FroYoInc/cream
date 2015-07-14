@@ -141,57 +141,6 @@ module CarpoolService {
       });
   }
 
-  // Gets all of the emails for the carpool with the provided id, minues the email provided
-  // in the notThisUser string
-  export function getUserEmails(carpoolID: string, notThisUser?:string) :  Promise<string> {
-    return new Promise<string>((resolve, reject) => {
-      getCarpoolByID(carpoolID)
-        .then( (_carpool) => {
-          var emails:Array<string> = [];
-
-          function appendToArray(email, max){
-            var length = (notThisUser ? max - 1 : max);
-            if(email != notThisUser){
-              emails.push(email);
-            }
-            if(emails.length == length){
-              resolve(emails.join(", "));
-            }
-          }
-
-          var userIds = _carpool.participants.map((u) => {return u.id});
-          var length = _carpool.participants.length;
-          for (var i = 0; i < length; ++i){
-
-            userSvc.getUserById(userIds[i])
-              .then((user) => {
-                appendToArray(user.email,length);
-              })
-              .catch(errors.UserNotFoundException, (err) => {});
-
-          }
-
-        });
-    });
-
-  }
-
-  export function getOwnerEmail(carpoolID: string, notThisUser?:string) :  Promise<string> {
-    return new Promise<string>((resolve, reject) => {
-      getCarpoolByID(carpoolID)
-        .then( (_carpool) => {
-          var emails:Array<string> = [];
-
-          userSvc.getUserById(_carpool.owner.id)
-            .then((user) => {
-              resolve(user.email);
-            })
-            .catch(errors.UserNotFoundException, (err) => {throw err;});
-
-        });
-    });
-  }
-
   export function addUserToCarpool(carpoolID:string, owner:string, userToAdd:string) : Promise<models.Carpool> {
     return new Promise<models.Carpool>((resolve, reject) => {
       var query = r.db(db).table(table).get(carpoolID).update({
