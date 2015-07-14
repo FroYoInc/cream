@@ -2,6 +2,7 @@ import restify = require('restify')
 import carpoolService = require('../services/carpool.svc')
 import userCtrl = require('./create-user.ctrl');
 import models = require('../models/models');
+import errors = require('../errors/errors');
 
 module CarpoolController {
   export interface OutputJSON {
@@ -10,6 +11,7 @@ module CarpoolController {
     owner: userCtrl.OutputJSON;
     campus: any; // This should be of type CampusController.OutputJSON
     participants: Array<userCtrl.OutputJSON>;
+    href: string;
   }
 
   export function toOutputJSON(carpool:models.Carpool):OutputJSON {
@@ -17,8 +19,9 @@ module CarpoolController {
       'name': carpool.name,
       'description': carpool.description,
       'owner': userCtrl.toOutputJSON(carpool.owner),
-      'campus': carpool.campus,
-      'participants': carpool.participants.map(userCtrl.toOutputJSON)
+      'campus': carpool.campus, // TODO: shoudl be campusCtrl.toOutputJSON
+      'participants': carpool.participants.map(userCtrl.toOutputJSON),
+      'href': '/carpools/' + carpool.id
     };
   }
   export function createCarpool(
@@ -31,12 +34,22 @@ module CarpoolController {
       carpoolService.createCarpool(
         carpoolName, campusName, description, owner)
         .then((carpool) => {
-          console.log(carpool);
-          res.send(201, carpool);
+          res.send(201, toOutputJSON(carpool));
+        })
+        .catch(errors.CarpoolOwnerNotFoundException, (err) => {
+          res.send(new restify.NotAcceptableError(err.message));
+        })
+        .catch(errors.CampusNotFoundException, (err) => {
+          res.send(new restify.NotAcceptableError(err.message));
+        })
+        .catch(errors.CarpoolExistException, (err) => {
+          res.send(new restify.ConflictError(err.message));
         })
         .catch((err) => {
-          console.error(err);
-          res.send(500, err)
+          res.send(new restify.InternalServerError(err.message));
+        })
+        .error((err) => {
+          res.send(new restify.InternalServerError(err.message));
         })
         .finally(next);
   }

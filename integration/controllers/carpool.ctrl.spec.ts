@@ -7,6 +7,7 @@ import models = require('../../src/models/models');
 import userService = require('../../src/services/user-service');
 import CarpoolSvc = require('../../src/services/carpool.svc');
 import CarpoolCtrl = require('../../src/controllers/carpool.ctrl');
+import UserCtrl = require('../../src/controllers/create-user.ctrl');
 
 
 function createCarpool(req:restify.Request, res:restify.Response)
@@ -58,11 +59,13 @@ describe('Carpool controller', () => {
 
     function test0 (status, outputJSON) {
       expect(status).toBe(201);
-      /*expect(outputJSON.name).toBe(inputJSON.name);
+      expect(outputJSON.name).toBe(inputJSON.name);
       expect(outputJSON.description).toBe(inputJSON.description);
-      //TODO: Test rest of json like owner, campus, etc..
-      var hasHref = (outputJSON.href.indexOf('/users/') > -1);
-      expect(hasHref).toEqual(true);*/
+      expect(outputJSON.owner).toEqual(UserCtrl.toOutputJSON(owner));
+      /*TODO: expect(outputJSON.campus).toBe(CampusCtrl.toOutputJSON(campus));*/
+      expect(outputJSON.participants).toEqual([UserCtrl.toOutputJSON(owner)]);
+      var hasHref = (outputJSON.href.indexOf('/carpools/') > -1);
+      expect(hasHref).toEqual(true);
     }
 
     var req = <restify.Request> {};
