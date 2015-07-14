@@ -63,8 +63,8 @@ module CarpoolService {
         .table(table)
         .insert({
           'name': carpool.name,
-          'owner': carpool.owner,
-          'participants': [carpool.owner],
+          'owner': carpool.owner.id,
+          'participants': [carpool.owner.id],
           'campus': carpool.campus,
           'description': carpool.description
         });
