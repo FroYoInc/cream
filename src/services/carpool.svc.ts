@@ -7,8 +7,8 @@ import q = require('../dbutils/query');
 import models = require('../models/models');
 import errors = require('../errors/errors');
 import userSvc = require('./user-service');
+import campusSvc = require('./campus.svc');
 import v = require('../validation/carpoolname.validator');
-import userService = require('../../src/services/user-service');
 
 var db = 'froyo';
 var table = 'carpools';
@@ -16,20 +16,35 @@ var carpoolNameIndex = 'name';
 
 module CarpoolService {
   var carpoolNameValidator = new v.CarpoolNameValidator();
+  function getCarpoolExistQuery(carpoolName):r.Expression<boolean> {
+    return r.db(db)
+      .table(table)
+      .getAll(carpoolName, {index: carpoolNameIndex})
+      .isEmpty().not();
+  }
+
   export function createCarpool(name: string,
-    campus: models.Campus, description: string, owner: string)
+    campusName: string, description: string, owner: string)
     :Promise<models.Carpool> {
 
     var carpool:models.Carpool = <models.Carpool>{};
 
-    function buildCarpoolModel() {
-      carpool.name = name;
-      carpool.description = description;
-      carpool.campus = campus;
-      return userSvc.getUserByUserName(owner)
-        .then((user) => {
-          carpool.owner = user.id;
-          carpool.participants = [user.id];
+    function buildCarpoolModel():Promise<void> {
+      return Promise.resolve()
+        .then(() => {
+          var p1 = userSvc.getUserByUserName(owner);
+          var p2 = campusSvc.getCampusByName(campusName);
+          return [p1, p2]
+        })
+        .spread((user:models.User, campus:models.Campus) => {
+          carpool.name = name;
+          carpool.description = description;
+          carpool.campus = campus;
+          carpool.owner = user;
+          carpool.participants = [user];
+        })
+        .catch(errors.UserNotFoundException, () => {
+          throw new errors.CarpoolOwnerNotFoundException();
         });
     }
 
@@ -41,23 +56,47 @@ module CarpoolService {
     }
 
     function insertCarpoolModel() {
-      var ownerExistQuery = userSvc.userExistQuery(owner);
+      var ownerExistQ = userSvc.userExistQuery(owner);
+      var campusExistQ = campusSvc.campusExistsQuery(campusName);
+      var carpoolExistQ = getCarpoolExistQuery(name);
       var createCarpoolQuery = r.db(db)
         .table(table)
         .insert({
           'name': carpool.name,
-          'owner': carpool.owner,
-          'participants': [carpool.owner],
-          'campus': carpool.campus,
+          'owner': carpool.owner.id,
+          'participants': [carpool.owner.id],
+          'campus': carpool.campus.id,
           'description': carpool.description
         });
-      var createCarpoolIfOwnerExistQuery = r.branch(
-        ownerExistQuery, createCarpoolQuery, r.expr('user does not exist'));
 
-      return q.run(createCarpoolIfOwnerExistQuery)()
+      // Note: Even though buildCarpoolModel ensure campus and user exist,
+      // there can be a race condition where a user get removed right after
+      // buildCarpoolModel method is completed. So we need to check if user
+      // exist before actually inserting the carpool model.
+      var createCarpoolIfOwnerExistAndCampusExistAndCarpoolDoesNotExist =
+        r.branch(
+          ownerExistQ,
+          r.branch(
+            campusExistQ,
+            r.branch(
+              carpoolExistQ,
+              r.expr('carpool already exist'),
+              createCarpoolQuery
+            ),
+            r.expr('campus not found')
+          ),
+          r.expr('owner not found')
+        );
+
+      return q.run(
+        createCarpoolIfOwnerExistAndCampusExistAndCarpoolDoesNotExist)()
         .then((result) => {
-          if (result == 'user does not exist') {
-            throw new errors.UserNotFoundException();
+          if (result == 'owner not found') {
+            throw new errors.CarpoolOwnerNotFoundException();
+          } else if (result == 'campus not found') {
+            throw new errors.CampusNotFoundException();
+          } else if (result == 'carpool already exist') {
+            throw new errors.CarpoolExistException();
           } else {
             setCarpoolID(result);
             return carpool;
@@ -71,12 +110,7 @@ module CarpoolService {
   }
 
   export function doesCarpoolExist(carpoolName: string): Promise<boolean> {
-    var carpoolExistQuery = r.db(db)
-      .table(table)
-      .getAll(carpoolName, {index: carpoolNameIndex})
-      .isEmpty().not();
-
-    return q.run(carpoolExistQuery)()
+    return q.run(getCarpoolExistQuery(carpoolName))()
       .then((result) => {
         return result === true
       });
@@ -84,44 +118,70 @@ module CarpoolService {
 
   // This should take an id as an argument and return the carpool it is associated with.
   export function getCarpoolByID(carpoolID: string) :  Promise<models.Carpool> {
-      var query = r.db(db).table(table).filter({id:carpoolID}).coerceTo('array');
-      return q.run(query)()
-        .then((_carpool) => {
-          assert.equal(_carpool.length, 1,
-            "Exactly one carpool should have been found");
-            var carpool:models.Carpool = _carpool[0];
-            return carpool;
+    var _db =  r.db(db);
+    var carpoolTable = _db.table(table);
+    var getCarpoolQuery = carpoolTable.get(carpoolID).merge({
+      'campus': _db.table('campuses').get(r.row('campus')),
+      'owner': _db.table('users').get(r.row('owner')),
+      'participants': r.row('participants').map((p) => {
+          return _db.table('users').get(p);
         })
+      });
+    var query =
+      r.branch(
+        carpoolTable.get(carpoolID).eq(null).not(),
+        getCarpoolQuery,
+        r.expr('carpool not found')
+      )
+    return q.run(query)()
+      .then((_carpool) => {
+        if (_carpool == 'carpool not found') {
+          throw new errors.CarpoolNotFoundException()
+        } else {
+          assert.equal(true, (_carpool.id == carpoolID),
+          'retrived object should have same id');
+          var carpool:models.Carpool = _carpool;
+          return carpool;
+        }
+      });
   }
 
-  // Gets all of the emails for the carpool with the provided id, minues the email provided
-  // in the notThisUser string
-  export function getUserEmails(carpoolID: string, notThisUser?:string) :  Promise<string> {
-    return new Promise<string>((resolve, reject) => {
+  // This should take a limit as an argument and return no more than that number of carpools.
+  export function getCarpools(limit: number) :  Promise<Array<models.Carpool>> {
+    var query = r.db(db).table(table).limit(limit).coerceTo('array');
+    return q.run(query)()
+      .then((_carpools) => {
+        return <Array<models.Carpool>> _carpools;
+      });
+  }
+
+  export function addUserToCarpool(carpoolID:string, owner:string, userToAdd:string) : Promise<models.Carpool> {
+    return new Promise<models.Carpool>((resolve, reject) => {
+      var query = r.db(db).table(table).get(carpoolID).update({
+                    participants: r.row("participants").append(userToAdd)
+                  });
+
       getCarpoolByID(carpoolID)
         .then( (_carpool) => {
-          var emails:Array<string> = [];
-
-          function appendToArray(email, max){
-            var length = (notThisUser ? max - 1 : max);
-            if(email != notThisUser){
-              emails.push(email);
+            if(_carpool.owner.userName == owner){
+              if(_carpool.participants.map((u) => {return u.id}).indexOf(userToAdd) < 0){ // Make sure the user is not already in the carpool
+                q.run(query)()
+                  .then( (result) => {
+                    getCarpoolByID(carpoolID)
+                      .then((carpool) => {
+                        resolve(carpool)
+                      })
+                  })
+              }
+              else{
+                throw new errors.UserAlreadyInCarpool();
+              }
             }
-            if(emails.length == length){
-              resolve(emails.join(", "));
+            else{
+              throw new errors.NotCarpoolOwner();
             }
-          }
-          
-          for (var i = 0; i < _carpool.participants.length; ++i){
+        }).catch(Error, (err) => {reject(err);})
 
-            userSvc.getUserById(_carpool.participants[i])
-              .then((user) => {
-                appendToArray(user.email,_carpool.participants.length);
-              })
-              .catch(errors.UserNotFoundException, (err) => {});
-
-          }
-        });
     });
 
   }

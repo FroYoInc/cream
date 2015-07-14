@@ -204,7 +204,7 @@ module UserService {
       throw new errors.InvalidActivationCodeException();
     }
 
-    function getUserIdByActivationCode() {
+   function getUserIdByActivationCode() {
       var getActivationQuery = r.db(db)
         .table(activationTable)
         .get(activationCode);
@@ -218,7 +218,7 @@ module UserService {
         });
     }
 
-    function setUserToActivated(user:models.User):models.User {
+   function setUserToActivated(user:models.User):models.User {
       if (user.isAccountActivated) {
         throw new errors.UserAlreadyActivatedException()
       }

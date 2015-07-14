@@ -110,7 +110,68 @@
                     }
                 }
             }
+        },
+
+        "/activate/{activationCode}": {
+            "get": {
+                "summary" : "Activates User account",
+                "description" : "\nThis endpoint takes random generated activation code from email link and switches the _isAccountActivated value from false to true, to call this endpoint make a get request to /activation/activationCode where activationCode is the code you wish to user for activation.",
+                "parameters": [
+                    {
+                        "name": "activationCode",
+                        "in": "path",
+                        "description": "Activation code",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "tags" : ["User"],
+                "responses" : {
+                    "302" : {
+                        "description" : "Redirect to /login on successful activation and redirect to /invalid-activation otherwise"
+                    }
+                }
+            }
+        },
+        "/carpools": {
+            "post": {
+                "summary": "Creates a Carpool.",
+                "description": "\nThis endpoint takes Carpool name, campusName, owner and description in a JSON object and creates a carpool.",
+                "parameters": [
+                    {
+                        "name": "NewCarpool",
+                        "in": "body",
+                        "description": "JSON object containing Carpool name, campus name, owner and description.",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/NewCarpool"
+                        }
+                    }
+                ],
+                "tags": [
+                    "Carpool"
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Carpool created successfully.",
+                        "schema": {
+                            "$ref": "#/definitions/Carpool"
+                        }
+                    },
+                    "406": {
+                        "description": "Carpool owner or campus not found"
+                    },
+                    "409": {
+                        "description": "Carpool already exists."
+                    },
+                    "500": {
+                        "description": "Internal server error."
+                    }
+                }
+            }
         }
+
+
     },
     "definitions": {
         "NewAccountInfo": {
@@ -129,6 +190,20 @@
                 "password": {"required": true, "type": "string"}
             }
         },
+        "NewCarpool": {
+            "required": [
+                "name",
+                "description",
+                "campus",
+                "owner"
+            ],
+            "properties": {
+                "name": {"required": true, "type": "string"},
+                "description": {"required": true, "type": "string"},
+                "campus": {"required": true, "type": "string"},
+                "owner": {"required": true, "type": "string"}
+            }
+        },
         "LoginInfo" : {
             "required": [
                 "email",
@@ -141,7 +216,7 @@
         },
         "User": {
             "required": [
-                "userID",
+                "href",
                 "firstName",
                 "lastName",
                 "userName",
@@ -149,7 +224,7 @@
 
             ],
             "properties" : {
-                "userID" : {"type" :"string"},
+                "href" : {"type" :"string"},
                 "firstName" : {"type" :"string"},
                 "lastName" : {"type" :"string"},
                 "userName" : {"type" :"string"},
@@ -160,45 +235,47 @@
         "Carpool" : {
             "required": [
                 "name",
-                "users",
+                "owner",
+                "participants",
                 "campus",
                 "description",
-                "id"
+                "href"
 
             ],
             "properties" : {
                 "name" : {"type" : "string"},
-                "users": {
-                    "type": "array", 
+                "owner": {"$ref": "#/definitions/User"},
+                "participants": {
+                    "type": "array",
                     "items" : {
                         "$ref" :"#/definitions/User"
                     }
                 },
                 "campus" : { "$ref": "#/definitions/Campus" },
                 "description" : {"type" : "string"},
-                "id" : {"type" :"string"}
+                "href" : {"type" :"string"}
             }
         },
         "Campus" : {
             "required": [
                 "name",
-                "id",
+                "href",
                 "location"
             ],
             "properties" : {
                 "name" : {"type" :"string"},
-                "id" : {"type" :"string"},
+                "href" : {"type" :"string"},
                 "location" : {"$ref":"#/definitions/GeoCode"}
             }
         },
         "GeoCode": {
             "required": [
-                "x",
-                "y"
+                "long",
+                "lat"
             ],
             "properties" : {
-                "x" : {"type" :"number"},
-                "y" : {"type" :"number"}
+                "long" : {"type" :"number"},
+                "lat" : {"type" :"number"}
             }
         },
         "Error": {

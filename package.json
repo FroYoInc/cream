@@ -39,6 +39,7 @@
     "gulp-sourcemaps": "^1.5.2",
     "gulp-tslint": "^3.0.1-beta",
     "gulp-typescript": "^2.7.3",
-    "gulp-util": "^3.0.4"
+    "gulp-util": "^3.0.4",
+    "smtp-server": "^1.4.2"
   }
 }

@@ -1,6 +1,8 @@
 import Restify = require('restify');
 import userControllers = require('./controllers/users');
+import ActivationController = require('./controllers/activation.ctrl');
 import CreateUserCtrl = require('./controllers/create-user.ctrl');
+import CarpoolCtrl = require('./controllers/carpool.ctrl');
 import c = require("./config");
 
 class routes{
@@ -9,11 +11,14 @@ class routes{
 
 
         /*********** User routes ***********/
-
         server.post("/users/login/", userControllers.login);
         server.get("/users/logout", userControllers.logout);
         server.post("/users", CreateUserCtrl.createUser);
+        server.get('/activate/:activate', ActivationController.activate);
 
+        /*********** Carpool routes ***********/
+        server.post('/carpools', CarpoolCtrl.createCarpool);
+        server.get('/carpools/:carpoolid', CarpoolCtrl.getCarpool);
 
         /*********** Documentation routes ***********/
 
