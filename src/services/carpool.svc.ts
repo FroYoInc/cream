@@ -65,7 +65,7 @@ module CarpoolService {
           'name': carpool.name,
           'owner': carpool.owner.id,
           'participants': [carpool.owner.id],
-          'campus': carpool.campus,
+          'campus': carpool.campus.id,
           'description': carpool.description
         });
 
