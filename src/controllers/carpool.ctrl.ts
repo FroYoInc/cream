@@ -36,22 +36,20 @@ module CarpoolController {
         .then((carpool) => {
           res.send(201, toOutputJSON(carpool));
         })
-        .catch(errors.CarpoolOwnerNotFoundException, (err) => {
-          res.send(new restify.NotAcceptableError(err.message));
-        })
-        .catch(errors.CampusNotFoundException, (err) => {
-          res.send(new restify.NotAcceptableError(err.message));
+        .catch(errors.CarpoolOwnerNotFoundException,
+          errors.CampusNotFoundException, (err) => {
+          next(new restify.NotAcceptableError(err.message));
         })
         .catch(errors.CarpoolExistException, (err) => {
-          res.send(new restify.ConflictError(err.message));
+          next(new restify.ConflictError(err.message));
         })
         .catch((err) => {
-          res.send(new restify.InternalServerError(err.message));
+          next(new restify.InternalServerError(err.message));
         })
         .error((err) => {
-          res.send(new restify.InternalServerError(err.message));
+          next(new restify.InternalServerError(err.message));
         })
-        .finally(next);
+        .then(next);
   }
 
   export function getCarpools(

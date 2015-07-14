@@ -73,9 +73,34 @@ describe('Carpool controller', () => {
     req.body = inputJSON;
 
     createCarpool(req, res)
+      // Test carpool cannot be created with an invalid owner
       .then(() => {
+        res.send = () => {};
+        req.body.owner = 'non-existant-username';
+        return createCarpool(req, res);
       })
+      .catch(restify.NotAcceptableError, (err) => {
+        expect(err.message).toBe('CarpoolOwnerNotFoundException:' +
+         ' carpool owner user not found');
+      })
+      // Test carpool cannot be created with an invalid campus
       .then(() => {
+        req.body.owner = owner.userName;
+        req.body.campus = 'non-existant-campus';
+        return createCarpool(req, res);
+      })
+      .catch(restify.NotAcceptableError, (err) => {
+        expect(err.message).toBe('CampusNotFoundException: ' +
+        'No campus found with the specified name or ID.');
+      })
+      // Test carpool cannot be created if carpool already exist
+      .then(() => {
+        req.body.campus = campus.name;
+        return createCarpool(req, res);
+      })
+      .catch(restify.ConflictError, (err) => {
+        expect(err.message).toBe('CarpoolExistException:' +
+        ' carpool already exist');
       })
       .catch(fail)
       .error(fail)
