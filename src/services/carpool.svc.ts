@@ -40,8 +40,8 @@ module CarpoolService {
           carpool.name = name;
           carpool.description = description;
           carpool.campus = campus;
-          carpool.owner = user.id;
-          carpool.participants = [user.id];
+          carpool.owner = user;
+          carpool.participants = [user];
         })
         .catch(errors.UserNotFoundException, () => {
           throw new errors.CarpoolOwnerNotFoundException();
@@ -159,10 +159,11 @@ module CarpoolService {
             }
           }
 
+          var userIds = _carpool.participants.map((u) => {return u.id});
           var length = _carpool.participants.length;
           for (var i = 0; i < length; ++i){
 
-            userSvc.getUserById(_carpool.participants[i])
+            userSvc.getUserById(userIds[i])
               .then((user) => {
                 appendToArray(user.email,length);
               })
@@ -181,7 +182,7 @@ module CarpoolService {
         .then( (_carpool) => {
           var emails:Array<string> = [];
 
-          userSvc.getUserById(_carpool.owner)
+          userSvc.getUserById(_carpool.owner.id)
             .then((user) => {
               resolve(user.email);
             })
@@ -199,8 +200,8 @@ module CarpoolService {
 
       getCarpoolByID(carpoolID)
         .then( (_carpool) => {
-            if(_carpool.owner == owner){
-              if(_carpool.participants.indexOf(userToAdd) < 0){ // Make sure the user is not already in the carpool
+            if(_carpool.owner.userName == owner){
+              if(_carpool.participants.map((u) => {return u.id}).indexOf(userToAdd) < 0){ // Make sure the user is not already in the carpool
                 q.run(query)()
                   .then( (result) => {
                     getCarpoolByID(carpoolID)
