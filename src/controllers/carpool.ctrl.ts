@@ -52,6 +52,24 @@ module CarpoolController {
         .then(next);
   }
 
+  export function getCarpool(
+    req:restify.Request, res:restify.Response, next:restify.Next) {
+    carpoolService.getCarpoolByID(req.params.carpoolid)
+      .then((carpool) => {
+        res.send(201, toOutputJSON(carpool));
+      })
+      .catch(errors.CarpoolNotFoundException, (err) => {
+        next(new restify.NotFoundError(err.message));
+      })
+      .catch((err) => {
+        next(new restify.InternalServerError(err.message));
+      })
+      .error((err) => {
+        next(new restify.InternalServerError(err.message));
+      })
+      .then(next);
+  }
+
   export function getCarpools(
     req:restify.Request, res:restify.Response, next:restify.Next) {
 

@@ -118,18 +118,32 @@ module CarpoolService {
 
   // This should take an id as an argument and return the carpool it is associated with.
   export function getCarpoolByID(carpoolID: string) :  Promise<models.Carpool> {
-    var query = r.db(db).table(table).filter({id:carpoolID}).coerceTo('array');
+    var _db =  r.db(db);
+    var carpoolTable = _db.table(table);
+    var getCarpoolQuery = carpoolTable.get(carpoolID).merge({
+      'campus': _db.table('campuses').get(r.row('campus')),
+      'owner': _db.table('users').get(r.row('owner')),
+      'participants': r.row('participants').map((p) => {
+          return _db.table('users').get(p);
+        })
+      });
+    var query =
+      r.branch(
+        carpoolTable.get(carpoolID).eq(null).not(),
+        getCarpoolQuery,
+        r.expr('carpool not found')
+      )
     return q.run(query)()
       .then((_carpool) => {
-        assert.equal(true, (_carpool.length <= 1),
-          "DB should not have returned more than 1 carpool");
-        if (_carpool.length == 0) {
-          throw new errors.CarpoolNotFoundException();
+        if (_carpool == 'carpool not found') {
+          throw new errors.CarpoolNotFoundException()
         } else {
-          var carpool:models.Carpool = _carpool[0];
+          assert.equal(true, (_carpool.id == carpoolID),
+          'retrived object should have same id');
+          var carpool:models.Carpool = _carpool;
           return carpool;
         }
-      })
+      });
   }
 
   // This should take a limit as an argument and return no more than that number of carpools.
