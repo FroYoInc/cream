@@ -21,7 +21,7 @@ module Models {
     owner: User; // The user id of the owner
     // Owner is a participant by default. Hence participants have at least 1
     // user
-    participants: [User]; // An array of user ids 
+    participants: [User]; // An array of user ids
     campus: Campus;
     description: string;
     id?: string;
