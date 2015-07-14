@@ -14,6 +14,11 @@ module Errors {
       this.stack = (<any>new Error()).stack;
     }
   }
+  export class MissingParametersException extends Exception {
+    constructor(message: string) {
+      super(message, 'MissingParametersException');
+    }
+  }
   export class UserExistException extends Exception {
     constructor() {
       super('user already exist', 'UserExistException');

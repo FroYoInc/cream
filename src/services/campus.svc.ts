@@ -145,7 +145,7 @@ module CampusService {
   export function getCampusList() : Promise<models.Campus[]> {
     var getAllCampusesQuery = r.db(db)
       .table(table)
-      .getAll();
+      .coerceTo('array');
 
     function returnCampusList(_campusList) : models.Campus[] {
       return <models.Campus[]> _campusList;

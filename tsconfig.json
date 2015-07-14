@@ -27,6 +27,7 @@
         "./integration/utils.ts",
         "./src/config.ts",
         "./src/controllers/activation.ctrl.ts",
+        "./src/controllers/campus.ctrl.ts",
         "./src/controllers/carpool.ctrl.ts",
         "./src/controllers/controllers.ts",
         "./src/controllers/create-user.ctrl.ts",
