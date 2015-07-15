@@ -72,14 +72,6 @@ describe('CarpoolService', () => {
 
   it('should create a carpool', (done) => {
 
-<<<<<<< HEAD
-    var campus:models.Campus = {
-      name: 'FroYoCampus',
-      location: {x: 100, y: 100},
-    };
-
-=======
->>>>>>> 67e761bb7ec600e510c12203dd0c50c4c9c375c3
     doesCarpoolExist('fropool')()
       .then(expectFalse)
       // Test carpool can be created

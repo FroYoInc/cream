@@ -26,9 +26,8 @@ function expectTrue(arg) {
   expect(arg).toBe(true);
 }
 
-function createCampus(CampusName: string, location: models.Address)
-: () => Promise<models.Campus> {
-  return () => {return campusSrv.createCampus(CampusName, location)}
+function createCampus(CampusName: string, location: models.Address) {
+  return campusSrv.createCampus(CampusName, location);
 }
 
 describe('Campus Service ' , () => {
@@ -36,9 +35,9 @@ describe('Campus Service ' , () => {
     it('should create a Campus', () => {
       createCampus('FroCampus', TempAddress)
       .then((campus) => {
-        expect(campus._name).toBe('FroCampus');
-        expect(campus._address).toBe(TempAddress);
+        expect(campus.name).toBe('FroCampus');
+        expect(campus.address).toBe(TempAddress);
       });
     });
-    
+
 });
