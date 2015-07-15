@@ -123,38 +123,6 @@ describe('CarpoolService', () => {
   });
 
 
-  /*it('should get the carpool owner\'s email', (done) => {
-
-    carpoolSvc.getOwnerEmail(carpoolID)
-      .then( (emailString) =>{
-        expect(emailString).toBe(owner.email);
-      })
-      .catch(fail)
-      .error(fail)
-      .finally(done);
-  });*/
-
-  /*it('should get all of the emails for the users', (done) => {
-
-    carpoolSvc.getUserEmails(carpoolID)
-      .then( (emailString) =>{
-        expect(emailString).toBe(owner.email);
-      })
-      .catch(fail)
-      .error(fail)
-      .finally(done);
-  });*/
-
-  /*it('should get all of the emails except the email provided', (done) => {
-
-    carpoolSvc.getUserEmails(carpoolID, owner.email)
-      .then( (emailString) =>{
-        expect(emailString).toBe("");
-      })
-      .catch(fail)
-      .error(fail)
-      .finally(done);
-  });*/
 
   /*it('should add a user to a carpool for a valid owner', (done) => {
 

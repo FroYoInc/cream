@@ -63,9 +63,9 @@ module CarpoolService {
         .table(table)
         .insert({
           'name': carpool.name,
-          'owner': carpool.owner,
-          'participants': [carpool.owner],
-          'campus': carpool.campus,
+          'owner': carpool.owner.id,
+          'participants': [carpool.owner.id],
+          'campus': carpool.campus.id,
           'description': carpool.description
         });
 
@@ -118,18 +118,32 @@ module CarpoolService {
 
   // This should take an id as an argument and return the carpool it is associated with.
   export function getCarpoolByID(carpoolID: string) :  Promise<models.Carpool> {
-    var query = r.db(db).table(table).filter({id:carpoolID}).coerceTo('array');
+    var _db =  r.db(db);
+    var carpoolTable = _db.table(table);
+    var getCarpoolQuery = carpoolTable.get(carpoolID).merge({
+      'campus': _db.table('campuses').get(r.row('campus')),
+      'owner': _db.table('users').get(r.row('owner')),
+      'participants': r.row('participants').map((p) => {
+          return _db.table('users').get(p);
+        })
+      });
+    var query =
+      r.branch(
+        carpoolTable.get(carpoolID).eq(null).not(),
+        getCarpoolQuery,
+        r.expr('carpool not found')
+      )
     return q.run(query)()
       .then((_carpool) => {
-        assert.equal(true, (_carpool.length <= 1),
-          "DB should not have returned more than 1 carpool");
-        if (_carpool.length == 0) {
-          throw new errors.CarpoolNotFoundException();
+        if (_carpool == 'carpool not found') {
+          throw new errors.CarpoolNotFoundException()
         } else {
-          var carpool:models.Carpool = _carpool[0];
+          assert.equal(true, (_carpool.id == carpoolID),
+          'retrived object should have same id');
+          var carpool:models.Carpool = _carpool;
           return carpool;
         }
-      })
+      });
   }
 
   // This should take a limit as an argument and return no more than that number of carpools.
@@ -139,57 +153,6 @@ module CarpoolService {
       .then((_carpools) => {
         return <Array<models.Carpool>> _carpools;
       });
-  }
-
-  // Gets all of the emails for the carpool with the provided id, minues the email provided
-  // in the notThisUser string
-  export function getUserEmails(carpoolID: string, notThisUser?:string) :  Promise<string> {
-    return new Promise<string>((resolve, reject) => {
-      getCarpoolByID(carpoolID)
-        .then( (_carpool) => {
-          var emails:Array<string> = [];
-
-          function appendToArray(email, max){
-            var length = (notThisUser ? max - 1 : max);
-            if(email != notThisUser){
-              emails.push(email);
-            }
-            if(emails.length == length){
-              resolve(emails.join(", "));
-            }
-          }
-
-          var userIds = _carpool.participants.map((u) => {return u.id});
-          var length = _carpool.participants.length;
-          for (var i = 0; i < length; ++i){
-
-            userSvc.getUserById(userIds[i])
-              .then((user) => {
-                appendToArray(user.email,length);
-              })
-              .catch(errors.UserNotFoundException, (err) => {});
-
-          }
-
-        });
-    });
-
-  }
-
-  export function getOwnerEmail(carpoolID: string, notThisUser?:string) :  Promise<string> {
-    return new Promise<string>((resolve, reject) => {
-      getCarpoolByID(carpoolID)
-        .then( (_carpool) => {
-          var emails:Array<string> = [];
-
-          userSvc.getUserById(_carpool.owner.id)
-            .then((user) => {
-              resolve(user.email);
-            })
-            .catch(errors.UserNotFoundException, (err) => {throw err;});
-
-        });
-    });
   }
 
   export function addUserToCarpool(carpoolID:string, owner:string, userToAdd:string) : Promise<models.Carpool> {
