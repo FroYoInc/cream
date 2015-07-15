@@ -14,6 +14,51 @@
         "application/json"
     ],
     "paths": {
+
+        "/campus/create": {
+          "post": {
+            "summary": "Creates a campus location.",
+            "description": "\nThis end point takes a campus name and an address in a JSON object and creates a campus.",
+            "parameters": [
+              {
+                "name": "CampusInfo",
+                "in:": "body",
+                "description": "JSON object containing campus name and address",
+                "required": true,
+                "schema": {
+                  "$ref": "#/definitions/CampusInfo"
+                }
+              }
+            ],
+            "tags": ["Campus"],
+            "responses": {
+              "201": {
+                "description": "The campus has been created successfully.",
+                "schema": {
+                  "$ref": "#/definitions/CampusInfo"
+                }
+              },
+              "400": {
+                "description": "Either the incorrect values were passed in the JSON object or the campus name is invalid."
+              },
+              "409": {
+                "description": "There is already a campus with the specified name."
+              },
+              "500": {
+                "description": "An unhandled, typically unknown, error."
+              }
+            }
+          }
+        },
+
+        "/campus/list": {
+          "get": {
+            "summary": "\n Returns all campuses.",
+            "description": "\n This end point returns an array of all campuses.",
+            "tags": ["Campus"]
+          }
+        },
+
         "/users/login": {
             "post": {
                 "summary": "Log the user in.",
@@ -136,6 +181,26 @@
 
     },
     "definitions": {
+        "CampusInfo": {
+          "required": [
+            "name",
+            "address"
+          ],
+          "properties": {
+            "name": {"required": true, "type": "string"},
+            "address": { "$ref": "#/definitions/Address"}
+          }
+        },
+        "Address": {
+          "required": [
+            "address",
+            "geoCode"
+          ],
+          "properties": {
+            "address": {"required": true, "type": "string"},
+            "geoCode": {"$ref": "#/definitions/GeoCode"}
+          }
+        },
         "NewAccountInfo": {
             "required": [
                 "userName",
@@ -216,12 +281,12 @@
         },
         "GeoCode": {
             "required": [
-                "x",
-                "y"
+                "lat",
+                "long"
             ],
             "properties" : {
-                "x" : {"type" :"number"},
-                "y" : {"type" :"number"}
+                "lat" : {"type" :"number"},
+                "long" : {"type" :"number"}
             }
         },
         "Error": {
