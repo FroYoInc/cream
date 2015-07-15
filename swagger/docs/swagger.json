@@ -170,7 +170,7 @@
                 }
             }
         },
-        "/carpools/:carpoolid": {
+        "/carpools/{carpoolid}": {
             "get": {
                 "summary" : "Get Carpool by id",
                 "description" : "\nThis endpoint retrives a single Carpool given its id",
