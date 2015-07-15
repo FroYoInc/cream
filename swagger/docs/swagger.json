@@ -169,9 +169,37 @@
                     }
                 }
             }
+        },
+        "/carpools/:carpoolid": {
+            "get": {
+                "summary" : "Get Carpool by id",
+                "description" : "\nThis endpoint retrives a single Carpool given its id",
+                "parameters": [
+                    {
+                        "name": "carpoolid",
+                        "in": "path",
+                        "description": "Carpool id",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "tags" : ["Carpool"],
+                "responses" : {
+                    "500" : {
+                        "description" : "Internal server error"
+                    },
+                    "404" : {
+                        "description" : "Carpool with given id not found"
+                    },
+                    "200": {
+                        "description" : "Carpool found",
+                        "schema": {
+                            "$ref": "#/definitions/Carpool"
+                        }
+                    }
+                }
+            }
         }
-
-
     },
     "definitions": {
         "NewAccountInfo": {
