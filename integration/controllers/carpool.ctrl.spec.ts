@@ -24,6 +24,20 @@ function createCarpool(req:restify.Request, res:restify.Response)
   });
 }
 
+function getCarpool(req:restify.Request, res:restify.Response)
+:Promise<void> {
+  return new Promise<void>((resolve, reject) => {
+    function next(err) {
+      if (err) {
+        reject(err)
+      } else {
+        resolve(null)
+      }
+    };
+    CarpoolCtrl.getCarpool(req, res, next)
+  });
+}
+
 describe('Carpool controller', () => {
 
   var campus:models.Campus;
@@ -57,7 +71,7 @@ describe('Carpool controller', () => {
       'owner': owner.userName
     };
 
-    function test0 (status, outputJSON) {
+    function test (status, outputJSON) {
       expect(status).toBe(201);
       expect(outputJSON.name).toBe(inputJSON.name);
       expect(outputJSON.description).toBe(inputJSON.description);
@@ -69,7 +83,7 @@ describe('Carpool controller', () => {
     }
 
     var req = <restify.Request> {};
-    var res = <restify.Response> {send: test0};
+    var res = <restify.Response> {send: test};
     req.body = inputJSON;
 
     createCarpool(req, res)
@@ -82,7 +96,9 @@ describe('Carpool controller', () => {
       .catch(restify.NotAcceptableError, (err) => {
         expect(err.message).toBe('CarpoolOwnerNotFoundException:' +
          ' carpool owner user not found');
+        return utils._catch();
       })
+      .then(utils.checkCaught)
       // Test carpool cannot be created with an invalid campus
       .then(() => {
         req.body.owner = owner.userName;
@@ -92,7 +108,9 @@ describe('Carpool controller', () => {
       .catch(restify.NotAcceptableError, (err) => {
         expect(err.message).toBe('CampusNotFoundException: ' +
         'No campus found with the specified name or ID.');
+        return utils._catch();
       })
+      .then(utils.checkCaught)
       // Test carpool cannot be created if carpool already exist
       .then(() => {
         req.body.campus = campus.name;
@@ -101,21 +119,48 @@ describe('Carpool controller', () => {
       .catch(restify.ConflictError, (err) => {
         expect(err.message).toBe('CarpoolExistException:' +
         ' carpool already exist');
+        return utils._catch();
       })
+      .then(utils.checkCaught)
       .catch(fail)
       .error(fail)
       .finally(done);
 
-/*
-    getValidActivationCode()
-      .then((activationCode) => {
-        req.params.activate = activationCode;
+  });
+
+  it('should retrive carpool by id', (done) => {
+    var carpool:models.Carpool;
+    function test(status, outputJSON) {
+      expect(status).toBe(200);
+      expect(outputJSON).toEqual(CarpoolCtrl.toOutputJSON(carpool));
+    }
+    var req = <restify.Request> {params: {}};
+    var res = <restify.Response> {send: test};
+
+    CarpoolSvc.createCarpool('corpool2', 'PSU', '_', owner.userName)
+      .then((_carpool) => {
+        carpool = _carpool;
+        req.params.carpoolid = _carpool.id;
       })
+      // Test a carpool can be retrived by its id
       .then(() => {
-        return activate(req, res);
+        return getCarpool(req, res);
       })
+      // Test a 404 error is returned when getting invalid carpool
+      .then(() => {
+        req.params.carpoolid = 'non-existant-carpool-id';
+        res.send = () => {};
+        return getCarpool(req, res);
+      })
+      .catch(restify.NotFoundError, (err) => {
+        console.log(err);
+        expect(err.message).toBe('CarpoolNotFoundException:' +
+        ' carpool not found');
+        return utils._catch();
+      })
+      .then(utils.checkCaught)
       .catch(fail)
       .error(fail)
-      .finally(done)*/
+      .finally(done);
   });
 })

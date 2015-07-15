@@ -7,6 +7,13 @@ import config = require('../src/config');
 import userSvc = require('../src/services/user-service');
 
 module Utils {
+  export enum Caught {Yes};
+  export function _catch() {return Caught.Yes}
+  export function checkCaught(arg: Caught) {
+    if (arg !== Caught.Yes) {
+      fail(new Error("Expected an exception to be caught"))
+    }
+  }
   export function findUserActivationCode(_user:models.User) {
     var findUserActivationCodeQuery = r.db('froyo')
       .table('activation')
