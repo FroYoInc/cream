@@ -12,6 +12,12 @@ var db = 'froyo';
 var table = 'carpools';
 var campusNameIndex = 'name';
 
+var TempAddress : models.Address = {
+  address : '1234 Campus way',
+  geoCode : {lat : 12.00, long : 12.00}
+};
+
+
 function expectFalse(arg) {
   expect(arg).toBe(false);
 }
@@ -25,24 +31,14 @@ function createCampus(CampusName: string, location: models.Address)
   return () => {return campusSrv.createCampus(CampusName, location)}
 }
 
-describe('CampusService' , () => {
+describe('Campus Service ' , () => {
 
-  beforeAll((done) => {
-    var campus = models.Campus = {
-      name : 'FroYoCampus',
-      location : {x: 100, y: 100},
-    };
-    campusSrv.createCampus(campus.name, campus.location)
-       .then((_campus) =>{
-        expect(campus.name).equals(_campus.name);
-        expect(campus.location).equals(_campus.location) 
-        });
-
-
-  });
-
-  it('should create a campus', (done) => {
-    createCampus
-    })
-
+    it('should create a Campus', () => {
+      createCampus('FroCampus', TempAddress)
+      .then((campus) => {
+        expect(campus._name).toBe('FroCampus');
+        expect(campus._address).toBe(TempAddress);
+      });
+    });
+    
 });
