@@ -3,6 +3,7 @@ import userControllers = require('./controllers/users');
 import ActivationController = require('./controllers/activation.ctrl');
 import CreateUserCtrl = require('./controllers/create-user.ctrl');
 import CarpoolCtrl = require('./controllers/carpool.ctrl');
+import CampusCtrl = require('./controllers/campus.ctrl');
 import c = require("./config");
 
 class routes{
@@ -11,14 +12,18 @@ class routes{
 
 
         /*********** User routes ***********/
-        server.post("/users/login/", userControllers.login);
-        server.get("/users/logout", userControllers.logout);
-        server.post("/users", CreateUserCtrl.createUser);
-        server.get('/activate/:activate', ActivationController.activate);
+        server.post("/api/users/login/", userControllers.login);
+        server.get("/api/users/logout", userControllers.logout);
+        server.post("/api/users", CreateUserCtrl.createUser);
+        server.get('/api/activate/:activate', ActivationController.activate);
 
         /*********** Carpool routes ***********/
-        server.post('/carpools', CarpoolCtrl.createCarpool);
-        server.get('/carpools/:carpoolid', CarpoolCtrl.getCarpool);
+        server.post('/api/carpools', CarpoolCtrl.createCarpool);
+        server.get('/api/carpools/:carpoolid', CarpoolCtrl.getCarpool);
+
+        /*********** Campus routes ************/
+        server.post('/api/campus', CampusCtrl.createCampus);
+        server.get('/api/campus', CampusCtrl.listCampuses);
 
         /*********** Documentation routes ***********/
 
