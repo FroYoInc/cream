@@ -22,8 +22,8 @@ class routes{
         server.get('/api/carpools/:carpoolid', CarpoolCtrl.getCarpool);
 
         /*********** Campus routes ************/
-        server.post('/api/campuses', CampusCtrl.createCampus);
-        server.get('/api/campuses', CampusCtrl.listCampuses);
+        server.post('/api/campus', CampusCtrl.createCampus);
+        server.get('/api/campus', CampusCtrl.listCampuses);
 
         /*********** Documentation routes ***********/
 

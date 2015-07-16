@@ -15,7 +15,7 @@
     ],
     "paths": {
 
-        "/campuses": {
+        "/campus": {
           "post": {
             "summary": "Creates a campus location.",
             "description": "\nThis end point takes a campus name and an address in a JSON object and creates a campus.",
@@ -51,7 +51,7 @@
           }
         },
 
-        "/campuses": {
+        "/campus": {
           "get": {
             "summary": "\n Returns all campuses.",
             "description": "\n This end point returns an array of all campuses.",

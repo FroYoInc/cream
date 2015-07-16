@@ -3,8 +3,33 @@ import CampusService = require('../services/campus.svc');
 import utils = require('../utils/utils');
 import errors = require('../errors/errors');
 import pv = require('../validation/parameter-validator');
+import models = require('../models/models');
 
 module CampusController {
+
+  export interface OutputJSON {
+    name: string;
+    address: models.Address;
+    href: string;
+  }
+
+  function toOutputJSON(campus: models.Campus): OutputJSON {
+    return {
+      name: campus.name,
+      address: campus.address,
+      href: '/campus/' + campus.id
+    };
+  }
+
+  function toOutputJSONArray(campuses: Array<models.Campus>): Array<OutputJSON> {
+    var arr : Array<OutputJSON> = [];
+
+    for (var index = 0; index < campuses.length; index++) {
+      arr.push(toOutputJSON(campuses[index]));
+    }
+
+    return arr;
+  }
 
   /**
    * Creates a campus.
@@ -31,7 +56,7 @@ module CampusController {
 
     CampusService.createCampus(campusInfo.name, campusInfo.address)
       .then((_campus) => {
-        res.send(201, _campus);
+        res.send(201, toOutputJSON(_campus));
         next();
       })
       .catch(
@@ -59,7 +84,7 @@ module CampusController {
 
     CampusService.getCampusList()
       .then((_list) => {
-        res.send(200, _list);
+        res.send(200, toOutputJSONArray(_list));
         next();
       })
       .catch((err) => {
