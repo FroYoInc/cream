@@ -1,6 +1,7 @@
 import restify = require('restify')
 import carpoolService = require('../services/carpool.svc')
 import userCtrl = require('./create-user.ctrl');
+import campusCtrl = require('./campus.ctrl');
 import models = require('../models/models');
 import errors = require('../errors/errors');
 
@@ -19,7 +20,7 @@ module CarpoolController {
       'name': carpool.name,
       'description': carpool.description,
       'owner': userCtrl.toOutputJSON(carpool.owner),
-      'campus': carpool.campus, // TODO: shoudl be campusCtrl.toOutputJSON
+      'campus': campusCtrl.toOutputJSON(carpool.campus),
       'participants': carpool.participants.map(userCtrl.toOutputJSON),
       'href': '/carpools/' + carpool.id
     };

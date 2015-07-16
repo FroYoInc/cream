@@ -153,7 +153,6 @@ describe('Carpool controller', () => {
         return getCarpool(req, res);
       })
       .catch(restify.NotFoundError, (err) => {
-        console.log(err);
         expect(err.message).toBe('CarpoolNotFoundException:' +
         ' carpool not found');
         return utils._catch();

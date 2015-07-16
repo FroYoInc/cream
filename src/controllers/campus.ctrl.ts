@@ -13,22 +13,12 @@ module CampusController {
     href: string;
   }
 
-  function toOutputJSON(campus: models.Campus): OutputJSON {
+  export function toOutputJSON(campus: models.Campus): OutputJSON {
     return {
       name: campus.name,
       address: campus.address,
-      href: '/campus/' + campus.id
+      href: '/campuses/' + campus.id
     };
-  }
-
-  function toOutputJSONArray(campuses: Array<models.Campus>): Array<OutputJSON> {
-    var arr : Array<OutputJSON> = [];
-
-    for (var index = 0; index < campuses.length; index++) {
-      arr.push(toOutputJSON(campuses[index]));
-    }
-
-    return arr;
   }
 
   /**
@@ -84,7 +74,7 @@ module CampusController {
 
     CampusService.getCampusList()
       .then((_list) => {
-        res.send(200, toOutputJSONArray(_list));
+        res.send(200, _list);
         next();
       })
       .catch((err) => {
