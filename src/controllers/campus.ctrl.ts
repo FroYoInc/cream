@@ -21,6 +21,16 @@ module CampusController {
     };
   }
 
+  export function toOutputJSONArray(campusArray: Array<models.Campus>): Array<OutputJSON> {
+    var arr = [];
+
+    for (var index = 0; index < campusArray.length; index++) {
+      arr.push(toOutputJSON(campusArray[index]));
+    }
+
+    return arr;
+  }
+
   /**
    * Creates a campus.
    *
@@ -74,7 +84,7 @@ module CampusController {
 
     CampusService.getCampusList()
       .then((_list) => {
-        res.send(200, _list);
+        res.send(200, toOutputJSONArray(_list));
         next();
       })
       .catch((err) => {
