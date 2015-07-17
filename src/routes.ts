@@ -17,10 +17,9 @@ class routes{
 
 
         /*********** Carppool Routes ***********/
-        server.post("/carpools/request", carpoolCtrl.requestToJoin);
-        server.post("/carpools/approve", carpoolCtrl.approveRequest);
-
-
+        server.post("/api/carpools/:id/participants", carpoolCtrl.requestToJoin);
+        server.post("/api/carpools/:id/participants/:carpoolID/join", carpoolCtrl.approveRequest);
+        // server.post("/api/carpools/:id/participants/:carpoolID/reject", carpoolCtrl.denyRequest);
 
         /*********** Documentation routes ***********/
 
