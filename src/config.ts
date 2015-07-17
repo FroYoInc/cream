@@ -40,16 +40,15 @@ export class Config {
    * @type {Object}
    */
   static email = {
-    //port: 465,
-    //host: 'localhost',
-    //secure: true,
+    port: 8081,
+    host: 'localhost',
+    secure: false,
     name: 'Corpool',
     auth: {
-      user: 'some@gmail.com',
-      pass: 'password'
+      user: 'no-reply@froyo.com',
+      pass: 'froyo'
     },
-    service: 'Gmail',
-    //ignoreTLS: false,
+    ignoreTLS: true
   };
 
   static docs = {
