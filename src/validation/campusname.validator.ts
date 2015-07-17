@@ -20,7 +20,7 @@ module Validation {
         if (campusName != null && campusName.trim().length > 0) {
           resolve(true);
         } else {
-          reject(new errors.CarpoolNameValidationException());
+          reject(new errors.CampusNameValidationException());
         }
       });
     }
