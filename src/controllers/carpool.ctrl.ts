@@ -75,14 +75,13 @@ module CarpoolController {
 
   export function getCarpools(
     req:restify.Request, res:restify.Response, next:restify.Next) {
-
     function getCarpoolList() {
       return carpoolService.getCarpools(10);
     }
 
     getCarpoolList()
       .then((_carpools) => {
-        res.send(200, _carpools);
+        res.send(200, _carpools.map(toOutputJSON));
         next();
       })
       .catch((err) => {

@@ -132,7 +132,7 @@ module CarpoolService {
         carpoolTable.get(carpoolID).eq(null).not(),
         getCarpoolQuery,
         r.expr('carpool not found')
-      )
+      );
     return q.run(query)()
       .then((_carpool) => {
         if (_carpool == 'carpool not found') {
@@ -147,14 +147,17 @@ module CarpoolService {
   }
 
   // This should take a limit as an argument and return no more than that number of carpools.
-  export function getCarpools(limit: number) :  Promise<Array<models.Carpool>> {
-    var query = r.db(db).table(table).limit(limit).coerceTo('array');
-    //var query = r.db('froyo').table('carpools').merge(function (carpool) {
-    //  return {owner: r.db('froyo').table('users').get(carpool('owner')) };
-    //}).limit(1).coerceTo('array');
+  export function getCarpools(limit: number) :  Promise<models.Carpool[]> {
+    var _db = r.db(db);
+    var query = _db.table(table).limit(limit).merge({
+      'campus': _db.table('campuses').get(r.row('campus')),
+      'owner': _db.table('users').get(r.row('owner')),
+      'participants': r.row('participants').map((p) => {
+        return _db.table('users').get(p);
+      })
+    }).coerceTo('array');
 
-    //eqJoin, restructure the object without left/right fields
-
+    //var query = _db.table(table).limit(limit).coerceTo('array');
 
     return q.run(query)()
       .then((_carpools) => {
