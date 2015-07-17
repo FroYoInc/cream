@@ -59,17 +59,6 @@ server.use(restify.bodyParser());
 
 var routes = new (require('./routes'))(server);
 
-server.get('/flavors', function(req, res, next) {
-  var flavors : string[] = ['Peanut Butter', 'Cookies N Cream', 'Cake Batter'];
-  res.send({'flavors': flavors});
-  next();
-});
-
-server.post('/users', Controller.createUser);
-server.get('/carpools', Controller.getCarpools);
-server.post('/campus/create', Controller.createCampus);
-server.get('/campus/list', Controller.getCampusList);
-
 server.listen(c.Config.app.port, function() {
   console.log('> %s listening on %s', server.name, server.url);
 });

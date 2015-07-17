@@ -38,6 +38,20 @@ function getCarpool(req:restify.Request, res:restify.Response)
   });
 }
 
+function getCarpools(req:restify.Request, res:restify.Response)
+:Promise<void> {
+  return new Promise<void>((resolve, reject) => {
+    function next(err) {
+      if (err) {
+        reject(err)
+      } else {
+        resolve(null)
+      }
+    };
+    CarpoolCtrl.getCarpools(req, res, next)
+  });
+}
+
 describe('Carpool controller', () => {
 
   var campus:models.Campus;
@@ -128,7 +142,7 @@ describe('Carpool controller', () => {
 
   });
 
-  it('should retrive carpool by id', (done) => {
+  it('should retrieve carpool by id', (done) => {
     var carpool:models.Carpool;
     function test(status, outputJSON) {
       expect(status).toBe(200);
@@ -153,12 +167,32 @@ describe('Carpool controller', () => {
         return getCarpool(req, res);
       })
       .catch(restify.NotFoundError, (err) => {
-        console.log(err);
         expect(err.message).toBe('CarpoolNotFoundException:' +
         ' carpool not found');
         return utils._catch();
       })
       .then(utils.checkCaught)
+      .catch(fail)
+      .error(fail)
+      .finally(done);
+  });
+
+  it('should retrieve a list of carpools', (done) => {
+    var carpoolList:models.Carpool[];
+
+    function test(status, outputJSON) {
+      expect(status).toBe(200);
+      expect(outputJSON.length > 0).toEqual(true);
+      expect(carpoolList.length).toEqual(outputJSON.length);
+    }
+    var req = <restify.Request> {params: {}};
+    var res = <restify.Response> {send: test};
+
+    CarpoolSvc.getCarpools(10)
+      .then((_carpoolList) => {
+        carpoolList = _carpoolList;
+      })
+      .then(() => {return getCarpools(req, res)})
       .catch(fail)
       .error(fail)
       .finally(done);

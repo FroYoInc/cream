@@ -15,7 +15,7 @@
     ],
     "paths": {
 
-        "/campus/create": {
+        "/api/campuses": {
           "post": {
             "summary": "Creates a campus location.",
             "description": "\nThis end point takes a campus name and an address in a JSON object and creates a campus.",
@@ -48,10 +48,7 @@
                 "description": "An unhandled, typically unknown, error."
               }
             }
-          }
-        },
-
-        "/campus/list": {
+          },
           "get": {
             "summary": "\n Returns all campuses.",
             "description": "\n This end point returns an array of all campuses.",
@@ -59,7 +56,7 @@
           }
         },
 
-        "/users/login": {
+        "/api/users/login": {
             "post": {
                 "summary": "Log the user in.",
                 "description": "\n This end point takes a user's email and password in a JSON object and then attempts to log them in and create a session object for them.",
@@ -102,7 +99,7 @@
                 }
             }
         },
-        "/users/logout": {
+        "/api/users/logout": {
             "get": {
                 "summary": "Logout the user.",
                 "description": "\nDestroys the current user's session and redirects them to '/' ",
@@ -119,7 +116,7 @@
                 }
             }
         },
-        "/users": {
+        "/api/users": {
             "post": {
                 "summary": "Creates a user account.",
                 "description": "\nThis endpoint takes the user's userName, firstName, lastName, email and password in a JSON object and creates an account for them.",
@@ -157,7 +154,7 @@
             }
         },
 
-        "/activate/{activationCode}": {
+        "/api/activate/{activationCode}": {
             "get": {
                 "summary" : "Activates User account",
                 "description" : "\nThis endpoint takes random generated activation code from email link and switches the _isAccountActivated value from false to true, to call this endpoint make a get request to /activation/activationCode where activationCode is the code you wish to user for activation.",
@@ -178,7 +175,7 @@
                 }
             }
         },
-        "/carpools": {
+        "/api/carpools": {
             "post": {
                 "summary": "Creates a Carpool.",
                 "description": "\nThis endpoint takes Carpool name, campusName, owner and description in a JSON object and creates a carpool.",
@@ -215,7 +212,7 @@
                 }
             }
         },
-        "/carpools/{carpoolid}": {
+        "/api/carpools/{carpoolid}": {
             "get": {
                 "summary" : "Get Carpool by id",
                 "description" : "\nThis endpoint retrives a single Carpool given its id",
