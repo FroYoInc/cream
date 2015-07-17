@@ -212,7 +212,23 @@
                         "description": "Internal server error."
                     }
                 }
+            },
+          "get": {
+            "summary": "\n Returns all Carpools.",
+            "description": "\n This end point returns an array of Carpools.",
+            "tags": ["Carpool"],
+            "responses": {
+                "200": {
+                    "description": "Retrieves list of carpools",
+                    "schema": {
+                        "$ref": "#/definitions/Carpool"
+                    }
+                },
+                "500": {
+                    "description": "Internal server error."
+                }
             }
+          }
         },
         "/api/carpools/{carpoolid}": {
             "get": {
