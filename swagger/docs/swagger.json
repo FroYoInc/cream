@@ -14,7 +14,49 @@
         "application/json"
     ],
     "paths": {
-        "/users/login": {
+
+        "/api/campuses": {
+          "post": {
+            "summary": "Creates a campus location.",
+            "description": "\nThis end point takes a campus name and an address in a JSON object and creates a campus.",
+            "parameters": [
+              {
+                "name": "CampusInfo",
+                "in:": "body",
+                "description": "JSON object containing campus name and address",
+                "required": true,
+                "schema": {
+                  "$ref": "#/definitions/CampusInfo"
+                }
+              }
+            ],
+            "tags": ["Campus"],
+            "responses": {
+              "201": {
+                "description": "The campus has been created successfully.",
+                "schema": {
+                  "$ref": "#/definitions/CampusInfo"
+                }
+              },
+              "400": {
+                "description": "Either the incorrect values were passed in the JSON object or the campus name is invalid."
+              },
+              "409": {
+                "description": "There is already a campus with the specified name."
+              },
+              "500": {
+                "description": "An unhandled, typically unknown, error."
+              }
+            }
+          },
+          "get": {
+            "summary": "\n Returns all campuses.",
+            "description": "\n This end point returns an array of all campuses.",
+            "tags": ["Campus"]
+          }
+        },
+
+        "/api/users/login": {
             "post": {
                 "summary": "Log the user in.",
                 "description": "\n This end point takes a user's email and password in a JSON object and then attempts to log them in and create a session object for them.",
@@ -57,7 +99,7 @@
                 }
             }
         },
-        "/users/logout": {
+        "/api/users/logout": {
             "get": {
                 "summary": "Logout the user.",
                 "description": "\nDestroys the current user's session and redirects them to '/' ",
@@ -74,7 +116,7 @@
                 }
             }
         },
-        "/users": {
+        "/api/users": {
             "post": {
                 "summary": "Creates a user account.",
                 "description": "\nThis endpoint takes the user's userName, firstName, lastName, email and password in a JSON object and creates an account for them.",
@@ -112,7 +154,7 @@
             }
         },
 
-        "/activate/{activationCode}": {
+        "/api/activate/{activationCode}": {
             "get": {
                 "summary" : "Activates User account",
                 "description" : "\nThis endpoint takes random generated activation code from email link and switches the _isAccountActivated value from false to true, to call this endpoint make a get request to /activation/activationCode where activationCode is the code you wish to user for activation.",
@@ -132,10 +174,97 @@
                     }
                 }
             }
+        },
+        "/api/carpools": {
+            "post": {
+                "summary": "Creates a Carpool.",
+                "description": "\nThis endpoint takes Carpool name, campusName, owner and description in a JSON object and creates a carpool.",
+                "parameters": [
+                    {
+                        "name": "NewCarpool",
+                        "in": "body",
+                        "description": "JSON object containing Carpool name, campus name, owner and description.",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/NewCarpool"
+                        }
+                    }
+                ],
+                "tags": [
+                    "Carpool"
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Carpool created successfully.",
+                        "schema": {
+                            "$ref": "#/definitions/Carpool"
+                        }
+                    },
+                    "406": {
+                        "description": "Carpool owner or campus not found"
+                    },
+                    "409": {
+                        "description": "Carpool already exists."
+                    },
+                    "500": {
+                        "description": "Internal server error."
+                    }
+                }
+            }
+        },
+        "/api/carpools/{carpoolid}": {
+            "get": {
+                "summary" : "Get Carpool by id",
+                "description" : "\nThis endpoint retrives a single Carpool given its id",
+                "parameters": [
+                    {
+                        "name": "carpoolid",
+                        "in": "path",
+                        "description": "Carpool id",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "tags" : ["Carpool"],
+                "responses" : {
+                    "500" : {
+                        "description" : "Internal server error"
+                    },
+                    "404" : {
+                        "description" : "Carpool with given id not found"
+                    },
+                    "200": {
+                        "description" : "Carpool found",
+                        "schema": {
+                            "$ref": "#/definitions/Carpool"
+                        }
+                    }
+                }
+            }
         }
 
     },
     "definitions": {
+        "CampusInfo": {
+          "required": [
+            "name",
+            "address"
+          ],
+          "properties": {
+            "name": {"required": true, "type": "string"},
+            "address": { "$ref": "#/definitions/Address"}
+          }
+        },
+        "Address": {
+          "required": [
+            "address",
+            "geoCode"
+          ],
+          "properties": {
+            "address": {"required": true, "type": "string"},
+            "geoCode": {"$ref": "#/definitions/GeoCode"}
+          }
+        },
         "NewAccountInfo": {
             "required": [
                 "userName",
@@ -152,6 +281,20 @@
                 "password": {"required": true, "type": "string"}
             }
         },
+        "NewCarpool": {
+            "required": [
+                "name",
+                "description",
+                "campus",
+                "owner"
+            ],
+            "properties": {
+                "name": {"required": true, "type": "string"},
+                "description": {"required": true, "type": "string"},
+                "campus": {"required": true, "type": "string"},
+                "owner": {"required": true, "type": "string"}
+            }
+        },
         "LoginInfo" : {
             "required": [
                 "email",
@@ -164,7 +307,7 @@
         },
         "User": {
             "required": [
-                "userID",
+                "href",
                 "firstName",
                 "lastName",
                 "userName",
@@ -172,7 +315,7 @@
 
             ],
             "properties" : {
-                "userID" : {"type" :"string"},
+                "href" : {"type" :"string"},
                 "firstName" : {"type" :"string"},
                 "lastName" : {"type" :"string"},
                 "userName" : {"type" :"string"},
@@ -183,15 +326,17 @@
         "Carpool" : {
             "required": [
                 "name",
-                "users",
+                "owner",
+                "participants",
                 "campus",
                 "description",
-                "id"
+                "href"
 
             ],
             "properties" : {
                 "name" : {"type" : "string"},
-                "users": {
+                "owner": {"$ref": "#/definitions/User"},
+                "participants": {
                     "type": "array",
                     "items" : {
                         "$ref" :"#/definitions/User"
@@ -199,29 +344,29 @@
                 },
                 "campus" : { "$ref": "#/definitions/Campus" },
                 "description" : {"type" : "string"},
-                "id" : {"type" :"string"}
+                "href" : {"type" :"string"}
             }
         },
         "Campus" : {
             "required": [
                 "name",
-                "id",
+                "href",
                 "location"
             ],
             "properties" : {
                 "name" : {"type" :"string"},
-                "id" : {"type" :"string"},
+                "href" : {"type" :"string"},
                 "location" : {"$ref":"#/definitions/GeoCode"}
             }
         },
         "GeoCode": {
             "required": [
-                "x",
-                "y"
+                "long",
+                "lat"
             ],
             "properties" : {
-                "x" : {"type" :"number"},
-                "y" : {"type" :"number"}
+                "long" : {"type" :"number"},
+                "lat" : {"type" :"number"}
             }
         },
         "Error": {

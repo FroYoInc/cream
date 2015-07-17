@@ -68,6 +68,7 @@ server.get('/flavors', function(req, res, next) {
 server.post('/users', Controller.createUser);
 server.get('/carpools', Controller.getCarpools);
 
+
 server.listen(c.Config.app.port, function() {
   console.log('> %s listening on %s', server.name, server.url);
 });
