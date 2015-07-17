@@ -21,7 +21,6 @@ function checkCaught(arg: Caught) {
   }
 }
 
-
 function expectFalse(arg) {
   expect(arg).toBe(false);
 }
