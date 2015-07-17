@@ -16,38 +16,40 @@
     "paths": {
 
         "/api/campuses": {
-          "post": {
-            "summary": "Creates a campus location.",
-            "description": "\nThis end point takes a campus name and an address in a JSON object and creates a campus.",
-            "parameters": [
-              {
-                "name": "CampusInfo",
-                "in:": "body",
-                "description": "JSON object containing campus name and address",
-                "required": true,
-                "schema": {
-                  "$ref": "#/definitions/CampusInfo"
-                }
+          "post":  {
+              "summary": "Creates a Campus.",
+              "description": "\nThis endpoint takes campus name and address in a JSON object and creates a campus.",
+              "parameters": [
+                  {
+                      "name": "Campus",
+                      "in": "body",
+                      "description": "JSON object containing Campus name and address.",
+                      "required": true,
+                      "schema": {
+                          "$ref": "#/definitions/NewCampus"
+                      }
+                  }
+              ],
+              "tags": [
+                  "Campus"
+              ],
+              "responses": {
+                  "201": {
+                      "description": "Campus created successfully.",
+                      "schema": {
+                          "$ref": "#/definitions/Campus"
+                      }
+                  },
+                  "400": {
+                    "description": "Insufficient parameters."
+                  },
+                  "409": {
+                      "description": "Campus already exists."
+                  },
+                  "500": {
+                      "description": "Internal server error."
+                  }
               }
-            ],
-            "tags": ["Campus"],
-            "responses": {
-              "201": {
-                "description": "The campus has been created successfully.",
-                "schema": {
-                  "$ref": "#/definitions/CampusInfo"
-                }
-              },
-              "400": {
-                "description": "Either the incorrect values were passed in the JSON object or the campus name is invalid."
-              },
-              "409": {
-                "description": "There is already a campus with the specified name."
-              },
-              "500": {
-                "description": "An unhandled, typically unknown, error."
-              }
-            }
           },
           "get": {
             "summary": "\n Returns all campuses.",
@@ -245,7 +247,7 @@
 
     },
     "definitions": {
-        "CampusInfo": {
+        "NewCampus": {
           "required": [
             "name",
             "address"
@@ -253,6 +255,19 @@
           "properties": {
             "name": {"required": true, "type": "string"},
             "address": { "$ref": "#/definitions/Address"}
+          }
+        },
+
+        "Campus": {
+          "required": [
+            "name",
+            "address",
+            "href"
+          ],
+          "properties": {
+            "name": {"required": true, "type": "string"},
+            "address": { "$ref": "#/definitions/Address"},
+            "href": {"required": true, "type": "string"}
           }
         },
         "Address": {
@@ -345,18 +360,6 @@
                 "campus" : { "$ref": "#/definitions/Campus" },
                 "description" : {"type" : "string"},
                 "href" : {"type" :"string"}
-            }
-        },
-        "Campus" : {
-            "required": [
-                "name",
-                "href",
-                "location"
-            ],
-            "properties" : {
-                "name" : {"type" :"string"},
-                "href" : {"type" :"string"},
-                "location" : {"$ref":"#/definitions/GeoCode"}
             }
         },
         "GeoCode": {
