@@ -97,16 +97,21 @@ declare module "rethinkdb" {
     insert(obj:any, options?:InsertOptions):Expression<any>;
 
     get(key:string):Sequence; // primary key
+    get(arg:Expression<any>):Sequence; // primary key
     getAll(key:string, index?:Index):Sequence; // without index defaults to primary key
     getAll(...keys:string[]):Sequence;
   }
 
   interface Sequence extends Operation<Cursor>, Writeable {
 
+    get(key:string):Sequence; // primary key
+    eq(v:any):Expression<boolean>;
+    get(arg:Expression<any>):Sequence; // primary key
     between(lower:any, upper:any, index?:Index):Sequence;
     filter(rql:ExpressionFunction<boolean>):Sequence;
     filter(rql:Expression<boolean>):Sequence;
     filter(obj:{[key:string]:any}):Sequence;
+    merge(any);
 
 
     // Join
@@ -203,6 +208,8 @@ declare module "rethinkdb" {
 
   interface Expression<T> extends Writeable, Operation<T> {
       (prop:string):Expression<any>;
+      map(a:any):Expression<any>;
+      map(transform:ExpressionFunction<any>):Sequence;
       merge(query:Expression<Object>):Expression<Object>;
       append(prop:string):Expression<Object>;
       contains(prop:string):Expression<boolean>;
