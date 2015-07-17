@@ -68,7 +68,7 @@ describe('Campus Service ' , () => {
     .then(() => {return campusSrv.getCampusByName('FroCampus')})
     .then((campus) => {
       expect(campus.name).toBe('FroCampus');
-      expect(campus.address).toBe(TempAddress);
+      expect(campus.address).toEqual(TempAddress);
       expect(campus.id).toBeDefined();
     })
     .catch(fail)
@@ -90,4 +90,13 @@ describe('Campus Service ' , () => {
       .finally(done);
 
       });
+
+    it('should not create a campus with invalid name', (done) => {
+      createCampus('', TempAddress)()
+      .catch(errors.CampusNameValidationException, _catch)
+      .then(checkCaught)
+      .finally(done);
+    })
+
+
 });
