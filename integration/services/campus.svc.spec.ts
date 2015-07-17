@@ -1,12 +1,7 @@
-import uuid = require('uuid');
-import r = require('rethinkdb');
-import c = require('../../src/config');
-import q = require('../../src/dbutils/query');
 import errors = require('../../src/errors/errors');
 import models = require('../../src/models/models');
 import campusSrv = require('../../src/services/campus.svc');
-import userSvc = require('../../src/services/user-service');
-import utils = require('../utils');
+
 
 var db = 'froyo';
 var table = 'carpools';
