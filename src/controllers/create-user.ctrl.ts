@@ -1,9 +1,26 @@
 import restify = require('restify')
 import userService = require('../services/user-service')
 import utils = require('../utils/utils');
+import models = require('../models/models');
 import errors = require('../errors/errors');
 
 module CreateUserController {
+  export interface OutputJSON {
+    userName: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    href: string;
+  }
+  export function toOutputJSON(user:models.User): OutputJSON {
+    return {
+      'userName': user.userName,
+      'firstName': user.firstName,
+      'lastName': user.lastName,
+      'email': user.email,
+      'href': '/users/' + user.id
+    };
+  }
   export function createUser(
     req:restify.Request, res:restify.Response, next:restify.Next) {
     var userInfo = req.body;
@@ -29,13 +46,7 @@ module CreateUserController {
       .then(getPasswordHash)
       .then(createUser)
       .then((_user) => {
-        res.send(201, {
-          'userName': _user.userName,
-          'firstName': _user.firstName,
-          'lastName': _user.lastName,
-          'email': _user.email,
-          'href': '/users/' + _user.id
-        });
+        res.send(201, toOutputJSON(_user));
         next();
       })
       .catch(

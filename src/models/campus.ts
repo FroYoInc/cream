@@ -1,13 +1,7 @@
-// After version 1 refactor this into its own file
-class GeoCode {
-  x: number;
-  y: number;
-}
-
 class Campus {
   private _name : string;
   private _id : string;
-  private _location: GeoCode;
+  private _address: Address;
 
   get name(): string {
   	return this._name;
@@ -25,11 +19,11 @@ class Campus {
   	this._id = newId;
   }
 
-  get location(): GeoCode {
-  	return this._location;
+  get address(): Address {
+  	return this._address;
   }
 
-  set location(newLocation: GeoCode) {
-  	this._location = newLocation;
-  }  
+  set location(newLocation: Address) {
+  	this._address = newLocation;
+  }
 }

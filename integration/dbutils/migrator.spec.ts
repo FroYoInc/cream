@@ -18,6 +18,14 @@ var dbShape : Shapes.DBShape = {
     indices: []
   },
   {
+    tableName: 'carpools',
+    indices: ['name']
+  },
+  {
+    tableName: 'campuses',
+    indices: ['name']
+  },
+  {
     tableName: 'activation',
     indices: []
   },
