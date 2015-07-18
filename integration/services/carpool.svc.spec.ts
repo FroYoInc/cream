@@ -48,7 +48,6 @@ function createUser():Promise<models.User> {
 }
 var campus:models.Campus;
 var owner:models.User;
-var carpool:models.Carpool;
 
 describe('CarpoolService', () => {
 
@@ -103,7 +102,7 @@ describe('CarpoolService', () => {
   });
 
   it('should get a carpool by id', (done) => {
-
+    var carpool:models.Carpool;
     createCarpool(utils.rs(), campus.name, utils.rs(), owner.userName)()
       .then((_carpool) => {
         carpool =_carpool;
