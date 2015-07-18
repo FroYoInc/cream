@@ -5,6 +5,8 @@ import q = require('../src/dbutils/query');
 import models = require('../src/models/models')
 import config = require('../src/config');
 import userSvc = require('../src/services/user-service');
+import carpoolSvc = require('../src/services/carpool.svc');
+import campusSvc = require('../src/services/campus.svc');
 
 module Utils {
   export enum Caught {Yes};
@@ -52,6 +54,70 @@ module Utils {
           .tap((_user) => {
             user = _user;
             resolve(user);
+          })
+          .catch(reject)
+          .error(reject);
+      }
+    });
+  }
+
+  function rn():number {return Math.random()};
+  function raddr():models.Address {
+    return {
+      address: rs(),
+      geoCode: {lat: rn(), long: rn()}
+    };
+  }
+
+  function createRandomCampus():Promise<models.Campus> {
+    return campusSvc.createCampus(rs(), raddr());
+  }
+
+  var campus:models.Campus;
+  export function getSomeCampuse():Promise<models.Campus> {
+    return new Promise<models.Campus>((resolve, reject) => {
+      if (campus != null) {
+        resolve(campus);
+      } else {
+        createRandomCampus()
+          .tap((_campus) => {
+            campus = _campus;
+            resolve(campus);
+          })
+          .catch(reject)
+          .error(reject);
+      }
+    });
+  }
+
+  function createRandomCarpool():Promise<models.Carpool> {
+    var owner:models.User;
+    var campus:models.Campus;
+    return Promise.resolve()
+      .then(() => {
+        var p1 = getSomeUser();
+        var p2 = getSomeCampuse();
+        return [p1, p2];
+      })
+      .spread((_owner:models.User, _campus:models.Campus) => {
+        owner = _owner; campus = _campus;
+      })
+      .then(() => {
+        return carpoolSvc.createCarpool(
+          rs(), campus.name, rs(), owner.userName);
+      });
+  }
+
+  var carpool:models.Carpool;
+  export function getSomeCarpool():Promise<models.Carpool> {
+    return new Promise<models.Carpool>((resolve, reject) => {
+      if (carpool != null) {
+        resolve(carpool);
+      } else {
+        createRandomCarpool()
+          .tap((_carpool) => {
+            carpool = _carpool;
+            resolve(carpool);
           })
           .catch(reject)
           .error(reject);

@@ -36,40 +36,26 @@ function doesCarpoolExist(carpoolName: string): () => Promise<boolean> {
   return () => { return carpoolSvc.doesCarpoolExist(carpoolName)}
 }
 
-function createCampus() : Promise<models.Campus> {
-  var address:models.Address = {
-    address: '123 Sesame Street',
-    geoCode: {long: 1, lat: 2}
-  }
-  return CampusSvc.createCampus('FroyoCampus', address);
-}
-function createUser():Promise<models.User> {
-  return userSvc.createUser('_', '_', utils.rs(), utils.em(), '_', '_');
-}
-var campus:models.Campus;
+
 var owner:models.User;
+var campus:models.Campus;
 
 describe('CarpoolService', () => {
-
-// Create a user and campus first
   beforeAll((done) => {
+    // Set owner and campus
     Promise.resolve()
       .then(() => {
-        var p1 = createUser();
-        var p2 = createCampus();
-        return [p1, p2];
+        return [utils.getSomeUser(), utils.getSomeCampuse()]
       })
-      .spread((_user:models.User, _campus:models.Campus) => {
-        owner = _user;
-        campus = _campus;
+      .spread((_owner:models.User, _campus:models.Campus) => {
+        owner =_owner; campus = _campus;
       })
-      .catch(fail)
       .error(fail)
+      .catch(fail)
       .finally(done);
   });
 
   it('should create a carpool', (done) => {
-
     doesCarpoolExist('fropool')()
       .then(expectFalse)
       // Test carpool can be created
@@ -103,10 +89,8 @@ describe('CarpoolService', () => {
 
   it('should get a carpool by id', (done) => {
     var carpool:models.Carpool;
-    createCarpool(utils.rs(), campus.name, utils.rs(), owner.userName)()
-      .then((_carpool) => {
-        carpool =_carpool;
-      })
+    utils.getSomeCarpool()
+      .then((_carpool) => {carpool = _carpool})
     // Ensure error is thrown when trying to retrive non-existant carpool
       .then(() => { return carpoolSvc.getCarpoolByID('non-existantid')})
       .catch(errors.CarpoolNotFoundException, _catch)
