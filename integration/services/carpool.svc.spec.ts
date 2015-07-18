@@ -48,8 +48,7 @@ function createUser():Promise<models.User> {
 }
 var campus:models.Campus;
 var owner:models.User;
-
-var carpoolID: string;
+var carpool:models.Carpool;
 
 describe('CarpoolService', () => {
 
@@ -83,7 +82,6 @@ describe('CarpoolService', () => {
         expect(carpool.owner).toEqual(owner);
         expect(carpool.participants.length).toBe(1);
         expect(carpool.participants[0]).toEqual(owner);
-        carpoolID = carpool.id;
         expect(carpool.id).toBeDefined();
       })
       // Test that a carpool cannot be created if one exist with same name
@@ -106,25 +104,27 @@ describe('CarpoolService', () => {
 
   it('should get a carpool by id', (done) => {
 
+    createCarpool(utils.rs(), campus.name, utils.rs(), owner.userName)()
+      .then((_carpool) => {
+        carpool =_carpool;
+      })
     // Ensure error is thrown when trying to retrive non-existant carpool
-    carpoolSvc.getCarpoolByID('non-existantCarpoolID')
+      .then(() => { return carpoolSvc.getCarpoolByID('non-existantid')})
       .catch(errors.CarpoolNotFoundException, _catch)
       .then(checkCaught)
       // Test a carpool can be retrived
-      .then(() => {return carpoolSvc.getCarpoolByID(carpoolID)})
-      .then((carpool) =>{
-        expect(carpool.name).toBe('fropool');
-        expect(carpool.description).toBe('first carpool');
-        expect(carpool.id).toBeDefined();
+      .then(() => {return carpoolSvc.getCarpoolByID(carpool.id)})
+      .then((_carpool) =>{
+        expect(_carpool.name).toBe(carpool.name);
+        expect(_carpool.description).toBe(carpool.description);
+        expect(_carpool.id).toBeDefined();
       })
       .catch(fail)
       .error(fail)
       .finally(done);
   });
 
-
-
-  /*it('should add a user to a carpool for a valid owner', (done) => {
+  /*it('should add a user to a carpool', (done) => {
 
     carpoolSvc.addUserToCarpool(carpoolID, owner.id, "123456789")
       .then( (_carpool) =>{
