@@ -40,7 +40,7 @@ module Utils {
     return userName + '@' + vem();
   }
 
-  function createRandomUser():Promise<models.User> {
+  export function createRandomUser():Promise<models.User> {
     return userSvc.createUser('_', '_', rs(), em(), '_', '_');
   }
 
@@ -123,6 +123,19 @@ module Utils {
           .error(reject);
       }
     });
+  }
+
+  export function getNonExistantUser():models.User {
+    return {
+      firstName: rs(),
+      lastName: rs(),
+      userName: rs(),
+      email: em(),
+      isAccountActivated: (Math.random() > 0.5),
+      passwordHash: rs(),
+      salt: rs(),
+      id: rs()
+    }
   }
 }
 export = Utils;

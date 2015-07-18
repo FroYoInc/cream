@@ -107,29 +107,46 @@ describe('CarpoolService', () => {
       .finally(done);
   });
 
-  /*it('should add a user to a carpool', (done) => {
-
-    carpoolSvc.addUserToCarpool(carpoolID, owner.id, "123456789")
-      .then( (_carpool) =>{
-        console.log(_carpool)
-        expect(_carpool.participants.map((u)=>{return u.id})).toEqual([owner.id, "123456789"]);
+  it('should add a user to a carpool', (done) => {
+    var carpool:models.Carpool;
+    var user:models.User;
+    // Get a carpool and a new user
+    utils.getSomeCarpool()
+      .then((_carpool) => {carpool = _carpool})
+      .then(utils.createRandomUser)
+      .then((_user) => {user = _user})
+      // Test participant cannot be added to a non existant carpool
+      .then(() => {
+        return carpoolSvc.addUserToCarpool('non-existant-carpool-id', user);
       })
+      .catch(errors.CarpoolNotFoundException, _catch)
+      // Test a user can be added to carpool
+      .then(() => {
+        expect(carpool.participants.length).toEqual(1);
+        return carpoolSvc.addUserToCarpool(carpool.id, user);
+      })
+      .then((newCarpool) => {
+        var list = newCarpool.participants
+        .filter((p) => {return p.id == user.id});
+        expect(list.length).toEqual(1);
+        expect(list[0].id).toEqual(user.id);
+        expect(newCarpool.participants.length).toEqual(2);
+      })
+      // Test participant cannot be added if already in carpool
+      .then(() => {
+        return carpoolSvc.addUserToCarpool(carpool.id, user);
+      })
+      .catch(errors.CarpoolParticipantAlreadyInCarpoolExecption, _catch)
+      .then(checkCaught)
+      // Test participant cannot be added if participant does not exist
+      .then(() => {
+        return carpoolSvc.addUserToCarpool(carpool.id,
+          utils.getNonExistantUser());
+      })
+      .catch(errors.CarpoolParticipantNotFoundException, _catch)
+      .then(checkCaught)
       .catch(fail)
       .error(fail)
       .finally(done);
-  });*/
-
-  /*it('should not add a user to a carpool for an invalid owner', (done) => {
-
-    carpoolSvc.addUserToCarpool(carpoolID, "123456789", "1234")
-      .then(fail)
-      .catch(errors.NotCarpoolOwner, done)
   });
-
-  it('should not add a user to a carpool if that user is already in the carpool', (done) => {
-    carpoolSvc.addUserToCarpool(carpoolID, owner.id, "123456789")
-      .then(fail)
-      .catch(errors.UserAlreadyInCarpool, done)
-  });*/
-
 });
