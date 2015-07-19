@@ -132,6 +132,7 @@ module Utils {
       userName: rs(),
       email: em(),
       isAccountActivated: (Math.random() > 0.5),
+      carpools: [],
       passwordHash: rs(),
       salt: rs(),
       id: rs()

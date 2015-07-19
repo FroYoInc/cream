@@ -68,6 +68,7 @@ module UserService {
        userName: userName,
        email: email,
        isAccountActivated: false,
+       carpools: [],
        passwordHash: passwordHash,
        salt: salt
      }
