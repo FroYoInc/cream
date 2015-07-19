@@ -173,7 +173,7 @@ module CarpoolService {
             if(_carpool.owner.userName == owner){
               if(_carpool.participants.map((u) => {return u.id}).indexOf(userToAdd) < 0){ // Make sure the user is not already in the carpool
                 q.run(query)()
-                  .then( (result) => {
+                  .then( () => {
                     getCarpoolByID(carpoolID)
                       .then((carpool) => {
                         resolve(carpool)
@@ -187,6 +187,44 @@ module CarpoolService {
             else{
               throw new errors.NotCarpoolOwner();
             }
+        }).catch(Error, (err) => {reject(err);})
+    });
+  }
+
+  export function updateCarpoolName(carpoolID:string, newName:string) : Promise<models.Carpool> {
+    return new Promise<models.Carpool>((resolve, reject) => {
+      var query = r.db(db).table(table).get(carpoolID).update({
+        name: newName
+      });
+
+      getCarpoolByID(carpoolID)
+      .then( () => {
+          q.run(query) ()
+          .then( () => {
+              getCarpoolByID(carpoolID)
+              .then((carpool) => {
+                  resolve(carpool)
+                })
+            })
+        }).catch(Error, (err) => {reject(err);})
+    });
+  }
+
+  export function updateCarpoolDescription(carpoolID:string, newDescription:string) : Promise<models.Carpool> {
+    return new Promise<models.Carpool>((resolve, reject) => {
+      var query = r.db(db).table(table).get(carpoolID).update({
+        description: newDescription
+      });
+
+      getCarpoolByID(carpoolID)
+        .then( () => {
+          q.run(query) ()
+            .then( () => {
+              getCarpoolByID(carpoolID)
+                .then((carpool) => {
+                  resolve(carpool)
+                })
+            })
         }).catch(Error, (err) => {reject(err);})
     });
   }
