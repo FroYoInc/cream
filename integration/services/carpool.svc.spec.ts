@@ -178,6 +178,7 @@ describe('CarpoolService', () => {
         return carpoolSvc.getUserCarpools(user);
       })
       .then((carpools) => {
+        console.log(carpools);
         expect(carpools.length).toBe(1);
       })
       .catch(fail)

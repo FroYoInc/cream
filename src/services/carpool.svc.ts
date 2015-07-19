@@ -163,8 +163,6 @@ module CarpoolService {
       })
     }).coerceTo('array');
 
-    //var query = _db.table(table).limit(limit).coerceTo('array');
-
     return q.run(query)()
       .then((_carpools) => {
         return <Array<models.Carpool>> _carpools;
@@ -173,19 +171,47 @@ module CarpoolService {
 
   export function getUserCarpools(user:models.User)
   :Promise<Array<models.Carpool>> {
-    return Promise.resolve()
-        .then(() => {
-          return [];
-        })
+    var userExistQuery = userSvc.userExistQuery(user.userName);
+    var getUserCarpoolsQuery = r.db(db)
+      .table('users')
+      .get(user.id)
+      .getField('carpools')
+      .map((carpoolId) => {
+        return r.db(db)
+          .table(table)
+          .get(carpoolId)
+      });
+    var getUserCarpoolsIfUserExistQuery =
+      r.branch(
+        userExistQuery,
+        getUserCarpoolsQuery,
+        r.expr('user not found')
+      );
+
+    return q.run(getUserCarpoolsIfUserExistQuery)()
+      .then((result) => {
+        if (result == 'user not found') {
+          throw new errors.UserNotFoundException()
+        } else {
+          return result;
+        }
+      })
   }
 
   export function addUserToCarpool(carpoolID:string, participant:models.User)
    :Promise<models.Carpool> {
     var participantExistQuery = userSvc.userExistQuery(participant.userName);
     var doesCarpoolExistQuery = doesCarpoolExistGivenID(carpoolID);
-    var addParicipantQuery = r.db(db).table(table).get(carpoolID).update({
+    var addParicipantQuery = r.db(db)
+    .table(table)
+    .get(carpoolID)
+    .update({
       'participants': r.row('participants').append(participant.id)
-      });
+    })
+    .and(r.db(db)
+      .table('users')
+      .get(participant.id)
+      .update({'carpools': r.row('carpools').append(carpoolID)}));
     var participantNotInCarpoolQuery = r.db(db).table(table)
       .get(carpoolID).getField('participants').contains(participant.id).not();
 
