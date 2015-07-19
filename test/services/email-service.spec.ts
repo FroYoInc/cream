@@ -17,6 +17,7 @@ describe('The Email Service', () => {
       userName: 'testuser',
       email: 'me@froyo4life.com',
       isAccountActivated: false,
+      carpools: [],
       passwordHash: '12345',
       salt: 'NaCl'
     };
@@ -45,7 +46,7 @@ describe('The Email Service', () => {
   it('should send the activation email with the activation code in it', () => {
     var activationCode: string = 'fhjsdBHJFSJKdwe239';
 	var mailData: any;
-	
+
 	// Override the send function, which will just save the sent message.
 	emailService.transportConfig = {
       send: (mail, callback) => {

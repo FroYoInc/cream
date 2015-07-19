@@ -57,6 +57,7 @@ describe('UserAuth', () => {
         userName: 'pHiggs',
         email: utils.validEmail('higgs'),
         isAccountActivated: true,
+        carpools: [],
         passwordHash: hash,
         salt: salt
   };
@@ -68,6 +69,7 @@ describe('UserAuth', () => {
         userName: 'bNye',
         email: utils.validEmail('bNye'),
         isAccountActivated: false,
+        carpools: [],
         passwordHash: hash,
         salt: salt
   };
@@ -78,6 +80,7 @@ describe('UserAuth', () => {
         userName: 'pHiggs',
         email: utils.validEmail('thisEmailIsNotInTheDB'),
         isAccountActivated: false,
+        carpools: [],
         passwordHash: '12345',
         salt: 'andPepper'
   };

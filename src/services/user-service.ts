@@ -26,7 +26,8 @@ module UserService {
   var emailValidator = new EmailValidator.EmailValidator(domainWhiteList);
   var userNameValidator = new UserNameValidator.UserNameValidator();
 
-  export function setEmailTransportConfig(config: nodemailer.TransporterConfig) {
+  export function setEmailTransportConfig(
+    config: nodemailer.TransporterConfig) {
   	transportConfig = config;
   }
 
@@ -68,6 +69,7 @@ module UserService {
        userName: userName,
        email: email,
        isAccountActivated: false,
+       carpools: [],
        passwordHash: passwordHash,
        salt: salt
      }
@@ -248,7 +250,8 @@ module UserService {
       });
   }
 
-  export function updateUserData(userData:models.UserData):Promise<models.UserData> {
+  export function updateUserData(userData:models.UserData):
+  Promise<models.UserData> {
     assert.equal((userData.id !== null), true,
       "Trying to update a userData without an id");
     var updateUserDataQuery = r.db(db)
@@ -258,7 +261,8 @@ module UserService {
     return q.run(updateUserDataQuery)().then(() => {return userData});
   }
 
-  export function createUserData(userData:models.UserData): Promise<models.UserData> {
+  export function createUserData(userData:models.UserData):
+  Promise<models.UserData> {
     var insertUserData = r.db(db).table(userDataTable).insert(userData);
     return q.run(insertUserData)().then(() => {return userData});
   }
