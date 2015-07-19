@@ -53,10 +53,10 @@ describe('CarpoolService', () => {
     doesCarpoolExist('fropool')()
       .then((val) => {expect(val).toBe(false)})
       // Test carpool can be created
-      .then(createCarpool('fropool', campus.name, 'first carpool', owner.userName))
+      .then(createCarpool('fropool', campus.name, 'carpool', owner.userName))
       .then((carpool) => {
         expect(carpool.name).toBe('fropool');
-        expect(carpool.description).toBe('first carpool');
+        expect(carpool.description).toBe('carpool');
         expect(carpool.campus).toEqual(campus);
         expect(carpool.owner).toEqual(owner);
         expect(carpool.participants.length).toBe(1);
