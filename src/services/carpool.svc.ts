@@ -171,6 +171,14 @@ module CarpoolService {
       });
   }
 
+  export function getUserCarpools(user:models.User)
+  :Promise<Array<models.Carpool>> {
+    return Promise.resolve()
+        .then(() => {
+          return [];
+        })
+  }
+
   export function addUserToCarpool(carpoolID:string, participant:models.User)
    :Promise<models.Carpool> {
     var participantExistQuery = userSvc.userExistQuery(participant.userName);

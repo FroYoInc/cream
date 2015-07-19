@@ -21,9 +21,6 @@ function checkCaught(arg: Caught) {
   }
 }
 
-function expectFalse(arg) {
-  expect(arg).toBe(false);
-}
 function createCarpool(n: string, c: string, d: string, o: string)
 : () => Promise<models.Carpool> {
   return () => {return carpoolSvc.createCarpool(n, c, d, o)}
@@ -54,7 +51,7 @@ describe('CarpoolService', () => {
 
   it('should create a carpool', (done) => {
     doesCarpoolExist('fropool')()
-      .then(expectFalse)
+      .then((val) => {expect(val).toBe(false)})
       // Test carpool can be created
       .then(createCarpool('fropool', campus.name, 'first carpool', owner.userName))
       .then((carpool) => {
@@ -142,6 +139,47 @@ describe('CarpoolService', () => {
       })
       .catch(errors.CarpoolParticipantNotFoundException, _catch)
       .then(checkCaught)
+      .catch(fail)
+      .error(fail)
+      .finally(done);
+  });
+
+  it('should retrive carpools a user is participant of', (done) => {
+    var carpool:models.Carpool;
+    var user:models.User;
+
+    Promise.resolve()
+      // Setup
+      .then(() => {
+        return [utils.createRandomUser(), utils.getSomeCarpool()];
+      })
+      .spread((u:models.User, c:models.Carpool) => {
+        carpool = c; user = u;
+      })
+      // Test newlt created user is not participant of any carpool
+      .then(() => {
+        return carpoolSvc.getUserCarpools(user);
+      })
+      .then((carpools) => {
+        expect(carpools.length).toBe(0);
+      })
+      // Test exception is thrown when invalid user is given
+      .then(() => {
+        return carpoolSvc.getUserCarpools(utils.getNonExistantUser());
+      })
+      .catch(errors.UserNotFoundException, _catch)
+      .then(checkCaught)
+      // Add user to a carpool
+      .then(() => {
+        return carpoolSvc.addUserToCarpool(carpool.id, user);
+      })
+      // Test user is participant of carpool by retriveing users's carpools
+      .then(() => {
+        return carpoolSvc.getUserCarpools(user);
+      })
+      .then((carpools) => {
+        expect(carpools.length).toBe(1);
+      })
       .catch(fail)
       .error(fail)
       .finally(done);
