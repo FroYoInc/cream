@@ -197,14 +197,11 @@ module CarpoolService {
         name: newName
       });
 
-      getCarpoolByID(carpoolID)
-      .then( () => {
-          q.run(query) ()
-          .then( () => {
-              getCarpoolByID(carpoolID)
-              .then((carpool) => {
-                  resolve(carpool)
-                })
+      q.run(query) ()
+        .then( () => {
+          getCarpoolByID(carpoolID)
+          .then((carpool) => {
+              resolve(carpool)
             })
         }).catch(Error, (err) => {reject(err);})
     });
@@ -216,14 +213,11 @@ module CarpoolService {
         description: newDescription
       });
 
-      getCarpoolByID(carpoolID)
+      q.run(query) ()
         .then( () => {
-          q.run(query) ()
-            .then( () => {
-              getCarpoolByID(carpoolID)
-                .then((carpool) => {
-                  resolve(carpool)
-                })
+          getCarpoolByID(carpoolID)
+            .then((carpool) => {
+              resolve(carpool)
             })
         }).catch(Error, (err) => {reject(err);})
     });
