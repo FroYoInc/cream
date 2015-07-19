@@ -139,9 +139,8 @@ module CarpoolService {
           throw new errors.CarpoolNotFoundException()
         } else {
           assert.equal(true, (_carpool.id == carpoolID),
-          'retrived object should have same id');
-          var carpool:models.Carpool = _carpool;
-          return carpool;
+          'retrieved object should have same id');
+          return _carpool;
         }
       });
   }
@@ -156,8 +155,6 @@ module CarpoolService {
         return _db.table('users').get(p);
       })
     }).coerceTo('array');
-
-    //var query = _db.table(table).limit(limit).coerceTo('array');
 
     return q.run(query)()
       .then((_carpools) => {
@@ -191,11 +188,8 @@ module CarpoolService {
               throw new errors.NotCarpoolOwner();
             }
         }).catch(Error, (err) => {reject(err);})
-
     });
-
   }
-
 }
 
 export = CarpoolService;
