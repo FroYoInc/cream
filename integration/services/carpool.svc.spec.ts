@@ -20,12 +20,9 @@ function checkCaught(arg: Caught) {
     fail(new Error("Expected an exception to be caught"))
   }
 }
+
 function expectFalse(arg) {
   expect(arg).toBe(false);
-}
-
-function expectTrue(arg) {
-  expect(arg).toBe(true);
 }
 function createCarpool(n: string, c: string, d: string, o: string)
 : () => Promise<models.Carpool> {
