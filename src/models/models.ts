@@ -33,6 +33,7 @@ module Models {
     userName: string;
     email: string;
     isAccountActivated: boolean;
+    carpools: Array<Carpool>;
     passwordHash: string;
     salt: string;
     id?: string;
