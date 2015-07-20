@@ -16,6 +16,12 @@ var carpoolNameIndex = 'name';
 
 module CarpoolService {
   var carpoolNameValidator = new v.CarpoolNameValidator();
+  function doesCarpoolExistGivenID(carpoolId:string):r.Expression<boolean> {
+    return r.db(db)
+      .table(table)
+      .get(carpoolId)
+      .eq(null).not();
+  }
   function getCarpoolExistQuery(carpoolName):r.Expression<boolean> {
     return r.db(db)
       .table(table)
@@ -157,43 +163,84 @@ module CarpoolService {
       })
     }).coerceTo('array');
 
-    //var query = _db.table(table).limit(limit).coerceTo('array');
-
     return q.run(query)()
       .then((_carpools) => {
         return <Array<models.Carpool>> _carpools;
       });
   }
 
-  export function addUserToCarpool(carpoolID:string, owner:string, userToAdd:string) : Promise<models.Carpool> {
-    return new Promise<models.Carpool>((resolve, reject) => {
-      var query = r.db(db).table(table).get(carpoolID).update({
-                    participants: r.row("participants").append(userToAdd)
-                  });
+  export function getUserCarpools(user:models.User)
+  :Promise<Array<models.Carpool>> {
+    var userExistQuery = userSvc.userExistQuery(user.userName);
+    var getUserCarpoolsQuery = r.db(db)
+      .table('users')
+      .get(user.id)
+      .getField('carpools')
+      .map((carpoolId) => {
+        return r.db(db)
+          .table(table)
+          .get(carpoolId)
+      });
+    var getUserCarpoolsIfUserExistQuery =
+      r.branch(
+        userExistQuery,
+        getUserCarpoolsQuery,
+        r.expr('user not found')
+      );
 
-      getCarpoolByID(carpoolID)
-        .then( (_carpool) => {
-            if(_carpool.owner.userName == owner){
-              if(_carpool.participants.map((u) => {return u.id}).indexOf(userToAdd) < 0){ // Make sure the user is not already in the carpool
-                q.run(query)()
-                  .then( (result) => {
-                    getCarpoolByID(carpoolID)
-                      .then((carpool) => {
-                        resolve(carpool)
-                      })
-                  })
-              }
-              else{
-                throw new errors.UserAlreadyInCarpool();
-              }
-            }
-            else{
-              throw new errors.NotCarpoolOwner();
-            }
-        }).catch(Error, (err) => {reject(err);})
+    return q.run(getUserCarpoolsIfUserExistQuery)()
+      .then((result) => {
+        if (result == 'user not found') {
+          throw new errors.UserNotFoundException()
+        } else {
+          return result;
+        }
+      })
+  }
 
-    });
+  export function addUserToCarpool(carpoolID:string, participant:models.User)
+   :Promise<models.Carpool> {
+    var participantExistQuery = userSvc.userExistQuery(participant.userName);
+    var doesCarpoolExistQuery = doesCarpoolExistGivenID(carpoolID);
+    var addParicipantQuery = r.db(db)
+    .table(table)
+    .get(carpoolID)
+    .update({
+      'participants': r.row('participants').append(participant.id)
+    })
+    .and(r.db(db)
+      .table('users')
+      .get(participant.id)
+      .update({'carpools': r.row('carpools').append(carpoolID)}));
+    var participantNotInCarpoolQuery = r.db(db).table(table)
+      .get(carpoolID).getField('participants').contains(participant.id).not();
 
+    var query = r.branch(
+      participantExistQuery,
+      r.branch(
+        doesCarpoolExistQuery,
+        r.branch(
+          participantNotInCarpoolQuery,
+          addParicipantQuery,
+          r.expr('participant already in carpool')
+        ),
+        r.expr('carpool does not exist')
+      ),
+      r.expr('participant does not exist')
+    );
+
+    return q.run(query)()
+      .then((result) => {
+        if (result == 'carpool does not exist') {
+          throw new errors.CarpoolNotFoundException();
+        } else if (result == 'participant does not exist') {
+          throw new errors.CarpoolParticipantNotFoundException();
+        } else if (result == 'participant already in carpool') {
+          throw new errors.CarpoolParticipantAlreadyInCarpoolExecption();
+        } else {
+          return getCarpoolByID(carpoolID);
+        }
+      });
   }
 
 }

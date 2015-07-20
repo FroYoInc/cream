@@ -81,6 +81,7 @@ declare module "rethinkdb" {
   }
 
   interface Writeable {
+    update(obj:Object, options?:UpdateOptions):Expression<any>;
     update(obj:Object, options?:UpdateOptions):Operation<WriteResult>;
     replace(obj:Object, options?:UpdateOptions):Operation<WriteResult>;
     replace(expr:ExpressionFunction<any>):Operation<WriteResult>;
@@ -112,6 +113,7 @@ declare module "rethinkdb" {
     filter(rql:Expression<boolean>):Sequence;
     filter(obj:{[key:string]:any}):Sequence;
     merge(any);
+    getField(a:string):Expression<any>;
 
 
     // Join

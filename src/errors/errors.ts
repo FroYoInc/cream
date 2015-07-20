@@ -64,7 +64,17 @@ module Errors {
       super('carpool already exist', 'CarpoolExistException');
     }
   }
-  //campus name should not be empty 
+  export class CarpoolParticipantNotFoundException extends Exception {
+    constructor() {
+      super('carpool participant not found', 'CarpoolParticipantNotFoundException');
+    }
+  }
+  export class CarpoolParticipantAlreadyInCarpoolExecption extends Exception {
+    constructor() {
+      super('carpool participant already in carpool', 'CarpoolParticipantAlreadyInCarpoolException');
+    }
+  }
+  //campus name should not be empty
   export class CampusNameValidationException extends Exception {
     constructor() {
       super('invalid campus name', 'CampusNameValidationException');
