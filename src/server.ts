@@ -63,10 +63,3 @@ var routes = new (require('./routes'))(server);
 server.listen(c.Config.app.port, function() {
   console.log('> %s listening on %s', server.name, server.url);
 });
-
-
-for(var i = 0; i < 100; ++i){
-  requestService.createRequest("123", "123")
-    .then(console.log)
-    .catch(Error, (err)=>{});
-}
