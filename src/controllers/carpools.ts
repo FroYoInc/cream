@@ -155,17 +155,18 @@ module carpoolControllers{
                       participants.push(obj.id);
                     });
                     if(participants.indexOf(req.session["userID"]) >= 0){
-                      requestServ.removeRequest(req.params.userToDenyID, req.params.carpoolID)
-                        .then( (result) => {
-                          resolve(200);
-                        })
-                        .catch(errors.CarpoolRequestNotFound, (err) => {
-                          resolve(404);
-                        })
+                      removeUserRequest(req.params.userToDenyID, req.params.carpoolID, resolve);
                     }
                     else {
                       resolve(403);
                     }
+                  })
+                  .catch(errors.CarpoolNotFoundException, (err) => {
+                    // If the carpool does not exist, remove the request  
+                    removeUserRequest(req.params.userToDenyID, req.params.carpoolID, resolve);
+                  })
+                  .catch(Error, (err) => {
+                    resolve(500);
                   })
               }
               else{
@@ -177,6 +178,17 @@ module carpoolControllers{
           resolve(400);
         }
       });
+
+      function removeUserRequest(userID, carpoolID, resolve){
+        requestServ.removeRequest(userID, carpoolID)
+          .then( (result) => {
+            resolve(200);
+          })
+          .catch(errors.CarpoolRequestNotFound, (err) => {
+            resolve(404);
+          })
+      }
+
     }
 }
 export = carpoolControllers;

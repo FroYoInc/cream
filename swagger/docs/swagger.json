@@ -155,43 +155,6 @@
                 }
             }
         },
-        "/api/carpools/request": {
-            "post": {
-                "summary": "Request to join carpool",
-                "description": "\nMakes a request for the user to join a carpool ",
-                "parameters": [
-                    {
-                        "name": "carpoolRequest",
-                        "in": "body",
-                        "description": "The id of the carpool that the user wishes to join",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/carpoolRequest"
-                        }
-                    }
-                ],
-                "tags": [
-                    "Carpool"
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Request successfully created."
-                    },
-                    "400": {
-                        "description": "No carpool id provided."
-                    },
-                    "401": {
-                        "description": "Unauthorized attempt, user must be logged in to make a request."
-                    },
-                    "409": {
-                        "description": "Conflict error.  User already has a request to join this carpool."
-                    },
-                    "500" : {
-                        "description" : "Internal Server error. Unable to make request"
-                    }
-                }
-            }
-        },
 
         "/api/activate/{activationCode}": {
             "get": {
@@ -296,6 +259,128 @@
                     }
                 }
             }
+        },
+        "/api/carpools/request": {
+            "post": {
+                "summary": "Request to join carpool",
+                "description": "\nMakes a request for the user to join a carpool ",
+                "parameters": [
+                    {
+                        "name": "carpoolRequest",
+                        "in": "body",
+                        "description": "The id of the carpool that the user wishes to join",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/carpoolRequest"
+                        }
+                    }
+                ],
+                "tags": [
+                    "Carpool"
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Request successfully created."
+                    },
+                    "400": {
+                        "description": "No carpool id provided."
+                    },
+                    "401": {
+                        "description": "Unauthorized attempt, user must be logged in to make a request."
+                    },
+                    "409": {
+                        "description": "Conflict error.  User already has a request to join this carpool."
+                    },
+                    "500" : {
+                        "description" : "Internal Server error. Unable to make request"
+                    }
+                }
+            }
+        },
+
+        "/api/carpools/addUser": {
+            "post": {
+                "summary": "Approves the user's request to join a carpool",
+                "description": "\nAdd's a user to a carpool.  The user attempting to add a member, must be logged in and a member of the carpool.",
+                "parameters": [
+                    {
+                        "name": "carpoolApproval",
+                        "in": "body",
+                        "description": "The id of the carpool that the user wishes to join, and the id of the user to add.",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/carpoolApproval"
+                        }
+                    }
+                ],
+                "tags": [
+                    "Carpool"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User added successfully."
+                    },
+                    "400": {
+                        "description": "One or more missing parameters"
+                    },
+                    "401": {
+                        "description": "Unauthorized attempt, user must be logged in."
+                    },
+                    "403": {
+                        "description": "Forbidden. The user must be a member of a carpool to add members."
+                    },
+                    "404": {
+                        "description": "Missing Resource. Unable to locate either the request, the user, or the carpool. "
+                    },
+                    "409": {
+                        "description": "Conflict error.  User is already a member of the carpool."
+                    },
+                    "500" : {
+                        "description" : "Internal Server error. Unable to make request"
+                    }
+                }
+            }
+        },
+
+        "/api/carpools/denyUser": {
+            "post": {
+                "summary": "Reject's the user's request to join",
+                "description": "\nDeny a user's request to join a carpool, and remove the request. The user denying the request, must be signed in and a member of the carpool.",
+                "parameters": [
+                    {
+                        "name": "carpoolDenial",
+                        "in": "body",
+                        "description": "The id of the carpool that the user wishes to join, and the id of the user to deny.",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/carpoolDenial"
+                        }
+                    }
+                ],
+                "tags": [
+                    "Carpool"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User request denied successfully."
+                    },
+                    "400": {
+                        "description": "One or more missing parameters"
+                    },
+                    "401": {
+                        "description": "Unauthorized attempt, user must be logged in."
+                    },
+                    "403": {
+                        "description": "Forbidden. The user must be a member of a carpool to deny members."
+                    },
+                    "404": {
+                        "description": "Request not found."
+                    },
+                    "500" : {
+                        "description" : "Internal Server error. Unable to make request"
+                    }
+                }
+            }
         }
 
     },
@@ -355,6 +440,29 @@
             ],
             "properties" : {
                 "carpoolID" : { "required": true, "type" :"string"}
+            }
+        },
+        "carpoolApproval" : {
+            "required": [
+                "carpoolID",
+                "userToAddID"
+            ],
+            "properties" : {
+                "carpoolID" : { "required": true, "type" :"string"},
+                "userToAddID" : { "required": true, "type" :"string"}
+
+            }
+        },
+        "carpoolDenial" : {
+            "required": [
+                "carpoolID",
+                "userToDenyId"
+
+            ],
+            "properties" : {
+                "carpoolID" : { "required": true, "type" :"string"},
+                "userToDenyId" : { "required": true, "type" :"string"}
+
             }
         },
         "NewCarpool": {
