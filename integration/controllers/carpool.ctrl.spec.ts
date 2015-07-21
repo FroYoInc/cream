@@ -194,7 +194,7 @@ describe('Carpool controller', () => {
       expect(outputJSON.name).toBe(inputJSON.name);
       expect(outputJSON.description).toBe(inputJSON.description);
       expect(outputJSON.owner).toEqual(UserCtrl.toOutputJSON(owner));
-      expect(outputJSON.campus).toBe(CampusCtrl.toOutputJSON(campus));
+      expect(outputJSON.campus).toEqual(CampusCtrl.toOutputJSON(campus));
       expect(outputJSON.participants).toEqual([UserCtrl.toOutputJSON(owner)]);
       var hasHref = (outputJSON.href.indexOf('/carpools/') > -1);
       expect(hasHref).toEqual(true);
