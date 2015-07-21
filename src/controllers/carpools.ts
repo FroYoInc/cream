@@ -155,7 +155,7 @@ module carpoolControllers{
                       participants.push(obj.id);
                     });
                     if(participants.indexOf(req.session["userID"]) >= 0){
-                      requestServ.removeRequest(req.params.userToAddID, req.params.carpoolID)
+                      requestServ.removeRequest(req.params.userToDenyID, req.params.carpoolID)
                         .then( (result) => {
                           resolve(200);
                         })
