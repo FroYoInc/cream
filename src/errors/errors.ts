@@ -156,19 +156,13 @@ module Errors {
   export class CarpoolRequestNotFoundException extends Exception {
     constructor(){
       super("The user request to join a carpool is not found",
-      'CarpoolRequestNotFound');
-    }
-  }
-
-  export class NotCarpoolOwner extends Exception {
-    constructor(){
-      super("User must be the carpool owner to add a user.", 'NotCarpoolOwner');
+      'CarpoolRequestNotFoundException');
     }
   }
 
   export class UserAlreadyInCarpool extends Exception {
     constructor(){
-      super("The user is already in the carpool.", 'UserAlreadyInCarpool');
+      super("The user is already in the carpool.", 'UserAlreadyInCarpoolExceoption');
     }
   }
 
