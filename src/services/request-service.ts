@@ -34,10 +34,7 @@ module RequestService {
                 throw new errors.CarpoolRequestConflictException();
             }
             else{
-                return q.run(insertRequest)()
-                        .then((result) => {
-                            return result;
-                        });
+                return q.run(insertRequest)();
             }
         });
 
@@ -53,10 +50,7 @@ module RequestService {
                 throw new errors.CarpoolRequestNotFoundException();
             }
             else{
-                return q.run(removeRequest)()
-                        .then((result) => {
-                            return result;
-                        });
+                return q.run(removeRequest)();
             }
         });
 
@@ -67,20 +61,14 @@ module RequestService {
         
         var getByUserID = r.db(db).table(table).filter({userID: userID}).coerceTo('array');
         
-        return q.run(getByUserID)()
-                .then((result) => {
-                    return result;
-                });
+        return q.run(getByUserID)();
     }
 
     export function getRequestByCarpoolID(carpoolID:string){
         
         var getByCarpoolID = r.db(db).table(table).filter({carpoolID: carpoolID}).coerceTo('array');
         
-        return q.run(getByCarpoolID)()
-                .then((result) => {
-                    return result;
-                });
+        return q.run(getByCarpoolID)();
     }
 }
 
