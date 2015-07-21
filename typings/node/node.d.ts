@@ -209,7 +209,6 @@ declare module NodeJS {
         Int8Array: typeof Int8Array;
         Intl: typeof Intl;
         JSON: typeof JSON;
-        Map: typeof Map;
         Math: typeof Math;
         NaN: typeof NaN;
         Number: typeof Number;
