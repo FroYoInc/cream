@@ -8,6 +8,7 @@ import userService = require('../../src/services/user-service');
 import CarpoolSvc = require('../../src/services/carpool.svc');
 import CarpoolCtrl = require('../../src/controllers/carpool.ctrl');
 import UserCtrl = require('../../src/controllers/create-user.ctrl');
+import CampusCtrl = require('../../src/controllers/campus.ctrl');
 import errors = require('../../src/errors/errors');
 import r = require('rethinkdb');
 import carpoolCtrl = require('../../src/controllers/carpools');
@@ -193,7 +194,7 @@ describe('Carpool controller', () => {
       expect(outputJSON.name).toBe(inputJSON.name);
       expect(outputJSON.description).toBe(inputJSON.description);
       expect(outputJSON.owner).toEqual(UserCtrl.toOutputJSON(owner));
-      /*TODO: expect(outputJSON.campus).toBe(CampusCtrl.toOutputJSON(campus));*/
+      expect(outputJSON.campus).toEqual(CampusCtrl.toOutputJSON(campus));
       expect(outputJSON.participants).toEqual([UserCtrl.toOutputJSON(owner)]);
       var hasHref = (outputJSON.href.indexOf('/carpools/') > -1);
       expect(hasHref).toEqual(true);
@@ -392,10 +393,9 @@ describe('Carpool controller', () => {
             })
           })
         })
-      })  
+      })
     })
 
   });
 
 })
-
