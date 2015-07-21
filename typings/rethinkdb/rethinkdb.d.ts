@@ -35,6 +35,12 @@ declare module "rethinkdb" {
 
   // Control Structures
   export function branch(test:Expression<boolean>, trueBranch:Expression<any>, falseBranch:Expression<any>):Expression<any>;
+  export function branch(test:Expression<boolean>, trueBranch:Operation<any>, falseBranch:Expression<any>):Expression<any>;
+  export function branch(test:Expression<boolean>, trueBranch:Expression<any>, falseBranch:Operation<any>):Expression<any>;
+  export function branch(test:Expression<boolean>, trueBranch:Operation<any>, falseBranch:Operation<any>):Expression<any>;
+
+
+
 
 
 

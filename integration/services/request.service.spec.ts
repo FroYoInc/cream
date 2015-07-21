@@ -58,12 +58,12 @@ describe('RequestService', () => {
 
   it('it should create a request', (done) => {
       createRequest(joinRequest.userID, joinRequest.carpoolID)
-      .then( () => {
-        reqServ.requestExists(joinRequest.userID, joinRequest.carpoolID)
-          .then(testTrue)
-          .error(fail)
-          .finally(done);
-      });
+      .then( (result) => {
+          testTrue(result);
+      })
+      .catch(Error, fail)
+      .error(fail)
+      .finally(done);
   });
 
   it('it should find a request by userID', (done) => {
@@ -98,11 +98,11 @@ describe('RequestService', () => {
 
   it('it should remove a request', (done) => {
       removeRequest(joinRequest.userID, joinRequest.carpoolID)
-      .then( () => {
-        reqServ.requestExists(joinRequest.userID, joinRequest.carpoolID)
-          .then(testFalse)
-          .error(fail)
-          .finally(done);
-      });
+      .then( (result) => {
+          testTrue(result);
+      })
+      .catch(Error, fail)
+      .error(fail)
+      .finally(done);
   });
 });

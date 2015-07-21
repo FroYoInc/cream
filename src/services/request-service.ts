@@ -13,47 +13,62 @@ module RequestService {
     var db = "froyo";
     var table = "requests";
 
-    export function requestExists(userID:string, carpoolID:string) : Promise<boolean> {
-        return q.run(
-                     r.db(db)
-                    .table(table)
-                    .filter({userID: userID,carpoolID: carpoolID})
-                    .isEmpty()
-                    .not()
-                )().then( (result) => {
-                    return result;
-                })
+    export function requestExists(userID:string, carpoolID:string) :r.Expression<boolean> {
+        return r.db(db)
+                .table(table)
+                .filter({userID: userID,carpoolID: carpoolID})
+                .isEmpty()
+                .not()
     }
 
     export function createRequest(userID:string, carpoolID:string) : Promise<boolean> {
         
-        var insertRequest = r.db(db).table(table).insert({userID,carpoolID});
-        return requestExists(userID, carpoolID)
-          .then( (result) => {
-            if(result){
+        var createRequestQuery = r.db(db).table(table).insert({userID,carpoolID});
+        var requestExistsQuery = requestExists(userID, carpoolID);
+
+        var createRequestIfItDoesNotExist =
+             r.branch(
+               requestExistsQuery,
+               r.expr('request exists'),
+               createRequestQuery
+             );
+
+        return q.run(
+          createRequestIfItDoesNotExist)()
+          .then((result) => {
+            if (result == 'request exists') {
                 throw new errors.CarpoolRequestConflictException();
+            } 
+            else {
+                return (result.inserted === 1);
             }
-            else{
-                return q.run(insertRequest)();
-            }
-        });
+          });
 
     }
 
-    export function removeRequest(userID:string, carpoolID:string) {
+    export function removeRequest(userID:string, carpoolID:string) : Promise<boolean> {
         
-        var removeRequest = r.db(db).table(table).filter({userID: userID,carpoolID: carpoolID}).delete();
+        var removeRequestQuery = r.db(db).table(table).filter({userID: userID,carpoolID: carpoolID}).delete();
+        var requestExistsQuery = requestExists(userID, carpoolID);
 
-        return requestExists(userID, carpoolID)
-          .then( (result) => {
-            if(!result){
+        var removeRequestIfItExists =
+             r.branch(
+               requestExistsQuery,
+               removeRequestQuery,
+               r.expr('request not found')
+             );
+
+        return q.run(
+          removeRequestIfItExists)()
+          .then((result) => {
+            if (result == 'request not found') {
                 throw new errors.CarpoolRequestNotFoundException();
-            }
-            else{
-                return q.run(removeRequest)();
-            }
-        });
+            } 
+            else {
+                return (result.deleted === 1);
 
+            }
+          });
 
     }
 
