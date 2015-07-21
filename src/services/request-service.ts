@@ -28,7 +28,8 @@ module RequestService {
     export function createRequest(userID:string, carpoolID:string) : Promise<boolean> {
         
         var insertRequest = r.db(db).table(table).insert({userID,carpoolID});
-        return requestExists(userID, carpoolID).then( (result) => {
+        return requestExists(userID, carpoolID)
+          .then( (result) => {
             if(result){
                 throw new errors.CarpoolRequestConflictException();
             }
@@ -46,7 +47,8 @@ module RequestService {
         
         var removeRequest = r.db(db).table(table).filter({userID: userID,carpoolID: carpoolID}).delete();
 
-        return requestExists(userID, carpoolID).then( (result) => {
+        return requestExists(userID, carpoolID)
+          .then( (result) => {
             if(!result){
                 throw new errors.CarpoolRequestNotFoundException();
             }
