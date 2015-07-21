@@ -22,21 +22,14 @@ module RequestService {
     }
 
     export function createRequest(userID:string, carpoolID:string) : Promise<boolean> {
-        
-        var createRequestQuery = r.db(db).table(table).insert({userID,carpoolID});
-        var requestExistsQuery = requestExists(userID, carpoolID);
 
         var createRequestIfItDoesNotExist =
-             r.branch(
-               requestExistsQuery,
-               r.expr('request exists'),
-               createRequestQuery
-             );
+        r.db(db).table(table).insert({id: userID + carpoolID, userID: userID,carpoolID: carpoolID},{conflict:"error"});
 
         return q.run(
           createRequestIfItDoesNotExist)()
           .then((result) => {
-            if (result == 'request exists') {
+            if (result.errors > 0) {
                 throw new errors.CarpoolRequestConflictException();
             } 
             else {
@@ -49,19 +42,11 @@ module RequestService {
     export function removeRequest(userID:string, carpoolID:string) : Promise<boolean> {
         
         var removeRequestQuery = r.db(db).table(table).filter({userID: userID,carpoolID: carpoolID}).delete();
-        var requestExistsQuery = requestExists(userID, carpoolID);
-
-        var removeRequestIfItExists =
-             r.branch(
-               requestExistsQuery,
-               removeRequestQuery,
-               r.expr('request not found')
-             );
 
         return q.run(
-          removeRequestIfItExists)()
+          removeRequestQuery)()
           .then((result) => {
-            if (result == 'request not found') {
+            if (result.deleted === 0) {
                 throw new errors.CarpoolRequestNotFoundException();
             } 
             else {
