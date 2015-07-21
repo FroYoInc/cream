@@ -34,7 +34,7 @@ module carpoolControllers{
                       if(result){
                         // Notify the members of the carpool that someone wises to join
                         carpoolServ.getCarpoolByID(req.params.carpoolID)
-                          .then(emailSvc.sendRequestToJoin)
+                          .then(sendRequest)
                           .catch(Error, (err) => {resolve(500)});
                         resolve(201);
                       }
@@ -55,6 +55,10 @@ module carpoolControllers{
             resolve(400);
           }
         });
+
+      function sendRequest(carpool:models.Carpool) {
+        return emailSvc.sendRequestToJoin(carpool);
+      }
 
     }
 
