@@ -13,14 +13,6 @@ module RequestService {
     var db = "froyo";
     var table = "requests";
 
-    export function requestExists(userID:string, carpoolID:string) :r.Expression<boolean> {
-        return r.db(db)
-                .table(table)
-                .filter({userID: userID,carpoolID: carpoolID})
-                .isEmpty()
-                .not()
-    }
-
     export function createRequest(userID:string, carpoolID:string) : Promise<boolean> {
 
         var createRequestIfItDoesNotExist =
@@ -41,7 +33,7 @@ module RequestService {
 
     export function removeRequest(userID:string, carpoolID:string) : Promise<boolean> {
         
-        var removeRequestQuery = r.db(db).table(table).filter({userID: userID,carpoolID: carpoolID}).delete();
+        var removeRequestQuery = r.db(db).table(table).get(userID + carpoolID).delete();
 
         return q.run(
           removeRequestQuery)()
