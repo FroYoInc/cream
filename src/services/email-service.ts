@@ -86,7 +86,7 @@ export class EmailService {
     var mailOptions = {
       from: config.Config.email.name + ' <' + config.Config.email.auth.user + '>',
       to: carpool.owner.email,
-      subject: 'A user is requesting to ' + carpool.name,
+      subject: 'A user is requesting to join ' + carpool.name,
       text: "A user has requested to join your carpool, " + carpool.name + ".  Please log in and approve or deny their request."
     };
 
@@ -95,7 +95,7 @@ export class EmailService {
       transporter.sendMail(mailOptions, (error, sent) => {
         if (error)
         {
-          reject(new errors.ActivationCodeSendException(error.message));
+          reject(new errors.CarpoolJoinRequestSendException(error.message));
           return;
         }
 

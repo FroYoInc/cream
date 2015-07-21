@@ -30,7 +30,7 @@ module RequestService {
         var insertRequest = r.db(db).table(table).insert({userID,carpoolID});
         return requestExists(userID, carpoolID).then( (result) => {
             if(result){
-                throw new errors.CarpoolRequestConflict();
+                throw new errors.CarpoolRequestConflictException();
             }
             else{
                 return q.run(insertRequest)()
@@ -48,7 +48,7 @@ module RequestService {
 
         return requestExists(userID, carpoolID).then( (result) => {
             if(!result){
-                throw new errors.CarpoolRequestNotFound();
+                throw new errors.CarpoolRequestNotFoundException();
             }
             else{
                 return q.run(removeRequest)()

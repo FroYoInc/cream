@@ -41,7 +41,7 @@ module carpoolControllers{
                       else{
                         resolve(500);
                       }
-                    }).catch(errors.CarpoolRequestConflict, (err) => {
+                    }).catch(errors.CarpoolRequestConflictException, (err) => {
                       resolve(409);
                     });
                 }
@@ -122,7 +122,7 @@ module carpoolControllers{
                     resolve(500);
                   })
               })
-              .catch(errors.CarpoolRequestNotFound, (err) => {
+              .catch(errors.CarpoolRequestNotFoundException, (err) => {
                 resolve(404);
               })
             })
@@ -184,7 +184,7 @@ module carpoolControllers{
           .then( (result) => {
             resolve(200);
           })
-          .catch(errors.CarpoolRequestNotFound, (err) => {
+          .catch(errors.CarpoolRequestNotFoundException, (err) => {
             resolve(404);
           })
       }

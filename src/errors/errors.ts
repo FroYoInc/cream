@@ -147,13 +147,13 @@ module Errors {
   }
 
 
-  export class CarpoolRequestConflict extends Exception {
+  export class CarpoolRequestConflictException extends Exception {
     constructor(){
       super("User already has a pending request to join this carpool",
       'CarpoolRequestConflict');
     }
   }
-  export class CarpoolRequestNotFound extends Exception {
+  export class CarpoolRequestNotFoundException extends Exception {
     constructor(){
       super("The user request to join a carpool is not found",
       'CarpoolRequestNotFound');
@@ -170,6 +170,12 @@ module Errors {
     constructor(){
       super("The user is already in the carpool.", 'UserAlreadyInCarpool');
     }
+  }
+
+  export class CarpoolJoinRequestSendException extends Exception {
+    constructor(message){
+      super(message, 'UserAlreadyInCarpool');
+    } 
   }
 
 }
