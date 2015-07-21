@@ -74,21 +74,20 @@ export class EmailService {
 
 
   /**
-   * Sends the activation email to the specified user.
+   * Sends a notification to the owner of a carpool letting them know that a user wishes to join
    *
-   * @param  {models.User}                         user           The user.
-   * @param  {string}                              activationCode Their activation code.
+   * @param  {models.Carpool}                         carpool           The carpool to join.
    * @return {Promise<nodemailer.SentMessageInfo>}                A Promise.
    */
-  public sendRequestToJoin(user: models.User, recipient:string): Promise<nodemailer.SentMessageInfo> {
+  public sendRequestToJoin(carpool: models.Carpool): Promise<nodemailer.SentMessageInfo> {
 
     var transporter = this.buildTransporter();
 
     var mailOptions = {
       from: config.Config.email.name + ' <' + config.Config.email.auth.user + '>',
-      to: recipient,
-      subject: 'A user is requesting to join your carpool',
-      text: "A user has requested to join your carpool.  Please log in and approve or deny their request."
+      to: carpool.owner.email,
+      subject: 'A user is requesting to ' + carpool.name,
+      text: "A user has requested to join your carpool, " + carpool.name + ".  Please log in and approve or deny their request."
     };
 
     return new Promise<nodemailer.SentMessageInfo>((resolve, reject) => {

@@ -6,7 +6,8 @@ import Promise = require('bluebird');
 import pv = require('../validation/parameter-validator');
 import requestServ = require('../services/request-service');
 import emailServ = require('../services/email-service');
-// import carpoolServ = require('../services/carpool.svc');
+import carpoolServ = require('../services/carpool.svc');
+import userServ = require('../services/user-service');
 import errors = require('../errors/errors');
 
 var emailSvc = new emailServ.EmailService();
@@ -22,39 +23,37 @@ module carpoolControllers{
     }
 
     export function joinRequest(req: Restify.Request) : Promise<number> {
-        return new Promise<number>((resolve, reject) => {
-        
-            var validReq = pv.verifyParams(req.params.carpoolID);
-            if(validReq){
-                auth.checkAuth(req)
-                  .then( (isAuth) => {
-                    if(isAuth){
-                        requestServ.createRequest(req.session["userID"], req.params.carpoolID)
-                          .then( (result) => {
-                              if(result){
-                                  // Notify the members of the carpool that someone wises to join
-                                  // carpoolServ.getOwnerEmail(req.params.carpoolID)
-                                  //   .then(emailSvc.sendRequestToJoin})
-                                  //   .catch(Error, (err) => {});
-                                  resolve(201);
+        return new Promise<number>((resolve, reject) => {  
+          var validReq = pv.verifyParams(req.params.carpoolID);
+          if(validReq){
+            auth.checkAuth(req)
+              .then( (isAuth) => {
+                if(isAuth){
+                  requestServ.createRequest(req.session["userID"], req.params.carpoolID)
+                    .then( (result) => {
+                      if(result){
+                        // Notify the members of the carpool that someone wises to join
+                        carpoolServ.getCarpoolByID(req.params.carpoolID)
+                          .then(emailSvc.sendRequestToJoin)
+                          .catch(Error, (err) => {resolve(500)});
+                        resolve(201);
+                      }
+                      else{
+                        resolve(500);
+                      }
+                    }).catch(errors.CarpoolRequestConflict, (err) => {
+                      resolve(409);
+                    });
+                }
+                else{
+                  resolve(401);
+                }
+              });
+          }
 
-                              }
-                              else{
-                                  resolve(500);
-                              }
-                          }).catch(errors.CarpoolRequestConflict, (err) => {
-                              resolve(409);
-                          });
-                    }
-                    else{
-                        resolve(401);
-                    }
-                  });
-            }
-
-            else {
-                resolve(400);
-            }
+          else {
+            resolve(400);
+          }
         });
 
     }
@@ -68,30 +67,116 @@ module carpoolControllers{
     }
 
     export function approveUserRequest(req:Restify.Request){
-      return new Promise<number>((resolve, reject) => {
-      
-          var validReq = pv.verifyParams(req.params.carpoolID, req.params.userToAdd);
-          if(validReq){
-              auth.checkAuth(req)
-                .then( (isAuth) => {
-                  if(isAuth){
-                    // Make a call to the add user to carpool function and 
-                    // send a 200 on success, a 403 if the use making the request is not the owner
-                    // and a 500 on some internal error
-                    // Make sure to remove the request once it is processed.
-                    resolve(200)
-                  }
-                  else{
-                      resolve(401);
-                  }
-                });
-          }
-
-          else {
-              resolve(400);
-          }
+      return new Promise<number>((resolve, reject) => {      
+        var validReq = pv.verifyParams(req.params.carpoolID, req.params.userToAddID);
+        if(validReq){
+            auth.checkAuth(req)
+              .then( (isAuth) => {
+                if(isAuth){
+                  carpoolServ.getCarpoolByID(req.params.carpoolID)
+                    .then((_carpool) => {
+                      var participants = [];
+                      _carpool.participants.map((obj) => {
+                        participants.push(obj.id);
+                      });
+                      if(participants.indexOf(req.session["userID"]) >= 0){
+                        addUser(req.params.userToAddID, req.params.carpoolID, resolve)
+                      }
+                      else{
+                        resolve(403);
+                      }
+                    })
+                    .catch(errors.CarpoolNotFoundException, (err) => {
+                      resolve(404)
+                    });
+                }
+                else{
+                  resolve(401);
+                }
+              });
+        }
+        else {
+          resolve(400);
+        }
       });
+
+      function addUser(userID, carpoolID, resolve){
+        userServ.getUserById(userID)
+          .then( (_user) => {
+            requestServ.removeRequest(userID, carpoolID)
+              .then( (result) => {
+                carpoolServ.addUserToCarpool(carpoolID, _user)
+                  .then( (_carpool) => {
+                    resolve(200);
+                  })
+                  .catch(errors.CarpoolParticipantNotFoundException, (err) => {
+                    resolve(404);
+                  })
+                  .catch(errors.CarpoolParticipantAlreadyInCarpoolExecption, (err) => {
+                    resolve(409);
+                  })
+                  .catch(errors.CarpoolNotFoundException, (err) => {
+                    resolve(404);
+                  })
+                  .catch(Error, () => {
+                    resolve(500);
+                  })
+              })
+              .catch(errors.CarpoolRequestNotFound, (err) => {
+                resolve(404);
+              })
+            })
+            .catch(errors.UserNotFoundException, (err) => {
+              resolve(404);
+            })
+      }
     }
 
+    export function denyRequest(req: Restify.Request, res:Restify.Response, next){
+      denyUserRequest(req)
+        .then( (status) => {
+            res.send(status);
+        });
+      next();
+    }
+
+    export function denyUserRequest(req:Restify.Request){
+      return new Promise<number>((resolve, reject) => {      
+        var validReq = pv.verifyParams(req.params.carpoolID, req.params.userToDenyID);
+
+        if(validReq){
+          auth.checkAuth(req)
+            .then( (isAuth) => {
+              if(isAuth){
+                carpoolServ.getCarpoolByID(req.params.carpoolID)
+                  .then((_carpool) => {
+                    var participants = [];
+                    _carpool.participants.map((obj) => {
+                      participants.push(obj.id);
+                    });
+                    if(participants.indexOf(req.session["userID"]) >= 0){
+                      requestServ.removeRequest(req.params.userToAddID, req.params.carpoolID)
+                        .then( (result) => {
+                          resolve(200);
+                        })
+                        .catch(errors.CarpoolRequestNotFound, (err) => {
+                          resolve(404);
+                        })
+                    }
+                    else {
+                      resolve(403);
+                    }
+                  })
+              }
+              else{
+                resolve(401)
+              }
+            })
+        }
+        else {
+          resolve(400);
+        }
+      });
+    }
 }
 export = carpoolControllers;

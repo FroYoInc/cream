@@ -11,6 +11,7 @@ import UserCtrl = require('../../src/controllers/create-user.ctrl');
 import errors = require('../../src/errors/errors');
 import r = require('rethinkdb');
 import carpoolCtrl = require('../../src/controllers/carpools');
+import query = require('../../src/dbutils/query');
 
 class Session {
   [key: string] : any;
@@ -24,6 +25,7 @@ class Request {
 
 class Params{
   carpoolID: any;
+  userToAddID: any;
 }
 
 class Response {
@@ -105,25 +107,33 @@ describe('Carpool controller', () => {
   var good =  new Restify();
   good.req = new Request();
   good.req.session = new Session();
-  good.req.session["userID"] = 1;
+  good.req.session["userID"] = '0000008';
   good.req.session["firstName"] = "Peter";
   good.req.session["lastName"] = "Higgs";
   good.req.session["userName"] = "pHiggs";
   good.req.session["email"] = utils.validEmail("pHiggs");
-
   good.req.params  = new Params();
   good.req.params.carpoolID  = "someCarpoolID";
+  good.req.params.userToAddID  = 1;
 
-
+  var goodUser: models.User = {
+        id: '0000008',
+        firstName: 'Peter',
+        lastName: 'Higgs',
+        userName: 'blah',
+        email: utils.validEmail('blah'),
+        isAccountActivated: true,
+        carpools: [],
+        passwordHash: "hash",
+        salt: "andPepper"
+  };
 
   var notLoggedIn = new Restify();
   notLoggedIn.req = new Request();
   notLoggedIn.req.session = new Session();
 
-
   notLoggedIn.req.params  = new Params();
   notLoggedIn.req.params.carpoolID  = "someCarpoolID";
-
 
   var bad = new Restify();
   bad.req = new Request();
@@ -136,6 +146,7 @@ describe('Carpool controller', () => {
 
   bad.req.params  = new Params();
 
+  var test200 = (result) => {expect(result).toBe(200);}
   var test201 = (result) => {expect(result).toBe(201);}
   var test400 = (result) => {expect(result).toBe(400);}
   var test401 = (result) => {expect(result).toBe(401);}
@@ -146,6 +157,10 @@ describe('Carpool controller', () => {
     return carpoolCtrl.joinRequest(req);
   }
 
+
+  function approveRequest(req){
+    return carpoolCtrl.approveUserRequest(req);
+  }
 
   it('it should create a request', (done) => {
       requestToJoin(good.req)
@@ -173,6 +188,22 @@ describe('Carpool controller', () => {
       .then(test409)
       .error(fail)
       .finally(done);
+  });
+
+  xit('it should approve a valid request', (done) => {
+
+    query.run(
+        r.db('froyo').table('users').insert(goodUser)
+    )()
+      .then(() => {
+        approveRequest(good.req)
+        .then(test200)
+        .catch(Error, fail)
+        .error(fail)
+        .finally(done);
+      });
+
+
   });
 
   it('should create a carpool', (done) => {

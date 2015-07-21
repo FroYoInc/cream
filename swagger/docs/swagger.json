@@ -155,7 +155,7 @@
                 }
             }
         },
-        "/carpools/request": {
+        "/api/carpools/request": {
             "post": {
                 "summary": "Request to join carpool",
                 "description": "\nMakes a request for the user to join a carpool ",
