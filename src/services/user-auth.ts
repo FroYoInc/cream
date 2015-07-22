@@ -112,7 +112,7 @@ module UserAuth{
                     var now = today.getTime() ; // The current epoch time
 
                     // The user has exceeeded their allowed number of failed attempts
-                    if(userData.numLoginAttempts >= c.Config.loginLock.max){
+                    if(userData.numLoginAttempts >= c.Config.loginLock.max - 1){
                         
                         // Set the lock
                         if(userData.lockoutExpiration === 0 || userData.lockoutExpiration === undefined){
