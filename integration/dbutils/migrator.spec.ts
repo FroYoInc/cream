@@ -7,6 +7,8 @@ import Shapes = require('../../src/dbutils/shapes');
 var migrator = new Migrator.Migrator();
 var conn : r.Connection;
 
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
+
 var dbShape : Shapes.DBShape = {
   dbname: 'froyo',
   tables: [{
@@ -64,13 +66,12 @@ afterAll((done) => {
     conn.close().then(done);
   } else {
     throw new Error("No rethinkdb exist to close...");
-    done();
   }
 });
 
 describe('Database Migrator', () => {
-  var fail = (error) => {expect(error).toBeUndefined();}
-  var testTrue = (result) => {expect(result).toBe(true);}
+  var fail = (error) => {expect(error).toBeUndefined();};
+  var testTrue = (result) => {expect(result).toBe(true);};
 
   it('should have the same databse shape as described in this test', () => {
     expect(dbShape).toEqual(Migrator.Migrator.dbShape);
@@ -106,7 +107,7 @@ describe('Database Migrator', () => {
   .map((t) => {
     return t.indices.map((i) => {
       var obj = {};
-      obj[t.tableName] = i
+      obj[t.tableName] = i;
       return obj;
     })
   })
