@@ -37,6 +37,7 @@ module Models {
     passwordHash: string;
     salt: string;
     id?: string;
+    isAdmin?: boolean;
     // carpools?: Array<Models.Carpool>;
   }
 

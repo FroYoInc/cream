@@ -31,6 +31,15 @@ module UserAuth{
 
     }
 
+    export function checkAdmin(req: Restify.Request) : Promise<boolean>{
+        return new Promise<boolean>((resolve, reject) => {
+            userSer.getUserById(req.session["userID"])
+            .then((_user) => {
+                resolve(_user.isAdmin === true);
+            })
+        })
+    }
+
     /**
      * Checks if the user is in the database. If they are in the database, it hashes
      * the password that is provided and checks it againts the hash in the database.
