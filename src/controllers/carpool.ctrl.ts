@@ -88,6 +88,15 @@ module CarpoolController {
         next(new restify.InternalServerError(err.message))
       });
   }
+
+  export function updateCarpool(req:restify.Request, res:restify.Response, next:restify.Next) {
+
+    carpoolService.updateCarpool(req.params.carpoolid, req.body)
+        .then((carpool) => {
+          res.send(200, toOutputJSON(carpool));
+          next();
+        })
+  }
 }
 
 export = CarpoolController;

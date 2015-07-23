@@ -168,11 +168,9 @@ module CarpoolService {
       });
   }
 
-  export function updateCarpoolName(carpoolID:string, newName:string) : Promise<models.Carpool> {
+  export function updateCarpool(carpoolID:string, newCarpool:models.Carpool) : Promise<models.Carpool> {
     return new Promise<models.Carpool>((resolve, reject) => {
-      var query = r.db(db).table(table).get(carpoolID).update({
-        name: newName
-      });
+      var query = r.db(db).table(table).get(carpoolID).update(newCarpool);
 
       q.run(query)()
           .then(() => {
@@ -183,22 +181,6 @@ module CarpoolService {
           }).catch(Error, (err) => {
             reject(err);
           })
-    });
-  }
-
-  export function updateCarpoolDescription(carpoolID:string, newDescription:string) : Promise<models.Carpool> {
-    return new Promise<models.Carpool>((resolve, reject) => {
-      var query = r.db(db).table(table).get(carpoolID).update({
-        description: newDescription
-      });
-
-      q.run(query) ()
-          .then( () => {
-            getCarpoolByID(carpoolID)
-                .then((carpool) => {
-                  resolve(carpool)
-                })
-          }).catch(Error, (err) => {reject(err);})
     });
   }
 
