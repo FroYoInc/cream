@@ -73,6 +73,19 @@ module CampusController {
       });
   }
 
+  export function removeCampus(req: restify.Request, res: restify.Response, next: restify.Next) {
+    var param = pv.verifyParams(req.params.CampusName);
+    if (param == true) {
+      CampusService.removeCampus(req.params.CampusName)
+      .catch(errors.CampusNotFoundException, (err) => {
+        res.send(404, {"Message" : "Campus name does not exist"})
+        });
+    } else {
+       res.send(400, {"mesage" : " User Must be admin to remove campous"});
+    }
+  }
+
+
   /**
    * Endpoint for listing campuses.
    *

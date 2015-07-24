@@ -74,6 +74,20 @@ module CampusService {
             .then(setCampusID);
   }
 
+  export function removeCampus(CampusName: string) : Promise<boolean> {
+      return new Promise<boolean> ( (resolve, reject) => {
+        var RemoveCampus = r.db(db).table(table).get(CampusName).delete();
+        q.run(RemoveCampus)().then( (result) => {
+          if(result.deleted !== 1) {
+            throw new errors.CampusNotFoundException;
+          } else {
+            resolve(true);
+          }
+
+        })
+    })
+  }
+
   /**
    * Retrieves a Campus by it's name.
    * @param  {string}                 campusName The campus name.
