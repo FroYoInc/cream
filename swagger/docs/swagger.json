@@ -233,7 +233,7 @@
         "/api/carpools/{carpoolid}": {
             "get": {
                 "summary" : "Get Carpool by id",
-                "description" : "\nThis endpoint retrives a single Carpool given its id",
+                "description" : "\nThis endpoint retrieves a single Carpool given its id",
                 "parameters": [
                     {
                         "name": "carpoolid",
@@ -261,14 +261,23 @@
             },
             "put": {
                 "summary" : "Update Carpool by id",
-                "description" : "\nThis endpoint updates a Carpool given its id",
+                "description" : "\nThis endpoint updates a Carpool given the carpool ID and a JSON object containing any updated fields.",
                 "parameters": [
                     {
-                        "name": "carpoolid",
+                        "name": "carpoolID",
                         "in": "path",
-                        "description": "Carpool id",
+                        "description": "Carpool ID",
                         "required": true,
                         "type": "string"
+                    },
+                    {
+                        "name": "UpdatedCarpool",
+                        "in": "body",
+                        "description": "JSON object containing new Carpool name, campus name, and/or description.",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/UpdatedCarpool"
+                        }
                     }
                 ],
                 "tags" : ["Carpool"],
@@ -277,7 +286,7 @@
                         "description" : "Internal server error"
                     },
                     "404" : {
-                        "description" : "Carpool with given id not found"
+                        "description" : "Carpool with given ID not found"
                     },
                     "200": {
                         "description" : "Carpool updated",
@@ -505,6 +514,13 @@
                 "description": {"required": true, "type": "string"},
                 "campus": {"required": true, "type": "string"},
                 "owner": {"required": true, "type": "string"}
+            }
+        },
+        "UpdatedCarpool": {
+            "properties": {
+                "name": {"type": "string"},
+                "description": {"type": "string"},
+                "campusID": {"type": "string"}
             }
         },
         "LoginInfo" : {
