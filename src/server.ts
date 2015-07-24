@@ -12,6 +12,7 @@ import Promise = require('bluebird');
 import sessions = require('express-session');
 import auth = require('./services/user-auth');
 import userSer = require('./services/user-service');
+import requestService = require('./services/request-service');
 
 var RDBStore = new (require('session-rethinkdb'))(sessions);
 

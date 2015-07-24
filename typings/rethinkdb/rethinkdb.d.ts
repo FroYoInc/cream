@@ -35,6 +35,10 @@ declare module "rethinkdb" {
 
   // Control Structures
   export function branch(test:Expression<boolean>, trueBranch:Expression<any>, falseBranch:Expression<any>):Expression<any>;
+  export function branch(test:Expression<boolean>, trueBranch:Operation<any>, falseBranch:Expression<any>):Expression<any>;
+  export function branch(test:Expression<boolean>, trueBranch:Expression<any>, falseBranch:Operation<any>):Expression<any>;
+  export function branch(test:Expression<boolean>, trueBranch:Operation<any>, falseBranch:Operation<any>):Expression<any>;
+  export function branch(test:Expression<boolean>, trueBranch:any, falseBranch:any):Expression<any>;
 
 
 
@@ -114,7 +118,7 @@ declare module "rethinkdb" {
     filter(obj:{[key:string]:any}):Sequence;
     merge(any);
     getField(a:string):Expression<any>;
-
+    forEach(a:any):any;
 
     // Join
     // these return left, right

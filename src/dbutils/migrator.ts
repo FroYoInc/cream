@@ -32,6 +32,10 @@ module DBUtils {
       {
         tableName: 'activation',
         indices: []
+      },
+      {
+        tableName : "requests",
+        indices: ["userID"]
       }]
     };
 
