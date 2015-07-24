@@ -90,8 +90,9 @@ module CarpoolController {
   }
 
   export function updateCarpool(req:restify.Request, res:restify.Response, next:restify.Next) {
+    var carpoolID = req.params.carpoolID;
 
-    carpoolService.updateCarpool(req.params.carpoolid, req.body)
+    carpoolService.updateCarpool(carpoolID, req.body)
         .then((carpool) => {
           res.send(200, toOutputJSON(carpool));
           next();
