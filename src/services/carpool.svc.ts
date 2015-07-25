@@ -202,7 +202,7 @@ module CarpoolService {
     campus?:string;
   }
 
-  export function updateCarpool(carpoolID:string, updatedCarpool:CarpoolUpdateModel) : Promise<models.Carpool> {
+  export function updateCarpool(carpoolID:string, updatedCarpool:CarpoolUpdateModel) : Promise<void> {
     var doesCarpoolExistQuery = doesCarpoolExistGivenID(carpoolID);
 
     //var isCarpoolNameTakenQuery = doesCarpoolExist( //*...name of carpool to add...**/ );
@@ -215,24 +215,32 @@ module CarpoolService {
 
     //todo: does campus exist?
 
-    if(updatedCarpool.campus) {
-      var doesCampusExistQuery = campusSrv.campusExistsQuery(updatedCarpool.campus);
+    function getCarpoolUpdateQuery() : r.Expression<any> {
+      if (updatedCarpool.campus) {
+        return r.branch(
+          doesCarpoolExistQuery,
+          r.branch(
+            campusSvc.campusExistsQuery(updatedCarpool.campus),
+            updateCarpoolQuery,
+            r.expr('campus does not exist')
+          ),
+          r.expr('carpool does not exist')
+          );
+      } else {
+        return r.branch(
+          doesCarpoolExistQuery,
+          updateCarpoolQuery,
+          r.expr('carpool does not exist')
+        );
+      }
     }
 
-
-
-    var query = r.branch(
-      doesCarpoolExistQuery,
-      updateCarpoolQuery,
-      r.expr('carpool does not exist')
-    );
-
-    return q.run(query)()
+    return q.run(getCarpoolUpdateQuery())()
       .then((result) => {
         if (result == 'carpool does not exist') {
           throw new errors.CarpoolNotFoundException();
-        } else {
-          return getCarpoolByID(carpoolID);
+        } else if (result == 'campus does not exist') {
+          throw new errors.CampusNotFoundException();
         }
       });
   }
