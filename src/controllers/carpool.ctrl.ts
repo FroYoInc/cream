@@ -106,7 +106,34 @@ module CarpoolController {
 
     //todo: take out id field if present
 
-    carpoolService.updateCarpool(carpoolID, req.body)
+    Promise.resolve()
+      // Create the CarpoolUpdateModel from the request body
+      .then(() => {
+        if (req.body.name) {
+          return {"name": req.body.name}
+        } else {
+          return {};
+        }
+      })
+      .then((obj) => {
+        if (req.body.description) {
+          obj["description"] = req.body.description;
+          return obj;
+        } else {
+          return obj;
+        }
+      })
+      .then((obj) => {
+        if (req.body.campus) {
+          obj["campus"] = getIDFromHref(req.body.campus);
+          return obj;
+        } else {
+          return obj;
+        }
+      })
+      .then((carpolUpdate) => {
+        return carpoolService.updateCarpool(carpoolID, carpolUpdate);
+      })
       .then(() => {
         res.send(204);
         next();
