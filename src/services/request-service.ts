@@ -13,10 +13,20 @@ module RequestService {
     var db = "froyo";
     var table = "requests";
 
-    export function createRequest(userID:string, carpoolID:string) : Promise<boolean> {
+    export function createRequest(userID:string, carpoolID:string, firstName:string, 
+                                  lastName:string, carpoolName: string) : Promise<boolean> {
 
         var createRequestIfItDoesNotExist =
-        r.db(db).table(table).insert({id: userID + carpoolID, userID: userID,carpoolID: carpoolID},{conflict:"error"});
+            r.db(db)
+            .table(table)
+            .insert({
+                id: userID + carpoolID, 
+                userID: userID, 
+                firstName: firstName,
+                lastName: lastName,
+                carpoolID: carpoolID,
+                carpoolName: carpoolName
+            },{conflict:"error"});
 
         return q.run(
           createRequestIfItDoesNotExist)()
@@ -62,6 +72,24 @@ module RequestService {
         
         return q.run(getByCarpoolID)();
     }
+
+    export function getAllRequestsForUser(user: models.User): Promise<Array<any>>{
+        var requests = [];
+        var numFinished = 0;
+        return new Promise<Array<any>>((resolve, reject) => {
+            user.carpools.map((obj, index) => {
+                getRequestByCarpoolID(obj.id)
+                .then((_requests) =>{
+                    requests = requests.concat(_requests);
+                    ++numFinished;
+                    if(numFinished === user.carpools.length){
+                      resolve(requests);
+                    }
+                })
+            });
+        });
+
+    } 
 }
 
 export = RequestService;

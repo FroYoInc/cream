@@ -26,21 +26,29 @@ module carpoolControllers{
         return new Promise<number>((resolve, reject) => {  
           var validReq = pv.verifyParams(req.params.carpoolID);
           if(validReq){
-            requestServ.createRequest(req.session["userID"], req.params.carpoolID)
-              .then( (result) => {
-                if(result){
-                  // Notify the members of the carpool that someone wises to join
-                  carpoolServ.getCarpoolByID(req.params.carpoolID)
-                    .then(sendRequest)
-                    .catch(Error, (err) => {resolve(500)});
-                  resolve(201);
-                }
-                else{
-                  resolve(500);
-                }
-              }).catch(errors.CarpoolRequestConflictException, (err) => {
-                resolve(409);
-              });
+            var s = req.session;
+            carpoolServ.getCarpoolByID(req.params.carpoolID)
+            .then( (_carpool) =>{
+              requestServ.createRequest(s["userID"], req.params.carpoolID,s["firstName"], s["lastName"], _carpool.name)
+                .then( (result) => {
+                  if(result){
+                    sendRequest(_carpool)
+                    .then(()=>{
+                      resolve(201);
+                    })
+                    .catch(errors.CarpoolJoinRequestSendException, (err) =>{
+                      resolve(201);
+                    });
+                  }
+                  else{
+                    resolve(500);
+                  }
+                }).catch(errors.CarpoolRequestConflictException, (err) => {
+                  resolve(409);
+                });
+            })
+            .catch(Error, (err) => {resolve(500)});
+
           }
 
           else {
@@ -170,5 +178,27 @@ module carpoolControllers{
       }
 
     }
+
+    export function getNotificationsHelper(req: Restify.Request) : Promise<any>{
+      return new Promise<any>((resolve, reject) => {
+        userServ.getUserById(req.session["userID"])
+        .then(requestServ.getAllRequestsForUser)
+        .then( (notifications) => {
+          resolve({status: 200, data :notifications});
+        })
+        .catch(errors.UserNotFoundException, (err) => {
+          resolve({status: 404, data : "User not found"});
+        })
+
+      });
+    }
+
+    export function getNotifications(req: Restify.Request, res: Restify.Response, next) {
+      getNotificationsHelper(req)
+      .then((result) => {
+        res.send(result.status, result.data);
+      })
+    }
+
 }
 export = carpoolControllers;
