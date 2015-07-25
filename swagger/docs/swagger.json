@@ -288,11 +288,8 @@
                     "404" : {
                         "description" : "Carpool with given ID not found"
                     },
-                    "200": {
-                        "description" : "Carpool updated",
-                        "schema": {
-                            "$ref": "#/definitions/Carpool"
-                        }
+                    "204": {
+                        "description" : "Carpool updated"
                     }
                 }
             }

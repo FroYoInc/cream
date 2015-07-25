@@ -92,47 +92,33 @@ module CarpoolController {
   export function updateCarpool(req:restify.Request, res:restify.Response, next:restify.Next) {
     var carpoolID = req.params.carpoolID;
 
-    //todo: translate href to campus id
     function getIDFromHref(href:string) : string {
       var hrefComponents = href.split('/');
       return hrefComponents[hrefComponents.length - 1];
     }
 
-    //function update(requestBody) : CarpoolSvc.CarpoolUpdateModel {
-    //  return {
-    //    "name":""
-    //  };
-    //}
-
-    //todo: take out id field if present
+    function addFieldFromJSON(JSONObject, newObject, fieldName:string) {
+      if (JSONObject[fieldName]) {
+        newObject[fieldName] = JSONObject[fieldName];
+      }
+      return newObject;
+    }
 
     Promise.resolve()
-      // Create the CarpoolUpdateModel from the request body
       .then(() => {
-        if (req.body.name) {
-          return {"name": req.body.name}
-        } else {
-          return {};
-        }
+        return addFieldFromJSON(req.body, {}, "name");
       })
       .then((obj) => {
-        if (req.body.description) {
-          obj["description"] = req.body.description;
-          return obj;
-        } else {
-          return obj;
-        }
+        return addFieldFromJSON(req.body, obj, "description");
       })
       .then((obj) => {
         if (req.body.campus) {
           obj["campus"] = getIDFromHref(req.body.campus);
-          return obj;
-        } else {
-          return obj;
         }
+        return obj;
       })
-      .then((carpolUpdate) => {
-        return carpoolService.updateCarpool(carpoolID, carpolUpdate);
+      .then((carpoolUpdate) => {
+        carpoolService.updateCarpool(carpoolID, carpoolUpdate);
       })
       .then(() => {
         res.send(204);
@@ -148,6 +134,49 @@ module CarpoolController {
         next(new restify.InternalServerError(err.message));
       })
       .then(next);
+
+    //Promise.resolve()
+    //  // Create the CarpoolUpdateModel from the request body
+    //  .then(() => {
+    //    if (req.body.name) {
+    //      return {"name": req.body.name}
+    //    } else {
+    //      return {};
+    //    }
+    //  })
+    //  .then((obj) => {
+    //    if (req.body.description) {
+    //      obj["description"] = req.body.description;
+    //      return obj;
+    //    } else {
+    //      return obj;
+    //    }
+    //  })
+    //  .then((obj) => {
+    //    if (req.body.campus) {
+    //      obj["campus"] = getIDFromHref(req.body.campus);
+    //      return obj;
+    //    } else {
+    //      return obj;
+    //    }
+    //  })
+    //  .then((carpolUpdate) => {
+    //    return carpoolService.updateCarpool(carpoolID, carpolUpdate);
+    //  })
+    //  .then(() => {
+    //    res.send(204);
+    //    next();
+    //  })
+    //  .catch(errors.CarpoolNotFoundException, (err) => {
+    //    next(new restify.NotFoundError(err.message));
+    //  })
+    //  .catch((err) => {
+    //    next(new restify.InternalServerError(err.message));
+    //  })
+    //  .error((err) => {
+    //    next(new restify.InternalServerError(err.message));
+    //  })
+    //  .then(next);
   }
 }
 
