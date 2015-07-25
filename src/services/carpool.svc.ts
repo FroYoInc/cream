@@ -215,6 +215,12 @@ module CarpoolService {
 
     //todo: does campus exist?
 
+    if(updatedCarpool.campus) {
+      var doesCampusExistQuery = campusSrv.campusExistsQuery(updatedCarpool.campus);
+    }
+
+
+
     var query = r.branch(
       doesCarpoolExistQuery,
       updateCarpoolQuery,

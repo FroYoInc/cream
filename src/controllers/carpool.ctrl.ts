@@ -118,11 +118,10 @@ module CarpoolController {
         return obj;
       })
       .then((carpoolUpdate) => {
-        carpoolService.updateCarpool(carpoolID, carpoolUpdate);
+        return carpoolService.updateCarpool(carpoolID, carpoolUpdate);
       })
       .then(() => {
         res.send(204);
-        next();
       })
       .catch(errors.CarpoolNotFoundException, (err) => {
         next(new restify.NotFoundError(err.message));
@@ -130,53 +129,7 @@ module CarpoolController {
       .catch((err) => {
         next(new restify.InternalServerError(err.message));
       })
-      .error((err) => {
-        next(new restify.InternalServerError(err.message));
-      })
       .then(next);
-
-    //Promise.resolve()
-    //  // Create the CarpoolUpdateModel from the request body
-    //  .then(() => {
-    //    if (req.body.name) {
-    //      return {"name": req.body.name}
-    //    } else {
-    //      return {};
-    //    }
-    //  })
-    //  .then((obj) => {
-    //    if (req.body.description) {
-    //      obj["description"] = req.body.description;
-    //      return obj;
-    //    } else {
-    //      return obj;
-    //    }
-    //  })
-    //  .then((obj) => {
-    //    if (req.body.campus) {
-    //      obj["campus"] = getIDFromHref(req.body.campus);
-    //      return obj;
-    //    } else {
-    //      return obj;
-    //    }
-    //  })
-    //  .then((carpolUpdate) => {
-    //    return carpoolService.updateCarpool(carpoolID, carpolUpdate);
-    //  })
-    //  .then(() => {
-    //    res.send(204);
-    //    next();
-    //  })
-    //  .catch(errors.CarpoolNotFoundException, (err) => {
-    //    next(new restify.NotFoundError(err.message));
-    //  })
-    //  .catch((err) => {
-    //    next(new restify.InternalServerError(err.message));
-    //  })
-    //  .error((err) => {
-    //    next(new restify.InternalServerError(err.message));
-    //  })
-    //  .then(next);
   }
 }
 
