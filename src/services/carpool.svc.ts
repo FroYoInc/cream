@@ -168,22 +168,6 @@ module CarpoolService {
       });
   }
 
-  export function updateCarpool(carpoolID:string, newCarpool:models.Carpool) : Promise<models.Carpool> {
-    return new Promise<models.Carpool>((resolve, reject) => {
-      var query = r.db(db).table(table).get(carpoolID).update(newCarpool);
-
-      q.run(query)()
-          .then(() => {
-            getCarpoolByID(carpoolID)
-                .then((carpool) => {
-                  resolve(carpool)
-                })
-          }).catch(Error, (err) => {
-            reject(err);
-          })
-    });
-  }
-
   export function getUserCarpools(user:models.User) : Promise<Array<models.Carpool>> {
     var userExistQuery = userSvc.userExistQuery(user.userName);
     var getUserCarpoolsQuery = r.db(db)
@@ -210,6 +194,33 @@ module CarpoolService {
           return result;
         }
       })
+  }
+
+  export function updateCarpool(carpoolID:string, updatedCarpool:models.Carpool) : Promise<models.Carpool> {
+    var doesCarpoolExistQuery = doesCarpoolExistGivenID(carpoolID);
+
+    //var isCarpoolNameTakenQuery = doesCarpoolExist( //*...name of carpool to add...**/ );
+    //may need to exclude the carpool with the given ID... in case you change the name of your own carpool to the same name
+
+    var updateCarpoolQuery = r.db(db).table(table).get(carpoolID).update(updatedCarpool);
+
+    //var userInCarpoolQuery = r.db(db).table(table)
+    //  .get(carpoolID).getField('participants').contains(participant.id);
+
+    var query = r.branch(
+      doesCarpoolExistQuery,
+      updateCarpoolQuery,
+      r.expr('carpool does not exist')
+    );
+
+    return q.run(query)()
+      .then((result) => {
+        if (result == 'carpool does not exist') {
+          throw new errors.CampusNotFoundException();
+        } else {
+          return getCarpoolByID(carpoolID);
+        }
+      });
   }
 
   export function addUserToCarpool(carpoolID:string, participant:models.User)
