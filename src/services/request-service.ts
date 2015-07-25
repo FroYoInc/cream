@@ -87,6 +87,9 @@ module RequestService {
                     }
                 })
             });
+            if(user.carpools.length === 0){
+                resolve([]);
+            }
         });
 
     } 

@@ -175,6 +175,9 @@ describe('Carpool controller', () => {
     return carpoolCtrl.denyUserRequest(req);
   }
 
+  function getNotifications(req){
+    return carpoolCtrl.getNotificationsHelper(req);
+  }
   it('should create a carpool', (done) => {
     var inputJSON = {
       'name': 'Corpool',
@@ -321,10 +324,42 @@ describe('Carpool controller', () => {
       .finally(done);
   });
 
+  xit('should get the notifications for a carpool', (done) =>{
+    var some =  new Restify();
+    some.req = new Request();
+    some.req.session = new Session();
+    some.req.session["userID"] = '1234567891';
+
+    var someUser: models.User = {
+          id: some.req.session["userID"],
+          firstName: 'Peter',
+          lastName: 'Higgs',
+          userName: 'blahblah',
+          email: utils.validEmail('blahblah'),
+          isAccountActivated: true,
+          carpools: [good.req.params.carpoolID],
+          passwordHash: "hash",
+          salt: "andPepper"
+    };
+
+    query.run(
+        r.db('froyo').table('users').insert(someUser,{conflict:"replace"})
+    )()
+    .then((b) => {
+      getNotifications(some.req)
+      .then( (result) => {
+        test200(result.status);
+        expect(result.data.length > 0).toBe(true);
+      })
+      .finally(done);
+    });
+
+  });
+
   it('should approve a request', (done) => {
 
     query.run(
-        r.db('froyo').table('users').insert(goodUser)
+        r.db('froyo').table('users').insert(goodUser,{conflict:"replace"})
     )()
       .then(() => {
         approveRequest(good.req)

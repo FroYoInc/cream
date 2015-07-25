@@ -151,7 +151,7 @@ describe('UserAuth', () => {
   it('should authenticate a valid user login', (done) => {
 
       query.run(
-          r.db('froyo').table('users').insert(goodUser)
+          r.db('froyo').table('users').insert(goodUser,{conflict:"error"})
       )()
         .then( () => {
           query.run(

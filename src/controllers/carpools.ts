@@ -182,7 +182,9 @@ module carpoolControllers{
     export function getNotificationsHelper(req: Restify.Request) : Promise<any>{
       return new Promise<any>((resolve, reject) => {
         userServ.getUserById(req.session["userID"])
-        .then(requestServ.getAllRequestsForUser)
+        .then( (_user)=>{
+          requestServ.getAllRequestsForUser(_user);
+        })
         .then( (notifications) => {
           resolve({status: 200, data :notifications});
         })
