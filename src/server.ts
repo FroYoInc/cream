@@ -10,7 +10,6 @@ import models = require('./models/models');
 import user = require('./models/user');
 import Promise = require('bluebird');
 import sessions = require('express-session');
-import auth = require('./services/user-auth');
 import userSer = require('./services/user-service');
 import requestService = require('./services/request-service');
 
