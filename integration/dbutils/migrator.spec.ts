@@ -33,7 +33,7 @@ var dbShape : Shapes.DBShape = {
   },
   {
     tableName : "requests",
-    indices: ["userID"]
+    indices: ["carpoolID"]
   }]
 };
 

@@ -31,7 +31,7 @@ module DBUtils {
       },
       {
         tableName : "requests",
-        indices: ["userID"]
+        indices: ["carpoolID"]
       }]
     };
     private _conn : r.Connection;
