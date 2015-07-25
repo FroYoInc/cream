@@ -196,7 +196,13 @@ module CarpoolService {
       })
   }
 
-  export function updateCarpool(carpoolID:string, updatedCarpool:models.Carpool) : Promise<models.Carpool> {
+  export interface CarpoolUpdateModel {
+    name?:string;
+    description?:string;
+    campus?:string;
+  }
+
+  export function updateCarpool(carpoolID:string, updatedCarpool:CarpoolUpdateModel) : Promise<models.Carpool> {
     var doesCarpoolExistQuery = doesCarpoolExistGivenID(carpoolID);
 
     //var isCarpoolNameTakenQuery = doesCarpoolExist( //*...name of carpool to add...**/ );
@@ -207,6 +213,8 @@ module CarpoolService {
     //var userInCarpoolQuery = r.db(db).table(table)
     //  .get(carpoolID).getField('participants').contains(participant.id);
 
+    //todo: does campus exist?
+
     var query = r.branch(
       doesCarpoolExistQuery,
       updateCarpoolQuery,
@@ -216,7 +224,7 @@ module CarpoolService {
     return q.run(query)()
       .then((result) => {
         if (result == 'carpool does not exist') {
-          throw new errors.CampusNotFoundException();
+          throw new errors.CarpoolNotFoundException();
         } else {
           return getCarpoolByID(carpoolID);
         }

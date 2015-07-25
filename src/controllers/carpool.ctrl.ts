@@ -92,11 +92,35 @@ module CarpoolController {
   export function updateCarpool(req:restify.Request, res:restify.Response, next:restify.Next) {
     var carpoolID = req.params.carpoolID;
 
+    //todo: translate href to campus id
+    function getIDFromHref(href:string) : string {
+      var hrefComponents = href.split('/');
+      return hrefComponents[hrefComponents.length - 1];
+    }
+
+    //function update(requestBody) : CarpoolSvc.CarpoolUpdateModel {
+    //  return {
+    //    "name":""
+    //  };
+    //}
+
+    //todo: take out id field if present
+
     carpoolService.updateCarpool(carpoolID, req.body)
-        .then((carpool) => {
-          res.send(200, toOutputJSON(carpool));
-          next();
-        })
+      .then(() => {
+        res.send(204);
+        next();
+      })
+      .catch(errors.CarpoolNotFoundException, (err) => {
+        next(new restify.NotFoundError(err.message));
+      })
+      .catch((err) => {
+        next(new restify.InternalServerError(err.message));
+      })
+      .error((err) => {
+        next(new restify.InternalServerError(err.message));
+      })
+      .then(next);
   }
 }
 
