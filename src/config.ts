@@ -10,7 +10,7 @@ export class Config {
   };
 
   static statsd = {
-    'host': 'localhost',
+    'host': '107.170.251.172',
     'port': 8125
   };
 
