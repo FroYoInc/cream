@@ -204,23 +204,14 @@ module CarpoolService {
 
   export function updateCarpool(carpoolID:string, updatedCarpool:CarpoolUpdateModel) : Promise<void> {
     var doesCarpoolExistQuery = doesCarpoolExistGivenID(carpoolID);
-
-    //var isCarpoolNameTakenQuery = doesCarpoolExist( //*...name of carpool to add...**/ );
-    //may need to exclude the carpool with the given ID... in case you change the name of your own carpool to the same name
-
     var updateCarpoolQuery = r.db(db).table(table).get(carpoolID).update(updatedCarpool);
-
-    //var userInCarpoolQuery = r.db(db).table(table)
-    //  .get(carpoolID).getField('participants').contains(participant.id);
-
-    //todo: does campus exist?
 
     function getCarpoolUpdateQuery() : r.Expression<any> {
       if (updatedCarpool.campus) {
         return r.branch(
           doesCarpoolExistQuery,
           r.branch(
-            campusSvc.campusExistsQuery(updatedCarpool.campus),
+            campusSvc.campusExistsGivenIDQuery(updatedCarpool.campus),
             updateCarpoolQuery,
             r.expr('campus does not exist')
           ),
