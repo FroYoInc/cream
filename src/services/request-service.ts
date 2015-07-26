@@ -66,7 +66,7 @@ module RequestService {
         return q.run(getByUserID)();
     }
 
-    export function getRequestByCarpoolID(carpoolID:string){
+    export function getRequestByCarpoolID(carpoolID:any){
         
         var getByCarpoolID = r.db(db).table(table).filter({carpoolID: carpoolID}).coerceTo('array');
         
@@ -78,7 +78,7 @@ module RequestService {
         var numFinished = 0;
         return new Promise<Array<any>>((resolve, reject) => {
             user.carpools.map((obj, index) => {
-                getRequestByCarpoolID(obj.id)
+                getRequestByCarpoolID(obj)
                 .then((_requests) =>{
                     requests = requests.concat(_requests);
                     ++numFinished;

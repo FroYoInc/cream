@@ -183,10 +183,10 @@ module carpoolControllers{
       return new Promise<any>((resolve, reject) => {
         userServ.getUserById(req.session["userID"])
         .then( (_user)=>{
-          requestServ.getAllRequestsForUser(_user);
-        })
-        .then( (notifications) => {
-          resolve({status: 200, data :notifications});
+          requestServ.getAllRequestsForUser(_user)
+          .then( (notifications) => {
+            resolve({status: 200, data : notifications ? notifications : []});
+          })
         })
         .catch(errors.UserNotFoundException, (err) => {
           resolve({status: 404, data : "User not found"});

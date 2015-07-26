@@ -4,6 +4,7 @@ import errors = require('../../src/errors/errors');
 import r = require('rethinkdb');
 import query = require('../../src/dbutils/query');
 import utils = require('../utils');
+import userSvc = require('../../src/services/user-service');
 
 class Session {
   [key: string] : any;
@@ -28,11 +29,11 @@ describe('RequestService', () => {
   good.req = new Request();
   good.req = new Response();
   good.req.session = new Session();
-  good.req.session["userID"] = "1234567891";
+  good.req.session["userID"] = "123456789";
 
   var joinRequest = {
     userID: good.req.session["userID"],
-    carpoolID: "someCarpoolID",
+    carpoolID: "blahblahblahblah",
   }
 
   var testFalse = (result) => {expect(result).toBe(false);}
@@ -60,8 +61,13 @@ describe('RequestService', () => {
     return reqServ.getAllRequestsForUser(user);
   }
 
+
   it('should create requests', (done) => {
       createRequest(joinRequest.userID, joinRequest.carpoolID, "Peter", "Higgs", "someCarpool")
+      .then( (result) => {
+          testTrue(result);
+      })
+      createRequest(joinRequest.userID, "someCarpool", "Peter", "Higgs", "someCarpool")
       .then( (result) => {
           testTrue(result);
       })
@@ -105,58 +111,34 @@ describe('RequestService', () => {
   });
 
   it('should get all requests for all of the carpools a user belongs to', (done) => {
-
-      var user : models.User = {
+      var userID = '1234fkasdkl';
+      query.run(r.db("froyo")
+          .table("users")
+          .insert({
             id: '1234fkasdkl',
             firstName: 'Peter',
             lastName: 'Higgs',
             userName: 'pHiggs',
             email: utils.validEmail('higgsGarbage'),
             isAccountActivated: true,
-            carpools:[],
+            carpools:["someCarpool", "someOtherCarpool"],
             passwordHash: "bofkldkfklsd",
             salt: "djfklsdfklskldf"
-      };
-
-      var carpool : models.Carpool;
-      carpool = {
-        name: "someCarpool",
-        owner: user,
-        participants: [user],
-        description: "Awesome",
-        id: "someCarpoolID",
-        campus: {
-          name : "Cool Campus",
-          address : {
-            address : '1234 Campus way',
-            geoCode : {lat : 12, long : 12}
-          }
-        }
-      };
-
-      var carpool2 : models.Carpool;
-      carpool2 = {
-        name: "someOtherCarpool",
-        owner: user,
-        participants: [user],
-        description: "Awesome",
-        id: "someOtherCarpool",
-        campus: {
-          name : "Cool Campus",
-          address : {
-            address : '1234 Campus way',
-            geoCode : {lat : 12, long : 12}
-          }
-        }
-      };
-      user.carpools = [carpool,carpool2];
-      
-      getAllUserRequests(user)
-      .then((result) => {
-        expect(result.length > 1 ).toBe(true);
       })
-      .error(fail)
-      .finally(done);
+      )()
+      .then( (b) => {
+        userSvc.getUserById(userID)
+          .then( (user) => {
+            getAllUserRequests(user)
+            .then((result) => {
+              expect(result.length >= 1 ).toBe(true);
+            })
+            .error(fail)
+            .finally(done);
+          })
+          .catch(Error, fail);
+      })
+      .catch(fail)
 
   });
 

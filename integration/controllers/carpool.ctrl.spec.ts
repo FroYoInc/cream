@@ -324,7 +324,7 @@ describe('Carpool controller', () => {
       .finally(done);
   });
 
-  xit('should get the notifications for a carpool', (done) =>{
+  it('should get the notifications for a carpool', (done) =>{
     var some =  new Restify();
     some.req = new Request();
     some.req.session = new Session();
