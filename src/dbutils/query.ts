@@ -4,7 +4,11 @@ import SDC = require('statsd-client');
 import connections = require('./connection-pool');
 import config = require('../config');
 
-var sdc = new SDC({host: config.Config.statsd.host});
+var sdc = new SDC({
+  host: config.Config.statsd.host,
+  port: config.Config.statsd.port
+});
+
 module Query {
   export function run<T>(query: r.Operation<T>, queryName?: string) {
     return () => {

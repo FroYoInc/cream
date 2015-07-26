@@ -10,7 +10,8 @@ export class Config {
   };
 
   static statsd = {
-    'host': 'localhost'
+    'host': 'localhost',
+    'port': 8125
   };
 
   static password = {
