@@ -6,6 +6,7 @@ import carpoolCtrl = require('./controllers/carpools');
 import CarpoolCtrl = require('./controllers/carpool.ctrl');
 import CampusCtrl = require('./controllers/campus.ctrl');
 import c = require("./config");
+import auth = require('./services/user-auth');
 
 class routes{
 
@@ -17,6 +18,28 @@ class routes{
         server.get("/api/users/logout", userControllers.logout);
         server.post("/api/users", CreateUserCtrl.createUser);
         server.get('/api/activate/:activate', ActivationController.activate);
+
+        /*********** Documentation routes ***********/
+
+        // /docs does not render the css correctly, so redirect to /docs/
+        server.get('/docs', function(req, res, next){
+            res.header('Location', '/docs/');
+            res.send(302);
+        });
+
+        server.get(/\/docs\/?.*/, Restify.serveStatic({
+          directory: c.Config.docs.dir,
+          default: c.Config.docs.defaultFile
+        }));
+
+        /**********************************/
+        /***********  IMPORTANT ***********/
+        /**********************************/
+        // All routes that go after this middleware will require user authorization
+        // If your route does not require user authorization, place it above this middleware
+        server.use( (req, res, next) => {
+            auth.checkAuthMiddle(req, res, next);
+        })
 
         /*********** Carpool routes ***********/
         server.post('/api/carpools', CarpoolCtrl.createCarpool);
@@ -32,19 +55,7 @@ class routes{
         server.get('/api/campuses', CampusCtrl.listCampuses);
 
 
-        /*********** Documentation routes ***********/
 
-
-        // /docs does not render the css correctly, so redirect to /docs/
-        server.get('/docs', function(req, res, next){
-            res.header('Location', '/docs/');
-            res.send(302);
-        });
-
-        server.get(/\/docs\/?.*/, Restify.serveStatic({
-          directory: c.Config.docs.dir,
-          default: c.Config.docs.defaultFile
-        }));
     }
 }
 

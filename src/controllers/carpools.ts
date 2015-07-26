@@ -26,28 +26,20 @@ module carpoolControllers{
         return new Promise<number>((resolve, reject) => {  
           var validReq = pv.verifyParams(req.params.carpoolID);
           if(validReq){
-            auth.checkAuth(req)
-              .then( (isAuth) => {
-                if(isAuth){
-                  requestServ.createRequest(req.session["userID"], req.params.carpoolID)
-                    .then( (result) => {
-                      if(result){
-                        // Notify the members of the carpool that someone wises to join
-                        carpoolServ.getCarpoolByID(req.params.carpoolID)
-                          .then(sendRequest)
-                          .catch(Error, (err) => {resolve(500)});
-                        resolve(201);
-                      }
-                      else{
-                        resolve(500);
-                      }
-                    }).catch(errors.CarpoolRequestConflictException, (err) => {
-                      resolve(409);
-                    });
+            requestServ.createRequest(req.session["userID"], req.params.carpoolID)
+              .then( (result) => {
+                if(result){
+                  // Notify the members of the carpool that someone wises to join
+                  carpoolServ.getCarpoolByID(req.params.carpoolID)
+                    .then(sendRequest)
+                    .catch(Error, (err) => {resolve(500)});
+                  resolve(201);
                 }
                 else{
-                  resolve(401);
+                  resolve(500);
                 }
+              }).catch(errors.CarpoolRequestConflictException, (err) => {
+                resolve(409);
               });
           }
 
@@ -74,30 +66,22 @@ module carpoolControllers{
       return new Promise<number>((resolve, reject) => {      
         var validReq = pv.verifyParams(req.params.carpoolID, req.params.userToAddID);
         if(validReq){
-            auth.checkAuth(req)
-              .then( (isAuth) => {
-                if(isAuth){
-                  carpoolServ.getCarpoolByID(req.params.carpoolID)
-                    .then((_carpool) => {
-                      var participants = [];
-                      _carpool.participants.map((obj) => {
-                        participants.push(obj.id);
-                      });
-                      if(participants.indexOf(req.session["userID"]) >= 0){
-                        addUser(req.params.userToAddID, req.params.carpoolID, resolve)
-                      }
-                      else{
-                        resolve(403);
-                      }
-                    })
-                    .catch(errors.CarpoolNotFoundException, (err) => {
-                      resolve(404)
-                    });
-                }
-                else{
-                  resolve(401);
-                }
+          carpoolServ.getCarpoolByID(req.params.carpoolID)
+            .then((_carpool) => {
+              var participants = [];
+              _carpool.participants.map((obj) => {
+                participants.push(obj.id);
               });
+              if(participants.indexOf(req.session["userID"]) >= 0){
+                addUser(req.params.userToAddID, req.params.carpoolID, resolve)
+              }
+              else{
+                resolve(403);
+              }
+            })
+            .catch(errors.CarpoolNotFoundException, (err) => {
+              resolve(404)
+            });
         }
         else {
           resolve(400);
@@ -149,34 +133,26 @@ module carpoolControllers{
         var validReq = pv.verifyParams(req.params.carpoolID, req.params.userToDenyID);
 
         if(validReq){
-          auth.checkAuth(req)
-            .then( (isAuth) => {
-              if(isAuth){
-                carpoolServ.getCarpoolByID(req.params.carpoolID)
-                  .then((_carpool) => {
-                    var participants = [];
-                    _carpool.participants.map((obj) => {
-                      participants.push(obj.id);
-                    });
-                    if(participants.indexOf(req.session["userID"]) >= 0){
-                      removeUserRequest(req.params.userToDenyID, req.params.carpoolID, resolve);
-                    }
-                    else {
-                      resolve(403);
-                    }
-                  })
-                  .catch(errors.CarpoolNotFoundException, (err) => {
-                    // If the carpool does not exist, remove the request  
-                    removeUserRequest(req.params.userToDenyID, req.params.carpoolID, resolve);
-                  })
-                  .catch(Error, (err) => {
-                    resolve(500);
-                  })
-              }
-              else{
-                resolve(401)
-              }
-            })
+            carpoolServ.getCarpoolByID(req.params.carpoolID)
+              .then((_carpool) => {
+                var participants = [];
+                _carpool.participants.map((obj) => {
+                  participants.push(obj.id);
+                });
+                if(participants.indexOf(req.session["userID"]) >= 0){
+                  removeUserRequest(req.params.userToDenyID, req.params.carpoolID, resolve);
+                }
+                else {
+                  resolve(403);
+                }
+              })
+              .catch(errors.CarpoolNotFoundException, (err) => {
+                // If the carpool does not exist, remove the request  
+                removeUserRequest(req.params.userToDenyID, req.params.carpoolID, resolve);
+              })
+              .catch(Error, (err) => {
+                resolve(500);
+              });
         }
         else {
           resolve(400);
