@@ -95,7 +95,8 @@ module CarpoolService {
         );
 
       return q.run(
-        createCarpoolIfOwnerExistAndCampusExistAndCarpoolDoesNotExist)()
+        createCarpoolIfOwnerExistAndCampusExistAndCarpoolDoesNotExist,
+        'createCarpool')()
         .then((result) => {
           if (result == 'owner not found') {
             throw new errors.CarpoolOwnerNotFoundException();
@@ -116,7 +117,7 @@ module CarpoolService {
   }
 
   export function doesCarpoolExist(carpoolName: string): Promise<boolean> {
-    return q.run(getCarpoolExistQuery(carpoolName))()
+    return q.run(getCarpoolExistQuery(carpoolName), 'doesCarpoolExist')()
       .then((result) => {
         return result === true
       });
@@ -139,7 +140,7 @@ module CarpoolService {
         getCarpoolQuery,
         r.expr('carpool not found')
       );
-    return q.run(query)()
+    return q.run(query, 'getCarpoolByID')()
       .then((_carpool) => {
         if (_carpool == 'carpool not found') {
           throw new errors.CarpoolNotFoundException()
@@ -163,7 +164,7 @@ module CarpoolService {
       })
     }).coerceTo('array');
 
-    return q.run(query)()
+    return q.run(query, 'getCarpools')()
       .then((_carpools) => {
         return <Array<models.Carpool>> _carpools;
       });
@@ -188,7 +189,7 @@ module CarpoolService {
         r.expr('user not found')
       );
 
-    return q.run(getUserCarpoolsIfUserExistQuery)()
+    return q.run(getUserCarpoolsIfUserExistQuery, 'getUserCarpools')()
       .then((result) => {
         if (result == 'user not found') {
           throw new errors.UserNotFoundException()
@@ -229,7 +230,7 @@ module CarpoolService {
       r.expr('participant does not exist')
     );
 
-    return q.run(query)()
+    return q.run(query, 'addUserToCarpool')()
       .then((result) => {
         if (result == 'carpool does not exist') {
           throw new errors.CarpoolNotFoundException();

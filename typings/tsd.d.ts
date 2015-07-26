@@ -10,4 +10,5 @@
 /// <reference path="nodemailer/nodemailer-types.d.ts" />
 /// <reference path="uuid/UUID.d.ts" />
 /// <reference path="express-session/express-session.d.ts" />
+/// <reference path="statsd-client/statsd-client.d.ts" />
 /// 

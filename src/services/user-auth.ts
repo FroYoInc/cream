@@ -24,7 +24,7 @@ module UserAuth{
          }
          else{
              var s = req.session;
-             var result = pv.verifyParams(s['userID'], s["firstName"], s["lastName"], 
+             var result = pv.verifyParams(s['userID'], s["firstName"], s["lastName"],
                                               s['userName'], s["email"]);
              result ? next() : res.send(401, {"message": "Unauthorized attempt, you must be logged in."});
          }
@@ -57,7 +57,7 @@ module UserAuth{
                             resolve(423);
                         }
                     });
-                    
+
                 }
                 else {
                     throw new errors.InvalidUserObject();
@@ -95,12 +95,12 @@ module UserAuth{
 
     function _checkLock(user: models.User ) : Promise<boolean>{
         return new Promise<boolean>((resolve, reject) => {
-        
+
             userSer.getUserData(user.id)
               .then( (userData) => {
                 // The user has never logged in before.
                 if (userData.numLoginAttempts === undefined){
-                    
+
                     userData.numLoginAttempts = 1;
                     userSer.updateUserData(userData).then( () => {
                         resolve(true)
@@ -113,7 +113,7 @@ module UserAuth{
 
                     // The user has exceeeded their allowed number of failed attempts
                     if(userData.numLoginAttempts >= c.Config.loginLock.max - 1){
-                        
+
                         // Set the lock
                         if(userData.lockoutExpiration === 0 || userData.lockoutExpiration === undefined){
                             userData.lockoutExpiration = now + c.Config.loginLock.lockoutTime;
@@ -176,7 +176,7 @@ module UserAuth{
                 throw new errors.UndefinedUserObject();
             }
             else{
-                var valid = pv.verifyParams(user.id, user.firstName, user.lastName, 
+                var valid = pv.verifyParams(user.id, user.firstName, user.lastName,
                                                 user.userName, user.email)
                 if(valid){
                     req.session["userID"] = user.id;
@@ -200,7 +200,7 @@ module UserAuth{
      * @param {Error)       =>  void}        callback [A callback function that gets passed any error that occur in destruction]
      */
     export function revokeSession(req: Restify.Request) : Promise<boolean> {
-        return new Promise<boolean>((resolve, reject) => {    
+        return new Promise<boolean>((resolve, reject) => {
             req.session.destroy( function (err){
                 if(err){
                     resolve(false);
@@ -215,7 +215,7 @@ module UserAuth{
     /**
      * Rovokes all of the sessions attached to the user
      * @param  {Restify.Request}  req [The request that houses one of the user's session]
-     * @return {Promise<boolean>} 
+     * @return {Promise<boolean>}
      */
     export function revokeSessions(req: Restify.Request) : Promise<boolean>{
         return new Promise<boolean>((resolve, reject) => {
@@ -223,9 +223,9 @@ module UserAuth{
                 var uid = req.session["userID"];
                 query.run(
                     r.db('froyo').table('session').filter({
-                        session: {userID: uid} 
-                    }).delete()
-                )().then( () => {resolve(true);} );
+                        session: {userID: uid}
+                    }).delete(),
+                'revokeSessions')().then( () => {resolve(true);} );
             }
             else{
                 throw new errors.SessionUserID();
@@ -236,4 +236,3 @@ module UserAuth{
 
 }
 export = UserAuth;
-
