@@ -316,7 +316,9 @@ describe('Carpool controller', () => {
 
   it('should update a carpool', (done) => {
     var carpool:models.Carpool;
-    var carpoolUpdate = {
+
+
+    var carpoolUpdate:CarpoolSvc.CarpoolUpdateModel = {
       'name': 'name updated',
       'description': 'description updated'
     };
@@ -324,9 +326,11 @@ describe('Carpool controller', () => {
     function test(status) {
       expect(status).toBe(204);
 
-      var updatedCarpool = CarpoolSvc.getCarpoolByID(carpool.id);
-      expect(updatedCarpool['name']).toBe(carpoolUpdate.name);
-      expect(updatedCarpool['description']).toBe(carpoolUpdate.description);
+      CarpoolSvc.getCarpoolByID(carpool.id)
+        .then((updatedCarpool) => {
+          expect(updatedCarpool['name']).toEqual(carpoolUpdate.name);
+          expect(updatedCarpool['description']).toEqual(carpoolUpdate.description);
+        });
     }
 
     var req = <restify.Request> {params: {}};
