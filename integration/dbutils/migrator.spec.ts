@@ -21,7 +21,7 @@ var dbShape : Shapes.DBShape = {
   },
   {
     tableName: 'carpools',
-    indices: ['name']
+    indices: ['name', 'pickupLocation.geoCode']
   },
   {
     tableName: 'campuses',
