@@ -316,8 +316,6 @@ describe('Carpool controller', () => {
 
   it('should update a carpool', (done) => {
     var carpool:models.Carpool;
-
-
     var carpoolUpdate:CarpoolSvc.CarpoolUpdateModel = {
       'name': 'name updated',
       'description': 'description updated'
@@ -345,6 +343,17 @@ describe('Carpool controller', () => {
       .then(() => {
         return updateCarpool(req, res);
       })
+      .then(() => {
+        req.params.carpoolID = 'non-existant-carpool-id';
+        res.send = () => {};
+        return updateCarpool(req, res);
+      })
+      .catch(restify.NotFoundError, (err) => {
+        expect(err.message).toBe('CarpoolNotFoundException:' +
+          ' carpool not found');
+        return utils._catch();
+      })
+      .then(utils.checkCaught)
       .catch(fail)
       .error(fail)
       .finally(done);

@@ -104,22 +104,17 @@ module CarpoolController {
       return newObject;
     }
 
-    Promise.resolve()
-      .then(() => {
-        return addFieldFromJSON(req.body, {}, "name");
-      })
-      .then((obj) => {
-        return addFieldFromJSON(req.body, obj, "description");
-      })
-      .then((obj) => {
-        if (req.body.campus) {
-          obj["campus"] = getIDFromHref(req.body.campus);
-        }
-        return obj;
-      })
-      .then((carpoolUpdate) => {
-        return carpoolService.updateCarpool(carpoolID, carpoolUpdate);
-      })
+    function getCarpoolUpdate(requestBody) {
+      var carpoolUpdate = {};
+      carpoolUpdate = addFieldFromJSON(requestBody, carpoolUpdate, "name");
+      carpoolUpdate = addFieldFromJSON(requestBody, carpoolUpdate, "description");
+      if(requestBody.campus) {
+        carpoolUpdate["campus"] = getIDFromHref(requestBody.campus);
+      }
+      return carpoolUpdate;
+    }
+
+    carpoolService.updateCarpool(carpoolID, getCarpoolUpdate(req.body))
       .then(() => {
         res.send(204);
       })
