@@ -340,10 +340,7 @@ describe('Carpool controller', () => {
     CarpoolSvc.createCarpool('update this name', 'PSU', 'update this description', owner.userName)
       .then((_carpool) => {
         carpool = _carpool;
-        req.params.carpoolid = _carpool.id;
-      })
-      .then(() => {
-        return CarpoolSvc.updateCarpool(carpool.id, carpoolUpdate);
+        req.params.carpoolID = _carpool.id;
       })
       .then(() => {
         return updateCarpool(req, res);
