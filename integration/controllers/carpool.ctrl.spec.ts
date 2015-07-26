@@ -141,12 +141,7 @@ describe('Carpool controller', () => {
         salt: "andPepper"
   };
 
-  var notLoggedIn = new Restify();
-  notLoggedIn.req = new Request();
-  notLoggedIn.req.session = new Session();
 
-  notLoggedIn.req.params  = new Params();
-  notLoggedIn.req.params.carpoolID  = "someCarpoolID";
 
   var bad = new Restify();
   bad.req = new Request();
@@ -162,7 +157,6 @@ describe('Carpool controller', () => {
   var test200 = (result) => {expect(result).toBe(200);}
   var test201 = (result) => {expect(result).toBe(201);}
   var test400 = (result) => {expect(result).toBe(400);}
-  var test401 = (result) => {expect(result).toBe(401);}
   var test403 = (result) => {expect(result).toBe(403);}
   var test404 = (result) => {expect(result).toBe(404);}
   var test409 = (result) => {expect(result).toBe(409);}
@@ -316,13 +310,6 @@ describe('Carpool controller', () => {
   it('should fail to create a request when parameters are missing.', (done) => {
       requestToJoin(bad.req)
       .then(test400)
-      .error(fail)
-      .finally(done);
-  });
-
-  it('should fail to create a request when the user is not logged in', (done) => {
-      requestToJoin(notLoggedIn.req)
-      .then(test401)
       .error(fail)
       .finally(done);
   });

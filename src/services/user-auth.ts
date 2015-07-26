@@ -14,22 +14,22 @@ module UserAuth{
     /**
      * Checks if the user has a valid session
      * @param  {Restify.Request}  req [The request to be verified]
+     * @param  {Restify.Response}  res [The restify response]
+     * @param  {Restify.Next}   [The next function, to pass control.]
      * @return {Promise<boolean>}     [A promise that a boolean will be returned]
      */
-    export function checkAuth(req: Restify.Request): Promise<boolean>{
-        return new Promise<boolean>((resolve, reject) => {
-            if (req.session === undefined){
-                resolve(false)
-            }
-            else{
-                var s = req.session;
-                var result = pv.verifyParams(s['userID'], s["firstName"], s["lastName"], 
-                                                 s['userName'], s["email"]);
-                resolve(result);
-            }
-        });
+     export function checkAuthMiddle(req: Restify.Request, res: Restify.Response, next){
+         if (req.session === undefined){
+             res.send(401);
+         }
+         else{
+             var s = req.session;
+             var result = pv.verifyParams(s['userID'], s["firstName"], s["lastName"], 
+                                              s['userName'], s["email"]);
+             result ? next() : res.send(401, {"message": "Unauthorized attempt, you must be logged in."});
+         }
 
-    }
+     }
 
     /**
      * Checks if the user is in the database. If they are in the database, it hashes
