@@ -21,7 +21,9 @@ module Query {
   }
 
   function _run<T>(query: r.Operation<T>, queryName?: string) {
+    var connAcquireT = new Date();
     return Promise.using<r.Connection>(connections.acquire(), (conn) => {
+      sdc.timing('db.connections.acquire', connAcquireT);
       var start = new Date();
       return query.run(conn)
         // Collect metrics on query time
