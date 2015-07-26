@@ -517,7 +517,7 @@
             "properties": {
                 "name": {"type": "string"},
                 "description": {"type": "string"},
-                "campusHref": {"type": "string"}
+                "campus": {"type": "string"}
             }
         },
         "LoginInfo" : {
