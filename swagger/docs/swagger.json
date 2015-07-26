@@ -381,6 +381,30 @@
                     }
                 }
             }
+        },
+        "/api/carpools/requests": {
+            "get": {
+                "summary": "Gets carpool join requests",
+                "description": "\nGets all of the join requests for all the carpools that a user is a member of.",
+                "tags": ["Carpool"],
+                "responses": {
+                    "200": {
+                        "description": "Success, notifications sent.",
+                        "schema": {
+                            "$ref": "#/definitions/notifications"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized attempt, user must be logged in."
+                    },
+                    "404": {
+                        "description": "User not found."
+                    },
+                    "500" : {
+                        "description" : "Internal Server error. Unable to make request"
+                    }
+                }
+            }
         }
 
     },
@@ -554,6 +578,23 @@
                     "type": "string"
                 }
             }
+        },
+        "notifications" : {
+                "type" : "array",
+                "items" : {
+                    "$ref" :"#/definitions/notification"
+                }
+
+        },
+        "notification" : {
+            "properties": {
+                "carpoolID" : {"type": "string"},
+                "firstName" : {"type": "string"},
+                "lastName" : {"type": "string"},
+                "userID" : {"type": "string"},
+                "carpoolName" : {"type": "string"}
+            }
+
         }
     }
 }

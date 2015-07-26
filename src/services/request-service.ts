@@ -8,7 +8,6 @@ import models = require('../models/models');
 import errors = require('../errors/errors');
 import config = require('../config');
 
-
 module RequestService {
     var db = "froyo";
     var table = "requests";
@@ -68,7 +67,9 @@ module RequestService {
 
     export function getRequestByCarpoolID(carpoolID:any){
         
-        var getByCarpoolID = r.db(db).table(table).filter({carpoolID: carpoolID}).coerceTo('array');
+        var getByCarpoolID = r.db(db).table(table).filter({carpoolID: carpoolID})
+                             .pluck("carpoolID", "carpoolName", "firstName", "lastName", "userID")
+                             .coerceTo('array');
         
         return q.run(getByCarpoolID)();
     }

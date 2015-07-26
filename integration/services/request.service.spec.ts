@@ -5,6 +5,8 @@ import r = require('rethinkdb');
 import query = require('../../src/dbutils/query');
 import utils = require('../utils');
 import userSvc = require('../../src/services/user-service');
+import bcrypt = require("bcrypt");
+
 
 class Session {
   [key: string] : any;
@@ -112,18 +114,22 @@ describe('RequestService', () => {
 
   it('should get all requests for all of the carpools a user belongs to', (done) => {
       var userID = '1234fkasdkl';
+
+      var salt = bcrypt.genSaltSync(10);
+      var hash = bcrypt.hashSync("1234", salt);
+
       query.run(r.db("froyo")
           .table("users")
           .insert({
             id: '1234fkasdkl',
-            firstName: 'Peter',
-            lastName: 'Higgs',
-            userName: 'pHiggs',
-            email: utils.validEmail('higgsGarbage'),
+            firstName: 'Bob',
+            lastName: 'LobLaw',
+            userName: 'LawBlog',
+            email: utils.validEmail('BobLobLaw'),
             isAccountActivated: true,
             carpools:["someCarpool", "someOtherCarpool"],
-            passwordHash: "bofkldkfklsd",
-            salt: "djfklsdfklskldf"
+            passwordHash: hash,
+            salt: salt
       })
       )()
       .then( (b) => {

@@ -44,12 +44,12 @@ class routes{
         /*********** Carpool routes ***********/
         server.post('/api/carpools', CarpoolCtrl.createCarpool);
         server.get('/api/carpools', CarpoolCtrl.getCarpools);
-        server.get('/api/carpools/:carpoolid', CarpoolCtrl.getCarpool);
+        server.get("/api/carpools/requests", carpoolCtrl.getNotifications);
         server.post("/api/carpools/request", carpoolCtrl.requestToJoin);
         server.post("/api/carpools/addUser", carpoolCtrl.approveRequest);
         server.post("/api/carpools/denyUser", carpoolCtrl.denyRequest);
-        server.get("/api/carpools/requests", carpoolCtrl.getNotifications);
-        
+        server.get('/api/carpools/:carpoolid', CarpoolCtrl.getCarpool); 
+                
         /*********** Campus routes ************/
         server.post('/api/campuses', CampusCtrl.createCampus);
         server.get('/api/campuses', CampusCtrl.listCampuses);
