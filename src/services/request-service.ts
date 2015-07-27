@@ -8,15 +8,24 @@ import models = require('../models/models');
 import errors = require('../errors/errors');
 import config = require('../config');
 
-
 module RequestService {
     var db = "froyo";
     var table = "requests";
 
-    export function createRequest(userID:string, carpoolID:string) : Promise<boolean> {
+    export function createRequest(userID:string, carpoolID:string, firstName:string, 
+                                  lastName:string, carpoolName: string) : Promise<boolean> {
 
         var createRequestIfItDoesNotExist =
-        r.db(db).table(table).insert({id: userID + carpoolID, userID: userID,carpoolID: carpoolID},{conflict:"error"});
+            r.db(db)
+            .table(table)
+            .insert({
+                id: userID + carpoolID, 
+                userID: userID, 
+                firstName: firstName,
+                lastName: lastName,
+                carpoolID: carpoolID,
+                carpoolName: carpoolName
+            },{conflict:"error"});
 
         return q.run(
           createRequestIfItDoesNotExist, 'createRequest')()
@@ -56,12 +65,37 @@ module RequestService {
         return q.run(getByUserID, 'getRequestByUserID')();
     }
 
-    export function getRequestByCarpoolID(carpoolID:string){
-
-        var getByCarpoolID = r.db(db).table(table).filter({carpoolID: carpoolID}).coerceTo('array');
-
+    export function getRequestByCarpoolID(carpoolID:any){
+        
+        var getByCarpoolID = r.db(db).table(table).filter({carpoolID: carpoolID})
+                             .pluck("carpoolID", "carpoolName", "firstName", "lastName", "userID")
+                             .coerceTo('array');
+        
         return q.run(getByCarpoolID, 'getRequestByCarpoolID')();
+
     }
+
+    export function getAllRequestsForUser(user: models.User): Promise<Array<any>>{
+        
+        var requests = [];
+        var numFinished = 0;
+        return new Promise<Array<any>>((resolve, reject) => {
+            user.carpools.map((obj, index) => {
+                getRequestByCarpoolID(obj)
+                .then((_requests) =>{
+                    requests = requests.concat(_requests);
+                    ++numFinished;
+                    if(numFinished === user.carpools.length){
+                      resolve(requests);
+                    }
+                })
+            });
+            if(user.carpools.length === 0){
+                resolve([]);
+            }
+        });
+
+    } 
 }
 
 export = RequestService;

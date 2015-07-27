@@ -4,6 +4,9 @@ import errors = require('../../src/errors/errors');
 import r = require('rethinkdb');
 import query = require('../../src/dbutils/query');
 import utils = require('../utils');
+import userSvc = require('../../src/services/user-service');
+import bcrypt = require("bcrypt");
+
 
 class Session {
   [key: string] : any;
@@ -32,15 +35,16 @@ describe('RequestService', () => {
 
   var joinRequest = {
     userID: good.req.session["userID"],
-    carpoolID: "someCarpoolID",
+    carpoolID: "blahblahblahblah",
   }
 
   var testFalse = (result) => {expect(result).toBe(false);}
   var testTrue = (result) => {expect(result).toBe(true);}
 
 
-  function createRequest(userID:string, carpoolID:string){
-    return reqServ.createRequest(userID, carpoolID);
+  function createRequest(userID:string, carpoolID:string, firstName:string, 
+                                  lastName:string, carpoolName: string){
+    return reqServ.createRequest(userID, carpoolID, firstName, lastName, carpoolName);
   }
 
   function removeRequest(userID:string, carpoolID:string){
@@ -55,9 +59,21 @@ describe('RequestService', () => {
     return reqServ.getRequestByCarpoolID(carpoolID);
   }
 
+  function getAllUserRequests(user:models.User){
+    return reqServ.getAllRequestsForUser(user);
+  }
 
-  it('it should create a request', (done) => {
-      createRequest(joinRequest.userID, joinRequest.carpoolID)
+
+  it('should create requests', (done) => {
+      createRequest(joinRequest.userID, joinRequest.carpoolID, "Peter", "Higgs", "someCarpool")
+      .then( (result) => {
+          testTrue(result);
+      })
+      createRequest(joinRequest.userID, "someCarpool", "Peter", "Higgs", "someCarpool")
+      .then( (result) => {
+          testTrue(result);
+      })
+      createRequest(joinRequest.userID, "someOtherCarpool", "Peter", "Higgs", "someOtherCarpool")
       .then( (result) => {
           testTrue(result);
       })
@@ -66,7 +82,7 @@ describe('RequestService', () => {
       .finally(done);
   });
 
-  it('it should find a request by userID', (done) => {
+  it('should find a request by userID', (done) => {
       getByUserID(joinRequest.userID)
       .then( (_request) => {
         if(_request[0]){
@@ -81,7 +97,7 @@ describe('RequestService', () => {
       .finally(done);
   });
 
-  it('it should find a request by carpoolID', (done) => {
+  it('should find a request by carpoolID', (done) => {
       getByCarpoolID(joinRequest.carpoolID)
       .then( (_request) => {
         if(_request[0]){
@@ -96,7 +112,43 @@ describe('RequestService', () => {
       .finally(done);
   });
 
-  it('it should remove a request', (done) => {
+  it('should get all requests for all of the carpools a user belongs to', (done) => {
+      var userID = '1234fkasdkl';
+
+      var salt = bcrypt.genSaltSync(10);
+      var hash = bcrypt.hashSync("1234", salt);
+
+      query.run(r.db("froyo")
+          .table("users")
+          .insert({
+            id: '1234fkasdkl',
+            firstName: 'Bob',
+            lastName: 'LobLaw',
+            userName: 'LawBlog',
+            email: utils.validEmail('BobLobLaw'),
+            isAccountActivated: true,
+            carpools:["someCarpool", "someOtherCarpool"],
+            passwordHash: hash,
+            salt: salt
+      })
+      )()
+      .then( (b) => {
+        userSvc.getUserById(userID)
+          .then( (user) => {
+            getAllUserRequests(user)
+            .then((result) => {
+              expect(result.length >= 1 ).toBe(true);
+            })
+            .error(fail)
+            .finally(done);
+          })
+          .catch(Error, fail);
+      })
+      .catch(fail)
+
+  });
+
+  it('should remove a request', (done) => {
       removeRequest(joinRequest.userID, joinRequest.carpoolID)
       .then( (result) => {
           testTrue(result);
