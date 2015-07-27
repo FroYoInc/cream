@@ -194,6 +194,6 @@ describe('UserService', () => {
       .finally(done);
 
     });
-
   });
+
 });
