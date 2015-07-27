@@ -29,8 +29,12 @@ module CarpoolService {
       .isEmpty().not();
   }
 
-  export function createCarpool(name: string,
-    campusName: string, description: string, owner: string)
+  export function createCarpool(
+    name: string,
+    campusName: string,
+    description: string,
+    owner: string,
+    pickupLocation: models.Address)
     :Promise<models.Carpool> {
 
     var carpool:models.Carpool = <models.Carpool>{};
