@@ -269,6 +269,44 @@ module UserService {
     return q.run(insertUserData, 'createUserData')()
       .then(() => {return userData});
   }
+
+  export function resendActivationEmail(email:string) : Promise<boolean>{
+      return new Promise<boolean> ((resolve, reject) => {
+        getUserByEmail(email)
+        .then((_user) => {
+          if(!_user.isAccountActivated){
+            var getActivationQuery = r.db(db)
+              .table(activationTable)
+              .filter({userId: _user.id})
+              .limit(1);
+            q.run(getActivationQuery)()
+            .then( (result) => {
+              if(result != undefined){
+                sendActivation(_user, result.activationCode);
+                resolve(true);
+              }
+              else{
+                throw new errors.UserDataNotFound();
+              }
+            })
+          }
+          else{
+            throw new errors.UserAlreadyActivatedException();
+          }
+        });
+      });
+
+    function sendActivation(user, activationCode) {
+      var emailService = new EmailService.EmailService();
+
+      if (transportConfig != null) {
+        emailService.transportConfig = transportConfig;
+      }
+      return emailService.sendActivation(user, activationCode);
+    }
+
+  }
+
 }
 
 export = UserService;

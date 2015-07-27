@@ -181,4 +181,19 @@ describe('UserService', () => {
       .error(fail)
       .finally(done);
   });
+
+  it("should resend an activation code", (done) => {
+    createUser(rs(), rs(), rs(), em(), rs(), rs())()
+    .then((user) => {
+      userService.resendActivationEmail(user.email)
+      .then( (result) => {
+        expect(result).toBeTruthy();
+      })
+      .catch(errors.UserDataNotFound, fail)
+      .catch(errors.UserAlreadyActivatedException, fail)
+      .finally(done);
+
+    });
+
+  });
 });
