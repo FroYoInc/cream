@@ -65,8 +65,7 @@ describe('CarpoolService', () => {
         expect(carpool.participants.length).toBe(1);
         expect(carpool.participants[0]).toEqual(owner);
         expect(carpool.id).toBeDefined();
-        // TODO: Fix this when carpool.svc implement pickup location
-        /*expect(carpool.pickupLocation).toEqual(addr);*/
+        expect(carpool.pickupLocation).toEqual(addr);
       })
       // Test that a carpool cannot be created if one exist with same name
       .then(createCarpool(
@@ -103,6 +102,7 @@ describe('CarpoolService', () => {
         expect(_carpool.name).toBe(carpool.name);
         expect(_carpool.description).toBe(carpool.description);
         expect(_carpool.id).toBeDefined();
+        expect(_carpool.pickupLocation).toEqual(carpool.pickupLocation);
       })
       .catch(fail)
       .error(fail)
