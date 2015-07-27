@@ -28,11 +28,11 @@ module RequestService {
             },{conflict:"error"});
 
         return q.run(
-          createRequestIfItDoesNotExist)()
+          createRequestIfItDoesNotExist, 'createRequest')()
           .then((result) => {
             if (result.errors > 0) {
                 throw new errors.CarpoolRequestConflictException();
-            } 
+            }
             else {
                 return (result.inserted === 1);
             }
@@ -41,15 +41,15 @@ module RequestService {
     }
 
     export function removeRequest(userID:string, carpoolID:string) : Promise<boolean> {
-        
+
         var removeRequestQuery = r.db(db).table(table).get(userID + carpoolID).delete();
 
         return q.run(
-          removeRequestQuery)()
+          removeRequestQuery, 'removeRequest')()
           .then((result) => {
             if (result.deleted === 0) {
                 throw new errors.CarpoolRequestNotFoundException();
-            } 
+            }
             else {
                 return (result.deleted === 1);
 
@@ -59,10 +59,10 @@ module RequestService {
     }
 
     export function getRequestByUserID(userID:string){
-        
+
         var getByUserID = r.db(db).table(table).filter({userID: userID}).coerceTo('array');
-        
-        return q.run(getByUserID)();
+
+        return q.run(getByUserID, 'getRequestByUserID')();
     }
 
     export function getRequestByCarpoolID(carpoolID:any){
@@ -71,7 +71,8 @@ module RequestService {
                              .pluck("carpoolID", "carpoolName", "firstName", "lastName", "userID")
                              .coerceTo('array');
         
-        return q.run(getByCarpoolID)();
+        return q.run(getByCarpoolID, 'getRequestByCarpoolID')();
+
     }
 
     export function getAllRequestsForUser(user: models.User): Promise<Array<any>>{
