@@ -5,6 +5,7 @@ import r = require('rethinkdb');
 import q = require('../dbutils/query');
 import assert = require('assert');
 
+
 module CampusService {
 
   var db = 'froyo';
