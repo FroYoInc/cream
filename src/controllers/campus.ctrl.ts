@@ -4,6 +4,7 @@ import utils = require('../utils/utils');
 import errors = require('../errors/errors');
 import pv = require('../validation/parameter-validator');
 import models = require('../models/models');
+import auth = require('../services/user-auth');
 
 module CampusController {
 
@@ -38,39 +39,51 @@ module CampusController {
    * @param  {restify.Response} res
    * @param  {restify.Next}     next
    */
+
   export function createCampus(req: restify.Request, res: restify.Response, next: restify.Next) {
-    var campusInfo = req.body;
-    var requestValid = pv.verifyParams(
-                        campusInfo.name,
-                        campusInfo.address,
-                        campusInfo.address.address,
-                        campusInfo.address.geoCode,
-                        campusInfo.address.geoCode.lat,
-                        campusInfo.address.geoCode.long);
+    auth.checkAdmin(req).then( (isAdmin) => {
+        if(isAdmin == true) {
+          var campusInfo = req.body;
+          var requestValid = pv.verifyParams(
+                              campusInfo.name,
+                              campusInfo.address,
+                              campusInfo.address.address,
+                              campusInfo.address.geoCode,
+                              campusInfo.address.geoCode.lat,
+                              campusInfo.address.geoCode.long);
 
-    if (!requestValid) {
-      res.send(400, {"message": "Bad Request: invalid or missing paramters"});
-      next();
-      return;
-    }
+            if (!requestValid) {
+              res.send(400, {"message": "Bad Request: invalid or missing paramters"});
+              next();
+              return;
+            }
 
-    CampusService.createCampus(campusInfo.name, campusInfo.address)
-      .then((_campus) => {
-        res.send(201, toOutputJSON(_campus));
-        next();
+          CampusService.createCampus(campusInfo.name, campusInfo.address)
+            .then((_campus) => {
+              res.send(201, toOutputJSON(_campus));
+              next();
+            })
+            .catch(
+              errors.CampusNameValidationException,
+              errors.MissingParametersException,
+              (err) => {
+              next(new restify.BadRequestError(err.message));
+            })
+            .catch(errors.CampusNameExistsException, (err) => {
+              next(new restify.ConflictError(err.message));
+            })
+            .catch((err) => {
+              next(new restify.InternalServerError(err.message));
+            });
+
+            //end if(isAdmin == true)
+        } else {
+          res.send(403, {"message" : "User Must be admin to create campus"});
+        }
       })
-      .catch(
-        errors.CampusNameValidationException,
-        errors.MissingParametersException,
-        (err) => {
-        next(new restify.BadRequestError(err.message));
-      })
-      .catch(errors.CampusNameExistsException, (err) => {
-        next(new restify.ConflictError(err.message));
-      })
-      .catch((err) => {
-        next(new restify.InternalServerError(err.message));
-      });
+
+
+
   }
 
   export function removeCampus(req: restify.Request, res: restify.Response, next: restify.Next) {
