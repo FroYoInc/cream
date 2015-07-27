@@ -172,5 +172,11 @@ module Errors {
     } 
   }
 
+  export class UserNotInCarpool extends Exception {
+    constructor(){
+      super("User must be a member to update carpool.", 'UserNotInCarpool');
+    }
+  }
+
 }
 export = Errors
