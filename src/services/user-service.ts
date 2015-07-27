@@ -52,7 +52,7 @@ module UserService {
   }
 
   export function doesUserExist(userName: string):Promise<boolean> {
-    return q.run(userExistQuery(userName))()
+    return q.run(userExistQuery(userName), 'doesUserExist')()
       .then((result) => {
         return result === true
       });
@@ -93,7 +93,7 @@ module UserService {
     }
 
     var createUserIfUserOrEmailDoesNotExist =
-      q.run(createUserIfUserOrEmailDoesNotExistQuery);
+      q.run(createUserIfUserOrEmailDoesNotExistQuery, 'createUser');
 
     function setUserID(result) {
       assert.equal(result.generated_keys.length, 1,
@@ -123,7 +123,8 @@ module UserService {
         .table(activationTable)
         .insert(activation);
 
-      return q.run(saveActivationQuery)().then(sendActivation).return(user);
+      return q.run(saveActivationQuery,
+        'saveActivation')().then(sendActivation).return(user);
     }
 
     function isValidUserName() {
@@ -155,7 +156,7 @@ module UserService {
       return <models.User> _user;
     }
 
-    return q.run(getUserByIdQuery)()
+    return q.run(getUserByIdQuery, 'getUserById')()
       .then(throwErrorIfUserNotFound)
       .then(returnUser)
   }
@@ -177,7 +178,7 @@ module UserService {
       .getAll(email, {index: emailIndex})
       .coerceTo('array');
     return emailValidator.isValid(email)
-      .then(q.run(getUserByEmailQuery))
+      .then(q.run(getUserByEmailQuery, 'getUserByEmail'))
       .then(returnUser);
   }
 
@@ -186,7 +187,7 @@ module UserService {
       .table(table)
       .getAll(userName, {index: userNameIndex})
       .coerceTo('array');
-    return q.run(getUserByUserNameQuery)()
+    return q.run(getUserByUserNameQuery, 'getUserByUserName')()
       .then(returnUser)
   }
 
@@ -197,7 +198,7 @@ module UserService {
       .table(table)
       .get(user.id)
       .update(user, {durability: 'hard'});
-    return q.run(updateUserQuery)().then(() => {return user});
+    return q.run(updateUserQuery, 'updateUser')().then(() => {return user});
   }
 
   export function activateUser(activationCode: string):Promise<models.User> {
@@ -210,7 +211,7 @@ module UserService {
       var getActivationQuery = r.db(db)
         .table(activationTable)
         .get(activationCode);
-      return q.run(getActivationQuery)()
+      return q.run(getActivationQuery, 'getUserIdByActivationCode')()
         .then((_result) => {
           var activation:models.Activation = _result;
           if (_result === null) {
@@ -238,7 +239,7 @@ module UserService {
     var getUserDataQuery = r.db(db)
       .table(userDataTable)
       .get(userID);
-    return q.run(getUserDataQuery)()
+    return q.run(getUserDataQuery, 'getUserData')()
       .then((_result) => {
         var userData:models.UserData = _result;
 
@@ -258,13 +259,15 @@ module UserService {
       .table(userDataTable)
       .get(userData.id)
       .update(userData, {durability: 'hard'});
-    return q.run(updateUserDataQuery)().then(() => {return userData});
+    return q.run(updateUserDataQuery, 'updateUserData')()
+      .then(() => {return userData});
   }
 
   export function createUserData(userData:models.UserData):
   Promise<models.UserData> {
     var insertUserData = r.db(db).table(userDataTable).insert(userData);
-    return q.run(insertUserData)().then(() => {return userData});
+    return q.run(insertUserData, 'createUserData')()
+      .then(() => {return userData});
   }
 }
 
