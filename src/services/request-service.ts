@@ -75,6 +75,7 @@ module RequestService {
     }
 
     export function getAllRequestsForUser(user: models.User): Promise<Array<any>>{
+        
         var requests = [];
         var numFinished = 0;
         return new Promise<Array<any>>((resolve, reject) => {
