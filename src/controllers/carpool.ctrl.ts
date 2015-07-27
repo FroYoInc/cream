@@ -31,9 +31,17 @@ module CarpoolController {
       var campusName:string = req.body.campus;
       var description:string = req.body.description;
       var owner:string = req.body.owner;
+      //TODO: Get this from the request
+      var addr:models.Address = {
+        address: "Asd",
+        geoCode: {
+          lat: 0,
+          long: 0
+        }
+      }
 
       carpoolService.createCarpool(
-        carpoolName, campusName, description, owner)
+        carpoolName, campusName, description, owner, addr)
         .then((carpool) => {
           res.send(201, toOutputJSON(carpool));
         })
