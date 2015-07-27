@@ -36,6 +36,19 @@ module CampusService {
       .isEmpty().not();
   }
 
+
+  /**
+   * Checks if a campus exists, by ID.
+   * @param  {string} campusID   [description]
+   * @return {[type]}            [description]
+   */
+  export function campusExistsGivenIDQuery(campusID: string) {
+    return r.db(db)
+      .table(table)
+      .get(campusID)
+      .eq(null).not();
+  }
+
   /**
    * Creates a campus.
    * @param  {string}                 campusName [description]

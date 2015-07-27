@@ -45,6 +45,7 @@ class routes{
         server.post('/api/carpools', CarpoolCtrl.createCarpool);
         server.get('/api/carpools', CarpoolCtrl.getCarpools);
         server.get("/api/carpools/requests", carpoolCtrl.getNotifications);
+        server.put('/api/carpools/:carpoolID', CarpoolCtrl.updateCarpool);
         server.post("/api/carpools/request", carpoolCtrl.requestToJoin);
         server.post("/api/carpools/addUser", carpoolCtrl.approveRequest);
         server.post("/api/carpools/denyUser", carpoolCtrl.denyRequest);

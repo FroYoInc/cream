@@ -145,9 +145,8 @@ module CarpoolService {
           throw new errors.CarpoolNotFoundException()
         } else {
           assert.equal(true, (_carpool.id == carpoolID),
-          'retrived object should have same id');
-          var carpool:models.Carpool = _carpool;
-          return carpool;
+          'retrieved object should have same id');
+          return _carpool;
         }
       });
   }
@@ -169,8 +168,7 @@ module CarpoolService {
       });
   }
 
-  export function getUserCarpools(user:models.User)
-  :Promise<Array<models.Carpool>> {
+  export function getUserCarpools(user:models.User) : Promise<Array<models.Carpool>> {
     var userExistQuery = userSvc.userExistQuery(user.userName);
     var getUserCarpoolsQuery = r.db(db)
       .table('users')
@@ -196,6 +194,46 @@ module CarpoolService {
           return result;
         }
       })
+  }
+
+  export interface CarpoolUpdateModel {
+    name?:string;
+    description?:string;
+    campus?:string;
+  }
+
+  export function updateCarpool(carpoolID:string, updatedCarpool:CarpoolUpdateModel) : Promise<void> {
+    var doesCarpoolExistQuery = doesCarpoolExistGivenID(carpoolID);
+    var updateCarpoolQuery = r.db(db).table(table).get(carpoolID).update(updatedCarpool);
+
+    function getCarpoolUpdateQuery() : r.Expression<any> {
+      if (updatedCarpool.campus) {
+        return r.branch(
+          doesCarpoolExistQuery,
+          r.branch(
+            campusSvc.campusExistsGivenIDQuery(updatedCarpool.campus),
+            updateCarpoolQuery,
+            r.expr('campus does not exist')
+          ),
+          r.expr('carpool does not exist')
+          );
+      } else {
+        return r.branch(
+          doesCarpoolExistQuery,
+          updateCarpoolQuery,
+          r.expr('carpool does not exist')
+        );
+      }
+    }
+
+    return q.run(getCarpoolUpdateQuery())()
+      .then((result) => {
+        if (result == 'carpool does not exist') {
+          throw new errors.CarpoolNotFoundException();
+        } else if (result == 'campus does not exist') {
+          throw new errors.CampusNotFoundException();
+        }
+      });
   }
 
   export function addUserToCarpool(carpoolID:string, participant:models.User)

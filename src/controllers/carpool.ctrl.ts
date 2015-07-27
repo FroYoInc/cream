@@ -88,6 +88,44 @@ module CarpoolController {
         next(new restify.InternalServerError(err.message))
       });
   }
+
+  export function updateCarpool(req:restify.Request, res:restify.Response, next:restify.Next) {
+    var carpoolID = req.params.carpoolID;
+
+    function getIDFromHref(href:string) : string {
+      var hrefComponents = href.split('/');
+      return hrefComponents[hrefComponents.length - 1];
+    }
+
+    function addFieldFromJSON(JSONObject, newObject, fieldName:string) {
+      if (JSONObject[fieldName]) {
+        newObject[fieldName] = JSONObject[fieldName];
+      }
+      return newObject;
+    }
+
+    function getCarpoolUpdate(requestBody) {
+      var carpoolUpdate = {};
+      carpoolUpdate = addFieldFromJSON(requestBody, carpoolUpdate, "name");
+      carpoolUpdate = addFieldFromJSON(requestBody, carpoolUpdate, "description");
+      if(requestBody.campus) {
+        carpoolUpdate["campus"] = getIDFromHref(requestBody.campus);
+      }
+      return carpoolUpdate;
+    }
+
+    carpoolService.updateCarpool(carpoolID, getCarpoolUpdate(req.body))
+      .then(() => {
+        res.send(204);
+      })
+      .catch(errors.CarpoolNotFoundException, (err) => {
+        next(new restify.NotFoundError(err.message));
+      })
+      .catch((err) => {
+        next(new restify.InternalServerError(err.message));
+      })
+      .then(next);
+  }
 }
 
 export = CarpoolController;

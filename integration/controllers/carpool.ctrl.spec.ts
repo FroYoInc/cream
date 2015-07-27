@@ -82,6 +82,20 @@ function getCarpools(req:restify.Request, res:restify.Response)
   });
 }
 
+function updateCarpool(req:restify.Request, res:restify.Response)
+:Promise<void> {
+  return new Promise<void>((resolve, reject) => {
+    function next(err) {
+      if (err) {
+        reject(err)
+      } else {
+        resolve(null)
+      }
+    }
+    CarpoolCtrl.updateCarpool(req, res, next)
+  });
+}
+
 describe('Carpool controller', () => {
 
   var campus:models.Campus;
@@ -302,6 +316,52 @@ describe('Carpool controller', () => {
       .error(fail)
       .finally(done);
   });
+
+  it('should update a carpool', (done) => {
+    var carpool:models.Carpool;
+    var carpoolUpdate:CarpoolSvc.CarpoolUpdateModel = {
+      'name': 'name updated',
+      'description': 'description updated'
+    };
+
+    function test(status) {
+      expect(status).toBe(204);
+
+      CarpoolSvc.getCarpoolByID(carpool.id)
+        .then((updatedCarpool) => {
+          expect(updatedCarpool['name']).toEqual(carpoolUpdate.name);
+          expect(updatedCarpool['description']).toEqual(carpoolUpdate.description);
+        });
+    }
+
+    var req = <restify.Request> {params: {}};
+    var res = <restify.Response> {send: test};
+    req.body = carpoolUpdate;
+
+    CarpoolSvc.createCarpool('update this name', 'PSU', 'update this description', owner.userName)
+      .then((_carpool) => {
+        carpool = _carpool;
+        req.params.carpoolID = _carpool.id;
+      })
+      .then(() => {
+        return updateCarpool(req, res);
+      })
+      .then(() => {
+        req.params.carpoolID = 'non-existant-carpool-id';
+        res.send = () => {};
+        return updateCarpool(req, res);
+      })
+      .catch(restify.NotFoundError, (err) => {
+        expect(err.message).toBe('CarpoolNotFoundException:' +
+          ' carpool not found');
+        return utils._catch();
+      })
+      .then(utils.checkCaught)
+      .catch(fail)
+      .error(fail)
+      .finally(done);
+  });
+
 
   it('should create a request', (done) => {
       requestToJoin(good.req)
