@@ -27,8 +27,8 @@ module ActivationController {
     next();
   }
 
-  export function resendActivationHelper(req:Restify.Request) : Promise<number>{
-    return new Promise<number>((resolve, reject) => {
+  export function resendActivationHelper(req:Restify.Request) : Promise<any>{
+    return new Promise<any>((resolve, reject) => {
       var validReq = pv.verifyParams(req.params.email);
       if(validReq){
           userService.resendActivationEmail(req.params.email)
@@ -40,11 +40,23 @@ module ActivationController {
           .catch(errors.UserAlreadyActivatedException, (err) => {
               resolve(409);
           })
-          .catch(errors.UserDataNotFound, (err) => {
+          .catch(errors.ActivationDataNotFoundException, (err) => {
               resolve(404);
           })
           .catch(errors.UserNotFoundException, (err) => {
               resolve(404);
+          })
+          .catch(errors.EmailValidationException, (err) => {
+            resolve(404);
+          })
+          .catch(errors.UserDataNotFound, (err) => {
+            resolve(404);
+          })
+          .catch(errors.ActivationSendLockException, (err) => {
+            resolve(423);
+          })
+          .catch(Error, (err) => {
+            resolve(500);
           })
       }
       else{

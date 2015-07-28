@@ -274,30 +274,65 @@ module UserService {
       return new Promise<boolean> ((resolve, reject) => {
         getUserByEmail(email)
         .then((_user) => {
-          if(!_user.isAccountActivated){
-            var getActivationQuery = r.db(db)
-              .table(activationTable)
-              .filter({userId: _user.id})
-              .limit(1);
-            q.run(getActivationQuery)()
-            .then( (result) => {
-              if(result != undefined){
-                sendActivation(_user, result.activationCode);
-                resolve(true);
-              }
-              else{
-                throw new errors.UserDataNotFound();
-              }
+            if(!_user.isAccountActivated){
+              getUserData(_user.id)
+              .then( (userData) => {
+                sendIfNotLocked(userData, _user, resolve, reject);
+              })
+              .catch(errors.UserDataNotFound, (err) => {
+                var userData = {
+                  activationLockout:0,
+                  id: _user.id,
+                  numLoginAttempts: 0,
+                  lockoutExpiration: 0,
+                };
+                sendIfNotLocked(userData, _user, resolve, reject)
+              })
+            }
+            else{
+              throw new errors.UserAlreadyActivatedException();
+            }
+          })
+          .catch(errors.UserNotFoundException, (err) => {
+            reject(err);
+          })
+          .catch(errors.EmailValidationException, (err) => {
+            reject(err);
+          })
+
+    });
+
+    function sendIfNotLocked(userData, user, resolve, reject){
+      var now = (new Date()).getTime(); // Get the epoch time
+      if(userData.activationLockout == undefined || userData.activationLockout <= now ){
+        var getActivationQuery = r.db(db)
+          .table(activationTable)
+          .filter({userId: user.id})
+          .coerceTo("array")
+          .limit(1);
+
+        q.run(getActivationQuery)()
+        .then( (activation) => {
+          if(activation[0] != undefined){
+            userData.activationLockout = now + config.Config.activationLock;
+            updateUserData(userData)
+            .then( (userData) => {
+              sendActivation(user, activation[0].id);
+              resolve(true);
+            })
+            .catch(Error, (err) => {
+              reject(err);
             })
           }
           else{
-            throw new errors.UserAlreadyActivatedException();
+            throw new errors.ActivationDataNotFoundException();
           }
-        })
-        .catch(errors.UserNotFoundException, (err) => {
-          throw err;
-        })
-      });
+        });
+      }
+      else{
+        throw new errors.ActivationSendLockException();
+      }
+    }
 
     function sendActivation(user, activationCode) {
       var emailService = new EmailService.EmailService();
