@@ -334,8 +334,8 @@ describe('Carpool controller', () => {
       'pickupLocation': {
         'address':'Street address updated',
         'geoCode': {
-          'lat':123,
-          'long':123
+          'long':133,
+          'lat':-25
         }
       }
     };
