@@ -18,6 +18,7 @@ class routes{
         server.get("/api/users/logout", userControllers.logout);
         server.post("/api/users", CreateUserCtrl.createUser);
         server.get('/api/activate/:activate', ActivationController.activate);
+        server.post('/api/activate/resend', ActivationController.resendActivation);
 
         /*********** Documentation routes ***********/
 

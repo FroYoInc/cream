@@ -439,6 +439,36 @@
                     }
                 }
             }
+        },
+
+        "/api/activate/resend": {
+            "post": {
+                "summary": "Resend a user's activation email",
+                "description": "\nCheck's if a user is activated and sends them an activation email if they are not.",
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "The email for the user requesting a resend.",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/resend"
+                        }
+                    }
+                ],
+                "tags": ["User"],
+                "responses": {
+                    "200": {
+                        "description": "Success, email sent."
+                    },
+                    "404": {
+                        "description": "Unable to find user data."
+                    },
+                    "409": {
+                        "description": "User is already activated."
+                    }
+                }
+            }
         }
 
     },
@@ -636,6 +666,16 @@
                 "carpoolName" : {"type": "string"}
             }
 
+        },
+        "resend" : {
+            "required":[
+                "email"
+            ],
+            "properties": {
+                "email" : {"type": "string"}
+            }
+
         }
+
     }
 }
