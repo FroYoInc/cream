@@ -293,7 +293,10 @@ module UserService {
           else{
             throw new errors.UserAlreadyActivatedException();
           }
-        });
+        })
+        .catch(errors.UserNotFoundException, (err) => {
+          throw err;
+        })
       });
 
     function sendActivation(user, activationCode) {

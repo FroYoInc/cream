@@ -25,13 +25,6 @@ function activate(req: restify.Request, res: restify.Response):Promise<void> {
   });
 }
 
-function resend(req: restify.Request, res: restify.Response):Promise<void> {
-  return new Promise<void>((resolve, reject) => {
-    function next() {resolve(null);}
-    ActivationCtrl.resendActivation(req, res, next)
-  });
-}
-
 describe('Activation controller', () => {
 
    function test0(statusCode) {
@@ -51,9 +44,7 @@ describe('Activation controller', () => {
    function test3(statusCode){
     expect(statusCode).toBe(200);
    }
-   function resend(req, rer){
 
-   }
 
   it('should activate a user and redirect request to login page', (done) => {
 
@@ -75,7 +66,7 @@ describe('Activation controller', () => {
   it('should redirect to an error page given invalid activation code', (done) => {
 
     var req = <restify.Request> {params: {'activate': 'invalidcode'}};
-    var res = <restify.Response> {send: test3, header: test2};
+    var res = <restify.Response> {send: test0, header: test2};
 
     activate(req, res)
       .catch(fail)
@@ -84,15 +75,19 @@ describe('Activation controller', () => {
   })
 
   it('should resend an activation email', (done) => {
-    var req = <restify.Request> {params: {'email': ''}};
-    var res = <restify.Response> {send: test3, header: test1};
+    
+    var test200 =  (result) => {expect(result).toBe(200)};
     var rs = utils.rs;
     var em = utils.em;
-    userService.createUser(rs(), rs(), rs(), em(), rs(), rs())
+    var email = em();
+    var req = <restify.Request> {params: {'email': email}};
+    var res = <restify.Response> {send: test0, header: test2};
+
+    userService.createUser(rs(), rs(), rs(), email, rs(), rs())
     .then( (_user) => {
-      ActivationCtrl.resendActivation(req, res, done)
+      ActivationCtrl.resendActivationHelper(req)
+      .then(test200)
       .catch(fail)
-      .error(fail)
       .finally(done)
     })
 

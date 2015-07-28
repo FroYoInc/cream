@@ -5,6 +5,8 @@ import userService = require('../services/user-service');
 import models = require('../models/models');
 import Promise = require('bluebird');
 import errors = require('../errors/errors');
+import pv = require('../validation/parameter-validator');
+
 module ActivationController {
   export function activate (req:Restify.Request,res:Restify.Response,next){
     var activate = req.params.activate;
@@ -25,25 +27,38 @@ module ActivationController {
     next();
   }
 
-  export function resendActivation(req:Restify.Request, res:Restify.Response, next){
+  export function resendActivationHelper(req:Restify.Request) : Promise<number>{
+    return new Promise<number>((resolve, reject) => {
       var validReq = pv.verifyParams(req.params.email);
       if(validReq){
           userService.resendActivationEmail(req.params.email)
           .then((result) => {
               if(result){
-                  res.send(200);
+                  resolve(200);
               }
           })
           .catch(errors.UserAlreadyActivatedException, (err) => {
-              res.send(409);
+              resolve(409);
           })
           .catch(errors.UserDataNotFound, (err) => {
-              res.send(404);
+              resolve(404);
+          })
+          .catch(errors.UserNotFoundException, (err) => {
+              resolve(404);
           })
       }
       else{
-          res.send(400);
+          resolve(400);
       }
+    });
+
+  }
+
+  export function resendActivation(req:Restify.Request,res:Restify.Response,next){
+      resendActivationHelper(req)
+      .then((statusCode) => {
+        res.send(statusCode);
+      })
   }
 }
 
