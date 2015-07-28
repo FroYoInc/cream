@@ -29,8 +29,12 @@ module CarpoolService {
       .isEmpty().not();
   }
 
-  export function createCarpool(name: string,
-    campusName: string, description: string, owner: string)
+  export function createCarpool(
+    name: string,
+    campusName: string,
+    description: string,
+    owner: string,
+    pickupLocation: models.Address)
     :Promise<models.Carpool> {
 
     var carpool:models.Carpool = <models.Carpool>{};
@@ -47,6 +51,7 @@ module CarpoolService {
           carpool.description = description;
           carpool.campus = campus;
           carpool.owner = user;
+          carpool.pickupLocation = pickupLocation;
           carpool.participants = [user];
         })
         .catch(errors.UserNotFoundException, () => {
@@ -72,7 +77,8 @@ module CarpoolService {
           'owner': carpool.owner.id,
           'participants': [carpool.owner.id],
           'campus': carpool.campus.id,
-          'description': carpool.description
+          'description': carpool.description,
+          'pickupLocation': carpool.pickupLocation
         });
 
       // Note: Even though buildCarpoolModel ensure campus and user exist,

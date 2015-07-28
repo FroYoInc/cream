@@ -21,9 +21,10 @@ function checkCaught(arg: Caught) {
   }
 }
 
-function createCarpool(n: string, c: string, d: string, o: string)
+function createCarpool(
+  n: string, c: string, d: string, o: string, a:models.Address)
 : () => Promise<models.Carpool> {
-  return () => {return carpoolSvc.createCarpool(n, c, d, o)}
+  return () => {return carpoolSvc.createCarpool(n, c, d, o, a)}
 }
 
 function doesCarpoolExist(carpoolName: string): () => Promise<boolean> {
@@ -50,10 +51,12 @@ describe('CarpoolService', () => {
   });
 
   it('should create a carpool', (done) => {
+    var addr:models.Address = utils.gra();
     doesCarpoolExist('fropool')()
       .then((val) => {expect(val).toBe(false)})
       // Test carpool can be created
-      .then(createCarpool('fropool', campus.name, 'carpool', owner.userName))
+      .then(createCarpool(
+        'fropool', campus.name, 'carpool', owner.userName, addr))
       .then((carpool) => {
         expect(carpool.name).toBe('fropool');
         expect(carpool.description).toBe('carpool');
@@ -62,17 +65,21 @@ describe('CarpoolService', () => {
         expect(carpool.participants.length).toBe(1);
         expect(carpool.participants[0]).toEqual(owner);
         expect(carpool.id).toBeDefined();
+        expect(carpool.pickupLocation).toEqual(addr);
       })
       // Test that a carpool cannot be created if one exist with same name
-      .then(createCarpool('fropool', campus.name, 'second', owner.userName))
+      .then(createCarpool(
+        'fropool', campus.name, 'second', owner.userName, addr))
       .catch(errors.CarpoolExistException, _catch)
       .then(checkCaught)
       // Test that a carpool cannot be created if owner does not exist
-      .then(createCarpool('yopool', campus.name, 'second', 'non-existantowner'))
+      .then(createCarpool(
+        'yopool', campus.name, 'second', 'non-existantowner', addr))
       .catch(errors.CarpoolOwnerNotFoundException, _catch)
       .then(checkCaught)
       // Test that a carpool cannot be created if ampus does not exist
-      .then(createCarpool('yopool', 'invalidcampus', 'second', owner.userName))
+      .then(createCarpool(
+        'yopool', 'invalidcampus', 'second', owner.userName, addr))
       .catch(errors.CampusNotFoundException, _catch)
       .then(checkCaught)
       // Fail if any other error was thrown
@@ -95,6 +102,7 @@ describe('CarpoolService', () => {
         expect(_carpool.name).toBe(carpool.name);
         expect(_carpool.description).toBe(carpool.description);
         expect(_carpool.id).toBeDefined();
+        expect(_carpool.pickupLocation).toEqual(carpool.pickupLocation);
       })
       .catch(fail)
       .error(fail)
