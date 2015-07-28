@@ -12,6 +12,7 @@ module CarpoolController {
     owner: userCtrl.OutputJSON;
     campus: any; // This should be of type CampusController.OutputJSON
     participants: Array<userCtrl.OutputJSON>;
+    pickupLocation: models.Address;
     href: string;
   }
 
@@ -22,6 +23,7 @@ module CarpoolController {
       'owner': userCtrl.toOutputJSON(carpool.owner),
       'campus': campusCtrl.toOutputJSON(carpool.campus),
       'participants': carpool.participants.map(userCtrl.toOutputJSON),
+      'pickupLocation': carpool.pickupLocation,
       'href': '/carpools/' + carpool.id
     };
   }
@@ -31,17 +33,10 @@ module CarpoolController {
       var campusName:string = req.body.campus;
       var description:string = req.body.description;
       var owner:string = req.body.owner;
-      //TODO: Get this from the request
-      var addr:models.Address = {
-        address: "Asd",
-        geoCode: {
-          lat: 0,
-          long: 0
-        }
-      }
+      var pickupLocation:models.Address = req.body.pickupLocation;
 
       carpoolService.createCarpool(
-        carpoolName, campusName, description, owner, addr)
+        carpoolName, campusName, description, owner, pickupLocation)
         .then((carpool) => {
           res.send(201, toOutputJSON(carpool));
         })

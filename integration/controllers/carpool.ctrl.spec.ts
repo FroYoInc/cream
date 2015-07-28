@@ -197,7 +197,13 @@ describe('Carpool controller', () => {
       'name': 'Corpool',
       'campus': 'PSU',
       'description': 'first carpool',
-      // TODO: Add pickupLocation
+      'pickupLocation': {
+        'address': '123 Yo street',
+        'geoCode': {
+          'long': -122.12351,
+          'lat': 42.1234
+        }
+      },
       'owner': owner.userName
     };
 
@@ -208,7 +214,7 @@ describe('Carpool controller', () => {
       expect(outputJSON.owner).toEqual(UserCtrl.toOutputJSON(owner));
       expect(outputJSON.campus).toEqual(CampusCtrl.toOutputJSON(campus));
       expect(outputJSON.participants).toEqual([UserCtrl.toOutputJSON(owner)]);
-      // TODO: Add pickupLocation
+      expect(outputJSON.pickupLocation).toEqual(inputJSON.pickupLocation);
       var hasHref = (outputJSON.href.indexOf('/carpools/') > -1);
       expect(hasHref).toEqual(true);
     }
