@@ -6,6 +6,9 @@ import CampusController = require('../../src/controllers/campus.ctrl');
 import CampusService = require('../../src/services/campus.svc');
 import config = require('../../src/config');
 import models = require('../../src/models/models');
+import auth = require('../../src/services/user-auth');
+import q = require('../../src/dbutils/query');
+import r = require('rethinkdb');
 
 function createCampus(req:Restify.Request, res:Restify.Response):Promise<void> {
   return new Promise<void>((resolve, reject) => {
@@ -89,9 +92,16 @@ describe('Campus Controller', () => {
         }
       }
     };
+    var adminID = 'string';
+    var adminIdQuery = r.db("froyo").table("users").filter({isAdmin : true}).coerceTo("array").limit(1);
+    q.run(adminIdQuery)().then( (admin) => {
+      adminID =  admin.id;
 
+      })
     var res = <Restify.Response> {send: fail};
-    var req = <Restify.Request> {};
+    var req = <Restify.Request> {session: {['userID'] : adminID} };
+
+
     req.body = inputJSON;
 
     createCampus(req, res)
