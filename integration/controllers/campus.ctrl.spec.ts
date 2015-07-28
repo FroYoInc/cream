@@ -84,10 +84,10 @@ describe('Campus Controller', () => {
 
 
     var res = <Restify.Response> {send: test0};
-    
+
     var good = new restify();
     good.req = new Request();
-    good.req.session = new Session();  
+    good.req.session = new Session();
     good.req.body = inputJSON;
 
 
@@ -118,7 +118,7 @@ describe('Campus Controller', () => {
   });
 
 
-  xit('should send error when campus name is invalid', (done) => {
+  it('should send error when campus name is invalid', (done) => {
     var inputJSON = {
       'name': '', // name is empty intentionally.
       'address': {
@@ -129,15 +129,24 @@ describe('Campus Controller', () => {
         }
       }
     };
+
     var res = <Restify.Response> {send: fail};
-    var req = <Restify.Request> { };
+
+    var good = new restify();
+    good.req = new Request();
+    good.req.session = new Session();
+    good.req.body = inputJSON;
+
+
+    //var res = <Restify.Response> {send: fail};
+    //var req = <Restify.Request> { };
 
     var adminIdQuery = r.db("froyo").table("users").filter({isAdmin : true}).coerceTo("array").limit(1);
     q.run(adminIdQuery)().then( (admin) => {
-        req.session["userID"] =  admin.id;
-        req.body = inputJSON;
+        good.req.session["userID"] =  admin[0].id;
+        good.req.body = inputJSON;
 
-        createCampus(req, res)
+        createCampus(good.req, res)
           .catch(Restify.BadRequestError, (err) => {
             expect(err.statusCode).toBe(400);
             var msg = 'CampusNameValidationException:';
