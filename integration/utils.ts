@@ -104,7 +104,7 @@ module Utils {
       })
       .then(() => {
         return carpoolSvc.createCarpool(
-          rs(), campus.name, rs(), owner.userName);
+          rs(), campus.name, rs(), owner.userName, gra());
       });
   }
 
@@ -137,6 +137,15 @@ module Utils {
       salt: rs(),
       id: rs()
     }
+  }
+
+  export function gra():models.Address {
+    return {
+      address: "1825 SW Broadway, Portland, OR 97201",
+      geoCode: {
+        long: -122 + Math.random(),
+        lat: 45+Math.random()}
+      }
   }
 }
 export = Utils;

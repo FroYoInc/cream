@@ -528,13 +528,15 @@
                 "name",
                 "description",
                 "campus",
+                "pickupLocation",
                 "owner"
             ],
             "properties": {
                 "name": {"required": true, "type": "string"},
                 "description": {"required": true, "type": "string"},
                 "campus": {"required": true, "type": "string"},
-                "owner": {"required": true, "type": "string"}
+                "owner": {"required": true, "type": "string"},
+                "pickupLocation": {"$ref": "#/definitions/Address"}
             }
         },
         "UpdatedCarpool": {
@@ -579,6 +581,7 @@
                 "participants",
                 "campus",
                 "description",
+                "pickupLocation",
                 "href"
 
             ],
@@ -593,6 +596,7 @@
                 },
                 "campus" : { "$ref": "#/definitions/Campus" },
                 "description" : {"type" : "string"},
+                "pickupLocation" : {"$ref" : "#/definitions/Address"},
                 "href" : {"type" :"string"}
             }
         },

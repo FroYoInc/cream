@@ -197,6 +197,13 @@ describe('Carpool controller', () => {
       'name': 'Corpool',
       'campus': 'PSU',
       'description': 'first carpool',
+      'pickupLocation': {
+        'address': '123 Yo street',
+        'geoCode': {
+          'long': -122.12351,
+          'lat': 42.1234
+        }
+      },
       'owner': owner.userName
     };
 
@@ -207,6 +214,7 @@ describe('Carpool controller', () => {
       expect(outputJSON.owner).toEqual(UserCtrl.toOutputJSON(owner));
       expect(outputJSON.campus).toEqual(CampusCtrl.toOutputJSON(campus));
       expect(outputJSON.participants).toEqual([UserCtrl.toOutputJSON(owner)]);
+      expect(outputJSON.pickupLocation).toEqual(inputJSON.pickupLocation);
       var hasHref = (outputJSON.href.indexOf('/carpools/') > -1);
       expect(hasHref).toEqual(true);
     }
@@ -266,7 +274,8 @@ describe('Carpool controller', () => {
     var req = <restify.Request> {params: {}};
     var res = <restify.Response> {send: test};
 
-    CarpoolSvc.createCarpool('corpool2', 'PSU', '_', owner.userName)
+    CarpoolSvc.createCarpool(
+      'corpool2', 'PSU', '_', owner.userName, utils.gra())
       .then((_carpool) => {
         carpool = _carpool;
         req.params.carpoolid = _carpool.id;
@@ -322,6 +331,7 @@ describe('Carpool controller', () => {
     var carpoolUpdate:CarpoolSvc.CarpoolUpdateModel = {
       'name': 'name updated',
       'description': 'description updated'
+      // TODO: Add pickupLocation
     };
 
     function test(status) {
@@ -331,6 +341,7 @@ describe('Carpool controller', () => {
         .then((updatedCarpool) => {
           expect(updatedCarpool['name']).toEqual(carpoolUpdate.name);
           expect(updatedCarpool['description']).toEqual(carpoolUpdate.description);
+      // TODO: Add pickupLocation
         });
     }
 
@@ -338,7 +349,9 @@ describe('Carpool controller', () => {
     var res = <restify.Response> {send: test};
     req.body = carpoolUpdate;
 
-    CarpoolSvc.createCarpool('update this name', 'PSU', 'update this description', owner.userName)
+    CarpoolSvc.createCarpool(
+      'update this name', 'PSU', 'update this description', owner.userName,
+      utils.gra())
       .then((_carpool) => {
         carpool = _carpool;
         req.params.carpoolID = _carpool.id;
