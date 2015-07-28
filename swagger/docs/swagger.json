@@ -461,11 +461,20 @@
                     "200": {
                         "description": "Success, email sent."
                     },
+                    "400": {
+                        "description": "Bad request, missing or incorrectly named parameter."
+                    },
                     "404": {
                         "description": "Unable to find user data."
                     },
                     "409": {
                         "description": "User is already activated."
+                    },
+                    "423": {
+                        "description": "The account is on a lockout, it will be available to request another email shortly"
+                    },
+                    "500": {
+                        "description": "Internal server error"
                     }
                 }
             }

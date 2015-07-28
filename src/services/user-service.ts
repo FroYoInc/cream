@@ -277,7 +277,7 @@ module UserService {
             if(!_user.isAccountActivated){
               getUserData(_user.id)
               .then( (userData) => {
-                sendIfNotLocked(userData, _user, resolve, reject);
+                sendIfNotLocked(userData,true, _user, resolve, reject);
               })
               .catch(errors.UserDataNotFound, (err) => {
                 var userData = {
@@ -286,7 +286,7 @@ module UserService {
                   numLoginAttempts: 0,
                   lockoutExpiration: 0,
                 };
-                sendIfNotLocked(userData, _user, resolve, reject)
+                sendIfNotLocked(userData,false, _user, resolve, reject)
               })
             }
             else{
@@ -302,7 +302,7 @@ module UserService {
 
     });
 
-    function sendIfNotLocked(userData, user, resolve, reject){
+    function sendIfNotLocked(userData,userDataExists, user, resolve, reject){
       var now = (new Date()).getTime(); // Get the epoch time
       if(userData.activationLockout == undefined || userData.activationLockout <= now ){
         var getActivationQuery = r.db(db)
@@ -315,25 +315,42 @@ module UserService {
         .then( (activation) => {
           if(activation[0] != undefined){
             userData.activationLockout = now + config.Config.activationLock;
-            updateUserData(userData)
-            .then( (userData) => {
-              sendActivation(user, activation[0].id);
-              resolve(true);
-            })
-            .catch(Error, (err) => {
-              reject(err);
-            })
+            if(userDataExists){
+              updateExistingUserData(userData,user,activation, resolve, reject);
+            }
+            else{
+              insertUserData(userData,user,activation, resolve, reject);
+            }
           }
           else{
-            throw new errors.ActivationDataNotFoundException();
+            reject(new errors.ActivationDataNotFoundException());
           }
         });
       }
       else{
-        throw new errors.ActivationSendLockException();
+        reject(new errors.ActivationSendLockException());
       }
     }
-
+    function insertUserData(userData,user,activation, resolve, reject){
+      createUserData(userData)
+      .then( (userData) => {
+        sendActivation(user, activation[0].id);
+        resolve(true);
+      })
+      .catch(Error, (err) => {
+        reject(err);
+      })
+    }
+    function updateExistingUserData(userData,user,activation, resolve, reject){
+      updateUserData(userData)
+      .then( (userData) => {
+        sendActivation(user, activation[0].id);
+        resolve(true);
+      })
+      .catch(Error, (err) => {
+        reject(err);
+      })
+    }
     function sendActivation(user, activationCode) {
       var emailService = new EmailService.EmailService();
 
