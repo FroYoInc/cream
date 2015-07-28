@@ -14,6 +14,11 @@ module Errors {
       this.stack = (<any>new Error()).stack;
     }
   }
+  export class MissingParametersException extends Exception {
+    constructor(message: string) {
+      super(message, 'MissingParametersException');
+    }
+  }
   export class UserExistException extends Exception {
     constructor() {
       super('user already exist', 'UserExistException');
@@ -38,6 +43,52 @@ module Errors {
     constructor(message: string) {
       super(message, 'EmailValidationException');
     }
+  }
+  export class CarpoolNameValidationException extends Exception {
+    constructor() {
+      super('invalid carpool name', 'CarpoolNameValidationException');
+    }
+  }
+  export class CarpoolNotFoundException extends Exception {
+    constructor() {
+      super('carpool not found', 'CarpoolNotFoundException');
+    }
+  }
+  export class CarpoolOwnerNotFoundException extends Exception {
+    constructor() {
+      super('carpool owner user not found', 'CarpoolOwnerNotFoundException');
+    }
+  }
+  export class CarpoolExistException extends Exception {
+    constructor() {
+      super('carpool already exist', 'CarpoolExistException');
+    }
+  }
+  export class CarpoolParticipantNotFoundException extends Exception {
+    constructor() {
+      super('carpool participant not found', 'CarpoolParticipantNotFoundException');
+    }
+  }
+  export class CarpoolParticipantAlreadyInCarpoolExecption extends Exception {
+    constructor() {
+      super('carpool participant already in carpool', 'CarpoolParticipantAlreadyInCarpoolException');
+    }
+  }
+  //campus name should not be empty
+  export class CampusNameValidationException extends Exception {
+    constructor() {
+      super('invalid campus name', 'CampusNameValidationException');
+    }
+  }
+  export class CampusNotFoundException extends Exception {
+    constructor() {
+      super('No campus found with the specified name or ID.', 'CampusNotFoundException');
+    }
+  }
+  export class CampusNameExistsException extends Exception {
+      constructor() {
+          super('The campus name is already in use.', 'CampusNameExistsException');
+      }
   }
   export class InvalidActivationCodeException extends Exception {
     constructor() {
@@ -94,5 +145,38 @@ module Errors {
       super(message, 'BcryptHashError');
     }
   }
+
+
+  export class CarpoolRequestConflictException extends Exception {
+    constructor(){
+      super("User already has a pending request to join this carpool",
+      'CarpoolRequestConflict');
+    }
+  }
+  export class CarpoolRequestNotFoundException extends Exception {
+    constructor(){
+      super("The user request to join a carpool is not found",
+      'CarpoolRequestNotFoundException');
+    }
+  }
+
+  export class UserAlreadyInCarpool extends Exception {
+    constructor(){
+      super("The user is already in the carpool.", 'UserAlreadyInCarpoolExceoption');
+    }
+  }
+
+  export class CarpoolJoinRequestSendException extends Exception {
+    constructor(message){
+      super(message, 'UserAlreadyInCarpool');
+    } 
+  }
+
+  export class UserNotInCarpool extends Exception {
+    constructor(){
+      super("User must be a member to update carpool.", 'UserNotInCarpool');
+    }
+  }
+
 }
 export = Errors

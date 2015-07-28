@@ -72,6 +72,38 @@ export class EmailService {
     });
   }
 
+
+  /**
+   * Sends a notification to the owner of a carpool letting them know that a user wishes to join
+   *
+   * @param  {models.Carpool}                         carpool           The carpool to join.
+   * @return {Promise<nodemailer.SentMessageInfo>}                A Promise.
+   */
+  public sendRequestToJoin(carpool: models.Carpool): Promise<nodemailer.SentMessageInfo> {
+
+    var transporter = this.buildTransporter();
+
+    var mailOptions = {
+      from: config.Config.email.name + ' <' + config.Config.email.auth.user + '>',
+      to: carpool.owner.email,
+      subject: 'A user is requesting to join ' + carpool.name,
+      text: "A user has requested to join your carpool, " + carpool.name + ".  Please log in and approve or deny their request."
+    };
+
+    return new Promise<nodemailer.SentMessageInfo>((resolve, reject) => {
+
+      transporter.sendMail(mailOptions, (error, sent) => {
+        if (error)
+        {
+          reject(new errors.CarpoolJoinRequestSendException(error.message));
+          return;
+        }
+
+        resolve(sent);
+      });
+    });
+  }
+
   /**
    * Builds an instance of a Transporter to be used with nodemailer to send
    * an email.

@@ -14,7 +14,51 @@
         "application/json"
     ],
     "paths": {
-        "/users/login": {
+
+        "/api/campuses": {
+          "post":  {
+              "summary": "Creates a Campus.",
+              "description": "\nThis endpoint takes campus name and address in a JSON object and creates a campus.",
+              "parameters": [
+                  {
+                      "name": "Campus",
+                      "in": "body",
+                      "description": "JSON object containing Campus name and address.",
+                      "required": true,
+                      "schema": {
+                          "$ref": "#/definitions/NewCampus"
+                      }
+                  }
+              ],
+              "tags": [
+                  "Campus"
+              ],
+              "responses": {
+                  "201": {
+                      "description": "Campus created successfully.",
+                      "schema": {
+                          "$ref": "#/definitions/Campus"
+                      }
+                  },
+                  "400": {
+                    "description": "Insufficient parameters."
+                  },
+                  "409": {
+                      "description": "Campus already exists."
+                  },
+                  "500": {
+                      "description": "Internal server error."
+                  }
+              }
+          },
+          "get": {
+            "summary": "\n Returns all campuses.",
+            "description": "\n This end point returns an array of all campuses.",
+            "tags": ["Campus"]
+          }
+        },
+
+        "/api/users/login": {
             "post": {
                 "summary": "Log the user in.",
                 "description": "\n This end point takes a user's email and password in a JSON object and then attempts to log them in and create a session object for them.",
@@ -57,7 +101,7 @@
                 }
             }
         },
-        "/users/logout": {
+        "/api/users/logout": {
             "get": {
                 "summary": "Logout the user.",
                 "description": "\nDestroys the current user's session and redirects them to '/' ",
@@ -74,7 +118,7 @@
                 }
             }
         },
-        "/users": {
+        "/api/users": {
             "post": {
                 "summary": "Creates a user account.",
                 "description": "\nThis endpoint takes the user's userName, firstName, lastName, email and password in a JSON object and creates an account for them.",
@@ -112,7 +156,7 @@
             }
         },
 
-        "/activate/{activationCode}": {
+        "/api/activate/{activationCode}": {
             "get": {
                 "summary" : "Activates User account",
                 "description" : "\nThis endpoint takes random generated activation code from email link and switches the _isAccountActivated value from false to true, to call this endpoint make a get request to /activation/activationCode where activationCode is the code you wish to user for activation.",
@@ -132,10 +176,306 @@
                     }
                 }
             }
+        },
+        "/api/carpools": {
+            "post": {
+                "summary": "Creates a Carpool.",
+                "description": "\nThis endpoint takes Carpool name, campusName, owner and description in a JSON object and creates a carpool.",
+                "parameters": [
+                    {
+                        "name": "NewCarpool",
+                        "in": "body",
+                        "description": "JSON object containing Carpool name, campus name, owner and description.",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/NewCarpool"
+                        }
+                    }
+                ],
+                "tags": [
+                    "Carpool"
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Carpool created successfully.",
+                        "schema": {
+                            "$ref": "#/definitions/Carpool"
+                        }
+                    },
+                    "406": {
+                        "description": "Carpool owner or campus not found"
+                    },
+                    "409": {
+                        "description": "Carpool already exists."
+                    },
+                    "500": {
+                        "description": "Internal server error."
+                    }
+                }
+            },
+          "get": {
+            "summary": "\n Returns all Carpools.",
+            "description": "\n This end point returns an array of Carpools.",
+            "tags": ["Carpool"],
+            "responses": {
+                "200": {
+                    "description": "Retrieves list of carpools",
+                    "schema": {
+                        "$ref": "#/definitions/Carpool"
+                    }
+                },
+                "500": {
+                    "description": "Internal server error."
+                }
+            }
+          }
+        },
+        "/api/carpools/{carpoolid}": {
+            "get": {
+                "summary" : "Get Carpool by id",
+                "description" : "\nThis endpoint retrieves a single Carpool given its id",
+                "parameters": [
+                    {
+                        "name": "carpoolid",
+                        "in": "path",
+                        "description": "Carpool id",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "tags" : ["Carpool"],
+                "responses" : {
+                    "500" : {
+                        "description" : "Internal server error"
+                    },
+                    "404" : {
+                        "description" : "Carpool with given id not found"
+                    },
+                    "200": {
+                        "description" : "Carpool found",
+                        "schema": {
+                            "$ref": "#/definitions/Carpool"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "summary" : "Update Carpool by id",
+                "description" : "\nThis endpoint updates a Carpool given the carpool ID and a JSON object containing any updated fields.",
+                "parameters": [
+                    {
+                        "name": "carpoolID",
+                        "in": "path",
+                        "description": "Carpool ID",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "UpdatedCarpool",
+                        "in": "body",
+                        "description": "JSON object containing new Carpool name, campus name, and/or description.",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/UpdatedCarpool"
+                        }
+                    }
+                ],
+                "tags" : ["Carpool"],
+                "responses" : {
+                    "500" : {
+                        "description" : "Internal server error"
+                    },
+                    "404" : {
+                        "description" : "Carpool with given ID not found"
+                    },
+                    "204": {
+                        "description" : "Carpool updated"
+                    }
+                }
+            }
+        },
+        "/api/carpools/request": {
+            "post": {
+                "summary": "Request to join carpool",
+                "description": "\nMakes a request for the user to join a carpool ",
+                "parameters": [
+                    {
+                        "name": "carpoolRequest",
+                        "in": "body",
+                        "description": "The id of the carpool that the user wishes to join",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/carpoolRequest"
+                        }
+                    }
+                ],
+                "tags": [
+                    "Carpool"
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Request successfully created."
+                    },
+                    "400": {
+                        "description": "No carpool id provided."
+                    },
+                    "401": {
+                        "description": "Unauthorized attempt, user must be logged in to make a request."
+                    },
+                    "409": {
+                        "description": "Conflict error.  User already has a request to join this carpool."
+                    },
+                    "500" : {
+                        "description" : "Internal Server error. Unable to make request"
+                    }
+                }
+            }
+        },
+
+        "/api/carpools/addUser": {
+            "post": {
+                "summary": "Approves the user's request to join a carpool",
+                "description": "\nAdd's a user to a carpool.  The user attempting to add a member, must be logged in and a member of the carpool.",
+                "parameters": [
+                    {
+                        "name": "carpoolApproval",
+                        "in": "body",
+                        "description": "The id of the carpool that the user wishes to join, and the id of the user to add.",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/carpoolApproval"
+                        }
+                    }
+                ],
+                "tags": [
+                    "Carpool"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User added successfully."
+                    },
+                    "400": {
+                        "description": "One or more missing parameters"
+                    },
+                    "401": {
+                        "description": "Unauthorized attempt, user must be logged in."
+                    },
+                    "403": {
+                        "description": "Forbidden. The user must be a member of a carpool to add members."
+                    },
+                    "404": {
+                        "description": "Missing Resource. Unable to locate either the request, the user, or the carpool. "
+                    },
+                    "409": {
+                        "description": "Conflict error.  User is already a member of the carpool."
+                    },
+                    "500" : {
+                        "description" : "Internal Server error. Unable to make request"
+                    }
+                }
+            }
+        },
+
+        "/api/carpools/denyUser": {
+            "post": {
+                "summary": "Reject's the user's request to join",
+                "description": "\nDeny a user's request to join a carpool, and remove the request. The user denying the request, must be signed in and a member of the carpool.",
+                "parameters": [
+                    {
+                        "name": "carpoolDenial",
+                        "in": "body",
+                        "description": "The id of the carpool that the user wishes to join, and the id of the user to deny.",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/carpoolDenial"
+                        }
+                    }
+                ],
+                "tags": [
+                    "Carpool"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User request denied successfully."
+                    },
+                    "400": {
+                        "description": "One or more missing parameters"
+                    },
+                    "401": {
+                        "description": "Unauthorized attempt, user must be logged in."
+                    },
+                    "403": {
+                        "description": "Forbidden. The user must be a member of a carpool to deny members."
+                    },
+                    "404": {
+                        "description": "Request not found."
+                    },
+                    "500" : {
+                        "description" : "Internal Server error. Unable to make request"
+                    }
+                }
+            }
+        },
+        "/api/carpools/requests": {
+            "get": {
+                "summary": "Gets carpool join requests",
+                "description": "\nGets all of the join requests for all the carpools that a user is a member of.",
+                "tags": ["Carpool"],
+                "responses": {
+                    "200": {
+                        "description": "Success, notifications sent.",
+                        "schema": {
+                            "$ref": "#/definitions/notifications"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized attempt, user must be logged in."
+                    },
+                    "404": {
+                        "description": "User not found."
+                    },
+                    "500" : {
+                        "description" : "Internal Server error. Unable to make request"
+                    }
+                }
+            }
         }
 
     },
     "definitions": {
+        "NewCampus": {
+          "required": [
+            "name",
+            "address"
+          ],
+          "properties": {
+            "name": {"required": true, "type": "string"},
+            "address": { "$ref": "#/definitions/Address"}
+          }
+        },
+
+        "Campus": {
+          "required": [
+            "name",
+            "address",
+            "href"
+          ],
+          "properties": {
+            "name": {"required": true, "type": "string"},
+            "address": { "$ref": "#/definitions/Address"},
+            "href": {"required": true, "type": "string"}
+          }
+        },
+        "Address": {
+          "required": [
+            "address",
+            "geoCode"
+          ],
+          "properties": {
+            "address": {"required": true, "type": "string"},
+            "geoCode": {"$ref": "#/definitions/GeoCode"}
+          }
+        },
         "NewAccountInfo": {
             "required": [
                 "userName",
@@ -152,6 +492,60 @@
                 "password": {"required": true, "type": "string"}
             }
         },
+        "carpoolRequest" : {
+            "required": [
+                "carpoolID"
+            ],
+            "properties" : {
+                "carpoolID" : { "required": true, "type" :"string"}
+            }
+        },
+        "carpoolApproval" : {
+            "required": [
+                "carpoolID",
+                "userToAddID"
+            ],
+            "properties" : {
+                "carpoolID" : { "required": true, "type" :"string"},
+                "userToAddID" : { "required": true, "type" :"string"}
+
+            }
+        },
+        "carpoolDenial" : {
+            "required": [
+                "carpoolID",
+                "userToDenyId"
+
+            ],
+            "properties" : {
+                "carpoolID" : { "required": true, "type" :"string"},
+                "userToDenyId" : { "required": true, "type" :"string"}
+
+            }
+        },
+        "NewCarpool": {
+            "required": [
+                "name",
+                "description",
+                "campus",
+                "pickupLocation",
+                "owner"
+            ],
+            "properties": {
+                "name": {"required": true, "type": "string"},
+                "description": {"required": true, "type": "string"},
+                "campus": {"required": true, "type": "string"},
+                "owner": {"required": true, "type": "string"},
+                "pickupLocation": {"$ref": "#/definitions/Address"}
+            }
+        },
+        "UpdatedCarpool": {
+            "properties": {
+                "name": {"type": "string"},
+                "description": {"type": "string"},
+                "campus": {"type": "string"}
+            }
+        },
         "LoginInfo" : {
             "required": [
                 "email",
@@ -164,7 +558,7 @@
         },
         "User": {
             "required": [
-                "userID",
+                "href",
                 "firstName",
                 "lastName",
                 "userName",
@@ -172,7 +566,7 @@
 
             ],
             "properties" : {
-                "userID" : {"type" :"string"},
+                "href" : {"type" :"string"},
                 "firstName" : {"type" :"string"},
                 "lastName" : {"type" :"string"},
                 "userName" : {"type" :"string"},
@@ -183,15 +577,18 @@
         "Carpool" : {
             "required": [
                 "name",
-                "users",
+                "owner",
+                "participants",
                 "campus",
                 "description",
-                "id"
+                "pickupLocation",
+                "href"
 
             ],
             "properties" : {
                 "name" : {"type" : "string"},
-                "users": {
+                "owner": {"$ref": "#/definitions/User"},
+                "participants": {
                     "type": "array",
                     "items" : {
                         "$ref" :"#/definitions/User"
@@ -199,29 +596,18 @@
                 },
                 "campus" : { "$ref": "#/definitions/Campus" },
                 "description" : {"type" : "string"},
-                "id" : {"type" :"string"}
-            }
-        },
-        "Campus" : {
-            "required": [
-                "name",
-                "id",
-                "location"
-            ],
-            "properties" : {
-                "name" : {"type" :"string"},
-                "id" : {"type" :"string"},
-                "location" : {"$ref":"#/definitions/GeoCode"}
+                "pickupLocation" : {"$ref" : "#/definitions/Address"},
+                "href" : {"type" :"string"}
             }
         },
         "GeoCode": {
             "required": [
-                "x",
-                "y"
+                "long",
+                "lat"
             ],
             "properties" : {
-                "x" : {"type" :"number"},
-                "y" : {"type" :"number"}
+                "long" : {"type" :"number"},
+                "lat" : {"type" :"number"}
             }
         },
         "Error": {
@@ -237,6 +623,23 @@
                     "type": "string"
                 }
             }
+        },
+        "notifications" : {
+                "type" : "array",
+                "items" : {
+                    "$ref" :"#/definitions/notification"
+                }
+
+        },
+        "notification" : {
+            "properties": {
+                "carpoolID" : {"type": "string"},
+                "firstName" : {"type": "string"},
+                "lastName" : {"type": "string"},
+                "userID" : {"type": "string"},
+                "carpoolName" : {"type": "string"}
+            }
+
         }
     }
 }

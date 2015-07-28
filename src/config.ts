@@ -9,6 +9,11 @@ export class Config {
     'baseurl' : 'http://localhost'
   };
 
+  static statsd = {
+    'host': '107.170.251.172',
+    'port': 8125
+  };
+
   static password = {
     salt: {
       rounds: 10

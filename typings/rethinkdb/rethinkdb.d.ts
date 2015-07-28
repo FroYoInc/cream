@@ -35,6 +35,10 @@ declare module "rethinkdb" {
 
   // Control Structures
   export function branch(test:Expression<boolean>, trueBranch:Expression<any>, falseBranch:Expression<any>):Expression<any>;
+  export function branch(test:Expression<boolean>, trueBranch:Operation<any>, falseBranch:Expression<any>):Expression<any>;
+  export function branch(test:Expression<boolean>, trueBranch:Expression<any>, falseBranch:Operation<any>):Expression<any>;
+  export function branch(test:Expression<boolean>, trueBranch:Operation<any>, falseBranch:Operation<any>):Expression<any>;
+  export function branch(test:Expression<boolean>, trueBranch:any, falseBranch:any):Expression<any>;
 
 
 
@@ -81,6 +85,7 @@ declare module "rethinkdb" {
   }
 
   interface Writeable {
+    update(obj:Object, options?:UpdateOptions):Expression<any>;
     update(obj:Object, options?:UpdateOptions):Operation<WriteResult>;
     replace(obj:Object, options?:UpdateOptions):Operation<WriteResult>;
     replace(expr:ExpressionFunction<any>):Operation<WriteResult>;
@@ -97,17 +102,23 @@ declare module "rethinkdb" {
     insert(obj:any, options?:InsertOptions):Expression<any>;
 
     get(key:string):Sequence; // primary key
+    get(arg:Expression<any>):Sequence; // primary key
     getAll(key:string, index?:Index):Sequence; // without index defaults to primary key
     getAll(...keys:string[]):Sequence;
   }
 
   interface Sequence extends Operation<Cursor>, Writeable {
 
+    get(key:string):Sequence; // primary key
+    eq(v:any):Expression<boolean>;
+    get(arg:Expression<any>):Sequence; // primary key
     between(lower:any, upper:any, index?:Index):Sequence;
     filter(rql:ExpressionFunction<boolean>):Sequence;
     filter(rql:Expression<boolean>):Sequence;
     filter(obj:{[key:string]:any}):Sequence;
-
+    merge(any);
+    getField(a:string):Expression<any>;
+    forEach(a:any):any;
 
     // Join
     // these return left, right
@@ -203,6 +214,8 @@ declare module "rethinkdb" {
 
   interface Expression<T> extends Writeable, Operation<T> {
       (prop:string):Expression<any>;
+      map(a:any):Expression<any>;
+      map(transform:ExpressionFunction<any>):Sequence;
       merge(query:Expression<Object>):Expression<Object>;
       append(prop:string):Expression<Object>;
       contains(prop:string):Expression<boolean>;

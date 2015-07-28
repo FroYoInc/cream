@@ -18,8 +18,20 @@ module DBUtils {
         indices: []
       },
       {
+        tableName: 'carpools',
+        indices: ['name', 'pickupLocation.geoCode']
+      },
+      {
+        tableName: 'campuses',
+        indices: ['name']
+      },
+      {
         tableName: 'activation',
         indices: []
+      },
+      {
+        tableName : "requests",
+        indices: ["carpoolID"]
       }]
     };
     private _conn : r.Connection;

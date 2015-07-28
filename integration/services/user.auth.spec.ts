@@ -15,8 +15,10 @@ class Request {
   session: Session;
 }
 
+
 class Response {
   session: Session;
+  send: any;
 }
 
 class Restify {
@@ -24,11 +26,13 @@ class Restify {
   res: Response;
 }
 
+
+
 describe('UserAuth', () => {
 
   var good =  new Restify();
   good.req = new Request();
-  good.req = new Response();
+  good.res = new Response();
   good.req.session = new Session();
   good.req.session["userID"] = 1;
   good.req.session["firstName"] = "Peter";
@@ -50,6 +54,8 @@ describe('UserAuth', () => {
   var salt = bcrypt.genSaltSync(10);
   var hash = bcrypt.hashSync(password, salt);
 
+  var res = new Response();
+
   goodUser = {
         id: '123456789',
         firstName: 'Peter',
@@ -57,6 +63,7 @@ describe('UserAuth', () => {
         userName: 'pHiggs',
         email: utils.validEmail('higgs'),
         isAccountActivated: true,
+        carpools: [],
         passwordHash: hash,
         salt: salt
   };
@@ -68,6 +75,7 @@ describe('UserAuth', () => {
         userName: 'bNye',
         email: utils.validEmail('bNye'),
         isAccountActivated: false,
+        carpools: [],
         passwordHash: hash,
         salt: salt
   };
@@ -78,6 +86,7 @@ describe('UserAuth', () => {
         userName: 'pHiggs',
         email: utils.validEmail('thisEmailIsNotInTheDB'),
         isAccountActivated: false,
+        carpools: [],
         passwordHash: '12345',
         salt: 'andPepper'
   };
@@ -100,10 +109,8 @@ describe('UserAuth', () => {
   var test500 = (result) => {expect(result).toBe(500);}
 
 
-
-
-  function checkAuth(req){
-    return userAuth.checkAuth(req);
+  function checkAuth(req,res, next){
+    return userAuth.checkAuthMiddle(req,res,next);
   }
 
   function revokeSessions(req){
@@ -119,17 +126,19 @@ describe('UserAuth', () => {
   }
 
   it('should verify a valid user session', (done) => {
-      checkAuth(good.req)
-      .then(testTrue)
-      .error(fail)
-      .finally(done);
+    res.send = (status, message) => {
+      expect(status).toBe(401);
+      done();
+    }
+    checkAuth(good.req, res, done)
   });
 
   it('should not verify an invalid user session', (done) => {
-      checkAuth(bad.req)
-      .then(testFalse)
-      .error(fail)
-      .finally(done);;
+    res.send = (status, message) => {
+      expect(status).toBe(401);
+      done();
+    }
+    checkAuth(bad.req, res, done)
   });
 
   it('should create a user session when given a valid user object', (done) => {
@@ -142,7 +151,7 @@ describe('UserAuth', () => {
   it('should authenticate a valid user login', (done) => {
 
       query.run(
-          r.db('froyo').table('users').insert(goodUser)
+          r.db('froyo').table('users').insert(goodUser,{conflict:"error"})
       )()
         .then( () => {
           query.run(

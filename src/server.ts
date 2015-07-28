@@ -10,8 +10,8 @@ import models = require('./models/models');
 import user = require('./models/user');
 import Promise = require('bluebird');
 import sessions = require('express-session');
-import auth = require('./services/user-auth');
 import userSer = require('./services/user-service');
+import requestService = require('./services/request-service');
 
 var RDBStore = new (require('session-rethinkdb'))(sessions);
 
@@ -58,14 +58,6 @@ server.use(sessions({
 server.use(restify.bodyParser());
 
 var routes = new (require('./routes'))(server);
-
-server.get('/flavors', function(req, res, next) {
-  var flavors : string[] = ['Peanut Butter', 'Cookies N Cream', 'Cake Batter'];
-  res.send({'flavors': flavors});
-  next();
-});
-
-server.post('/users', Controller.createUser);
 
 server.listen(c.Config.app.port, function() {
   console.log('> %s listening on %s', server.name, server.url);

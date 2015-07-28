@@ -1,21 +1,31 @@
 module Models {
+
   export interface GeoCode {
-    x: number;
-    y: number;
+    lat: number;
+    long: number;
+  }
+
+  export interface Address {
+    address: string;
+    geoCode: GeoCode;
   }
 
   export interface Campus {
     name: string;
-    id: string;
-    location: Models.GeoCode
+    address: Address;
+    id?: string;
   }
 
   export interface Carpool {
     name: string;
-    users: Array<Models.User>;
+    owner: User; // The user id of the owner
+    // Owner is a participant by default. Hence participants have at least 1
+    // user
+    participants: [User]; // An array of user ids
     campus: Campus;
     description: string;
-    id: string;
+    pickupLocation: Address;
+    id?: string;
   }
 
   export interface User {
@@ -24,10 +34,11 @@ module Models {
     userName: string;
     email: string;
     isAccountActivated: boolean;
+    carpools: Array<Carpool>;
     passwordHash: string;
     salt: string;
     id?: string;
-    carpools?: Array<Models.Carpool>;
+    // carpools?: Array<Models.Carpool>;
   }
 
   export interface UserData {
