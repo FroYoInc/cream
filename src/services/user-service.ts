@@ -10,7 +10,7 @@ import models = require('../models/models');
 import errors = require('../errors/errors');
 import config = require('../config');
 import assert = require('assert');
-
+import bcrypt = require('bcrypt');
 
 module UserService {
 
@@ -269,6 +269,47 @@ module UserService {
     return q.run(insertUserData, 'createUserData')()
       .then(() => {return userData});
   }
+
+  export function changeUserPassword(email:string, newPassword: string, 
+                                     sendResetEmail?: (u:models.User, p:string) => any)
+                                    : Promise<boolean>{
+    return new Promise<boolean>((resolve, reject) => {
+      getUserByEmail(email)
+      .then( (_user) => {
+        var user = _user;
+        createNewSaltAndHash(_user, newPassword)
+        .then(updateUser)
+        .then( (_user) => {
+          if(sendResetEmail){
+            sendResetEmail(_user, newPassword);
+          }
+          resolve(_user.salt !== user.salt && _user.passwordHash !== user.passwordHash);
+        })
+        .catch(Error, reject);
+      })
+      .catch(errors.UserNotFoundException, reject)
+    });
+
+    function createNewSaltAndHash(user:models.User, password:string): Promise<models.User>{
+      return new Promise<models.User>((resolve, reject) => {
+          bcrypt.genSalt(config.Config.password.salt.rounds, (err, salt)=>{
+            if(err){
+              throw new errors.BcryptSaltError(err.message);
+            }
+            user.salt = salt;
+            bcrypt.hash(password, user.salt, (err, hash) =>{
+              if(err){
+                throw new errors.BcryptHashError(err.message);
+              }
+              user.passwordHash = hash;
+              resolve(user);
+            });
+          });
+      });
+    }
+
+  }
+
 }
 
 export = UserService;
