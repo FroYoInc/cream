@@ -290,7 +290,7 @@ module UserService {
               })
             }
             else{
-              throw new errors.UserAlreadyActivatedException();
+              reject(new errors.UserAlreadyActivatedException());
             }
           })
           .catch(errors.UserNotFoundException, (err) => {

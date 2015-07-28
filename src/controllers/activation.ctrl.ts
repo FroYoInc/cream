@@ -49,9 +49,6 @@ module ActivationController {
           .catch(errors.EmailValidationException, (err) => {
             resolve(404);
           })
-          .catch(errors.UserDataNotFound, (err) => {
-            resolve(404);
-          })
           .catch(errors.ActivationSendLockException, (err) => {
             resolve(423);
           })
