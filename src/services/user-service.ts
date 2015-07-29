@@ -191,7 +191,7 @@ module UserService {
       .then(returnUser)
   }
 
-  function updateUser(user:models.User):Promise<models.User> {
+  export function updateUser(user:models.User):Promise<models.User> {
     assert.equal((user.id !== null), true,
       "Trying to update a user that doesn't have an id");
     var updateUserQuery = r.db(db)
@@ -276,6 +276,7 @@ module UserService {
             resolve(_user.carpools.length >= 1);
           })
           .catch(errors.UserNotFoundException, (err) => {
+            console.log(err.message);
             reject(err);
           });
     }); 

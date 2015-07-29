@@ -60,7 +60,7 @@ module CarpoolController {
             .then(next);
         }
         else{
-          next(new restify.ForbiddenError("A user is not allowed to belong to more than one carpool"));
+          next(new restify.ForbiddenError("User alredy in a carpool."));
         }
       })
       .catch(errors.UserNotFoundException, (err) => {

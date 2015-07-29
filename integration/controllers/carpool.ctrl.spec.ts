@@ -233,7 +233,6 @@ describe('Carpool controller', () => {
     rest.req = new Request();
     rest.req.session = new Session();
     var req = rest.req;
-    var req2 = rest.req;
     var res = <restify.Response> {send: test};
     req.body = inputJSON;
     var userName = utils.rs();
@@ -242,24 +241,12 @@ describe('Carpool controller', () => {
     userService.createUser(rs(), rs(),userName, utils.em(),rs(), rs())
     .then( (user) =>{
       req.session["userID"] = user.id;
-      userService.createUser(rs(), rs(),rs(), utils.em(),rs(), rs())
-      .then( (user) => {
-        req2.session["userID"] = user.id;
-        runTest();
-      })  
+      runTest()
     })
 
     // Then attempt to create a carpool with that user
     function runTest(){
-      createCarpool(req2, res)
-        // Test carpool cannot be created with an invalid owner
-        .then(() => {
-          return createCarpool(req2, res);
-        })
-        .catch(restify.ForbiddenError, (err) => {
-          expect(err.message).toBe("A user is not allowed to belong to more than one carpool");
-          return utils._catch();
-        })
+      createCarpool(req, res)
         .then(() => {
           res.send = () => {};
           req.body.owner = 'non-existant-username';
@@ -298,6 +285,54 @@ describe('Carpool controller', () => {
         .error(fail)
         .finally(done);
     }
+  });
+
+  it('should not create a carpool if a user already has a carpool', (done) => {
+    var userName = utils.rs();
+    var inputJSON = {
+      'name': 'SomeRandomCarpool',
+      'campus': 'PSU',
+      'description': 'first carpool',
+      'pickupLocation': {
+        'address': '123 Yo street',
+        'geoCode': {
+          'long': -122.12351,
+          'lat': 42.1234
+        }
+      },
+      'owner': userName
+    };
+
+    var rest = new Restify();
+    rest.req = new Request();
+    rest.req.session = new Session();
+    var req = rest.req;
+    var res = <restify.Response> {send: (status, outputJSON) => { expect(status).toBe(201); }};
+    req.body = inputJSON;
+    var rs = () => {return utils.rs()};
+    
+    userService.createUser(rs(), rs(),userName, utils.em(),rs(), rs())
+    .then( (user) =>{
+      req.session["userID"] = user.id;
+      runTest(req);
+    });
+    
+    function runTest(req){
+      createCarpool(req, res)
+      .then( (result) => {
+        setTimeout(myFunction, 100);
+        function myFunction(){
+          createCarpool(req, res)
+          .then(fail)
+          .catch(restify.ForbiddenError, (err) => {
+            expect(err.message).toBe("User alredy in a carpool.");
+          })
+          .finally(done);          
+        }
+
+      })
+    }
+
   });
 
   it('should retrieve carpool by id', (done) => {
