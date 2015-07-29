@@ -241,7 +241,7 @@ describe('Carpool controller', () => {
     userService.createUser(rs(), rs(),userName, utils.em(),rs(), rs())
     .then( (user) =>{
       req.session["userID"] = user.id;
-      runTest()
+      runTest();
     })
 
     // Then attempt to create a carpool with that user
@@ -447,10 +447,15 @@ describe('Carpool controller', () => {
 
 
   it('should create a request', (done) => {
+    userService.createUser(utils.rs(), utils.rs(), utils.rs(), utils.em(),utils.rs(),utils.rs())
+    .then( (user) => {
+      good.req.session["userID"] = user.id;
       requestToJoin(good.req)
       .then(test201)
       .error(fail)
       .finally(done);
+    })
+
   });
 
   it('should fail to create a request when parameters are missing.', (done) => {
@@ -500,25 +505,26 @@ describe('Carpool controller', () => {
   });
 
   it('should approve a request', (done) => {
-
-    query.run(
-        r.db('froyo').table('users').insert(goodUser,{conflict:"replace"})
-    )()
-      .then(() => {
         approveRequest(good.req)
         .then(test403)
         .then(()=>{
+          member.req.params.userToAddID = good.req.session["userID"]
           approveRequest(member.req)
           .then(test200)
           .finally(done);
         })
 
-      });
+  });
 
+  it('should fail to make a request when a user is already in a carpool', (done) => {
+    requestToJoin(good.req)
+    .then(test403)
+    .error(fail)
+    .finally(done);
   });
 
   it('should fail to approve a non existent request', (done) => {
-    approveRequest(good.req)
+    approveRequest(member.req)
     .then(test404)
     .finally(done);
   });
@@ -559,7 +565,7 @@ describe('Carpool controller', () => {
           })
         })
       })
-    })
+    });
 
   });
 

@@ -202,6 +202,9 @@
                             "$ref": "#/definitions/Carpool"
                         }
                     },
+                    "403": {
+                        "description": "User already in a carpool."
+                    },
                     "406": {
                         "description": "Carpool owner or campus not found"
                     },
@@ -318,6 +321,9 @@
                     },
                     "400": {
                         "description": "No carpool id provided."
+                    },
+                    "403": {
+                        "description": "User already in a carpool."
                     },
                     "401": {
                         "description": "Unauthorized attempt, user must be logged in to make a request."
