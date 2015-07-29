@@ -269,6 +269,17 @@ module UserService {
     return q.run(insertUserData, 'createUserData')()
       .then(() => {return userData});
   }
+  export function userAlreadyHasCarpool(userID:string) : Promise<boolean>{
+    return new Promise<boolean> ( (resolve, reject) => {
+      getUserById(userID)
+          .then( (_user) => {
+            resolve(_user.carpools.length >= 1);
+          })
+          .catch(errors.UserNotFoundException, (err) => {
+            reject(err);
+          });
+    }); 
+  }
 }
 
 export = UserService;

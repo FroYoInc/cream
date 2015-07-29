@@ -1,6 +1,7 @@
 import restify = require('restify')
 import carpoolService = require('../services/carpool.svc')
 import userCtrl = require('./create-user.ctrl');
+import userService = require('../services/user-service');
 import campusCtrl = require('./campus.ctrl');
 import models = require('../models/models');
 import errors = require('../errors/errors');
@@ -35,25 +36,40 @@ module CarpoolController {
       var owner:string = req.body.owner;
       var pickupLocation:models.Address = req.body.pickupLocation;
 
-      carpoolService.createCarpool(
-        carpoolName, campusName, description, owner, pickupLocation)
-        .then((carpool) => {
-          res.send(201, toOutputJSON(carpool));
-        })
-        .catch(errors.CarpoolOwnerNotFoundException,
-          errors.CampusNotFoundException, (err) => {
-          next(new restify.NotAcceptableError(err.message));
-        })
-        .catch(errors.CarpoolExistException, (err) => {
-          next(new restify.ConflictError(err.message));
-        })
-        .catch((err) => {
-          next(new restify.InternalServerError(err.message));
-        })
-        .error((err) => {
-          next(new restify.InternalServerError(err.message));
-        })
-        .then(next);
+      userService.userAlreadyHasCarpool(req.session["userID"])
+      .then( (result) => {
+        if(!result){
+          carpoolService.createCarpool(
+            carpoolName, campusName, description, owner, pickupLocation)
+            .then((carpool) => {
+              res.send(201, toOutputJSON(carpool));
+            })
+            .catch(errors.CarpoolOwnerNotFoundException,
+              errors.CampusNotFoundException, (err) => {
+              next(new restify.NotAcceptableError(err.message));
+            })
+            .catch(errors.CarpoolExistException, (err) => {
+              next(new restify.ConflictError(err.message));
+            })
+            .catch((err) => {
+              next(new restify.InternalServerError(err.message));
+            })
+            .error((err) => {
+              next(new restify.InternalServerError(err.message));
+            })
+            .then(next);
+        }
+        else{
+          next(new restify.ForbiddenError("A user is not allowed to belong to more than one carpool"));
+        }
+      })
+      .catch(errors.UserNotFoundException, (err) => {
+        next(new restify.InternalServerError(err.message));
+      })
+
+
+
+
   }
 
   export function getCarpool(
