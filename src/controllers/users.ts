@@ -64,6 +64,16 @@ module userControllers{
         next();
     }
 
+    export function resetPasswordHandler(req:Restify.Request, res:Restify.Response, next){
+        resetPassword(req)
+        .then( (status) => {
+            res.send(status);
+        })
+        .catch(Error, (err) => {
+            res.send(500);
+        })
+    }
+
     export function resetPassword(req:Restify.Request) : Promise<number>{
         return new Promise<number> ( (resolve, reject) => {
             var p = req.params;
@@ -87,6 +97,16 @@ module userControllers{
             var emailService = new EmailService.EmailService();
             return emailService.sendPassReset(user, password);
           }
+    }
+
+    export function changePasswordHandler(req:Restify.Request, res:Restify.Response, next){
+        changePassword(req)
+        .then( (status) => {
+            res.send(status);
+        })
+        .catch(Error, (err) => {
+            res.send(500);
+        })
     }
 
     export function changePassword(req:Restify.Request) : Promise<number>{

@@ -18,6 +18,7 @@ class routes{
         server.get("/api/users/logout", userControllers.logout);
         server.post("/api/users", CreateUserCtrl.createUser);
         server.get('/api/activate/:activate', ActivationController.activate);
+        server.put("api/users/password/reset", userControllers.resetPasswordHandler);
 
         /*********** Documentation routes ***********/
 
@@ -40,6 +41,9 @@ class routes{
         server.use( (req, res, next) => {
             auth.checkAuthMiddle(req, res, next);
         })
+
+        /*********** User routes ***********/
+        server.put("api/users/password", userControllers.changePasswordHandler);
 
         /*********** Carpool routes ***********/
         server.post('/api/carpools', CarpoolCtrl.createCarpool);
