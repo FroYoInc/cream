@@ -274,18 +274,25 @@ module UserService {
                                      sendResetEmail?: (u:models.User, p:string) => any)
                                     : Promise<boolean>{
     return new Promise<boolean>((resolve, reject) => {
+      var oldSalt;
+      var oldHash;
       getUserByEmail(email)
-      .then( (_user) => {
-        var user = _user;
-        createNewSaltAndHash(_user, newPassword)
-        .then(updateUser)
-        .then( (_user) => {
-          if(sendResetEmail){
-            sendResetEmail(_user, newPassword);
-          }
-          resolve(_user.salt !== user.salt && _user.passwordHash !== user.passwordHash);
+      .then( (user) => {
+        oldSalt = user.salt;
+        oldHash = user.passwordHash;
+
+        createNewSaltAndHash(user, newPassword)
+        .then( (user) => {
+          updateUser(user)
+          .then( (_user) => {
+            if(sendResetEmail){
+              sendResetEmail(_user, newPassword)
+              .catch(errors.PasswordResetSendException, (err) => {});
+            }
+            resolve(_user.salt != oldSalt && _user.passwordHash != oldHash);
+          })
+          .catch(Error, reject);
         })
-        .catch(Error, reject);
       })
       .catch(errors.UserNotFoundException, reject)
     });

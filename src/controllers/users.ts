@@ -102,9 +102,9 @@ module userControllers{
             auth.authenticateUser(req, req.session["email"], p.curPassword)
                 .then( (status) => {
                     if(status === 200){
-                        userSer.changeUserPassword(p.email, uuid.v4().replace(/-/g, ''))
+                        userSer.changeUserPassword(req.session["email"], p.newPassword)
                         .then((result) => {
-                            result? resolve(200) : resolve(406);
+                            result ? resolve(200) : resolve(406);
                         })
                         .catch(errors.UserNotFoundException, (err) => {
                             resolve(404);    
