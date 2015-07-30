@@ -445,6 +445,20 @@
                     }
                 }
             }
+        },
+        "/api/user/carpools": {
+            "get": {
+                "summary": "Gets all the user's carpools",
+                "description": "\nGets all of the carpools that a user is associated with.",
+                "tags": ["Carpool", "User"],
+                "responses": {
+                    "200": {
+                        "description": "Success, carpools sent."
+                    },
+                    "404": {
+                        "description": "User not found."
+                    }                }
+            }
         }
 
     },

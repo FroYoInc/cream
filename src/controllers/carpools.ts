@@ -213,5 +213,21 @@ module carpoolControllers{
       })
     }
 
+    export function getUserCarpools(req: Restify.Request, res: Restify.Response, next){
+        userServ.getUserById(req.session["userID"])
+        .then( (user) => {
+          carpoolServ.getUserCarpools(user)
+          .then( (carpools) => {
+            res.send(200, {"carpools": carpools});
+          })
+          .catch(errors.UserNotFoundException, (err) =>{
+            res.send(404, {"message":  "User not found"});
+          });
+        })
+        .catch(errors.UserNotFoundException, (err) => {
+          res.send(404, {"message":  "User not found"});
+        })
+
+    }
 }
 export = carpoolControllers;
