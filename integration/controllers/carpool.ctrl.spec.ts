@@ -13,7 +13,7 @@ import errors = require('../../src/errors/errors');
 import r = require('rethinkdb');
 import carpoolCtrl = require('../../src/controllers/carpools');
 import query = require('../../src/dbutils/query');
-
+import bcrypt = require("bcrypt");
 class Session {
   [key: string] : any;
 }
@@ -201,6 +201,8 @@ describe('Carpool controller', () => {
   function getNotifications(req){
     return carpoolCtrl.getNotificationsHelper(req);
   }
+
+
   it('should create a carpool', (done) => {
     var inputJSON = {
       'name': 'Corpool',
@@ -567,6 +569,55 @@ describe('Carpool controller', () => {
       })
     });
 
+  });
+
+  function getUserCarpools(req, res, done){
+    carpoolCtrl.getUserCarpools(req, res, done);
+  }
+
+  it("should get a user's carpools", (done) => {
+
+
+    var userID = "yoloswag";
+    var salt = bcrypt.genSaltSync(10);
+    var hash = bcrypt.hashSync("yoloswag", salt);
+
+    userService.createUser("Leonardo", "da Vinci", "ItalysFinest", "ItalysFinest@froyo.com", hash, salt)
+    .then( (user) => {
+      userID = user.id;
+      var pickup = {
+        'address': '123 Yo street',
+        'geoCode': {
+          'long': -122.12351,
+          'lat': 42.1234
+        }
+      };
+      CarpoolSvc.createCarpool("Machina Magnifica","PSU","Room for one",user.userName,pickup)
+      .then( (carpool) => {
+        var rest = new Restify();
+        rest.req = new Request();
+        rest.req.session = new Session();
+        var req = rest.req;
+        req.session["userID"] = userID; // The ever easy to remember bob lob law user id
+        var res = <restify.Response> {send: test};
+        getUserCarpools(req, res, done);
+
+      });
+
+    });
+    function test(status, data){
+      var pickup = {
+        'address': '123 Yo street',
+        'geoCode': {
+          'long': -122.12351,
+          'lat': 42.1234
+        }
+      };
+      expect(status).toBe(200);
+      expect(data.name).toBe("Machina Magnifica");
+      expect(data.description).toBe("Room for one");
+      expect(data.owner).toBe(userID);
+    }
   });
 
 })

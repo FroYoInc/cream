@@ -218,14 +218,18 @@ module carpoolControllers{
         .then( (user) => {
           carpoolServ.getUserCarpools(user)
           .then( (carpools) => {
-            res.send(200, {"carpools": carpools});
+            var data = carpools[0] != undefined ? carpools[0] : null;
+            res.send(200, data);
+            next();
           })
           .catch(errors.UserNotFoundException, (err) =>{
             res.send(404, {"message":  "User not found"});
+            next();
           });
         })
         .catch(errors.UserNotFoundException, (err) => {
           res.send(404, {"message":  "User not found"});
+          next();
         })
 
     }

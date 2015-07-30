@@ -453,7 +453,10 @@
                 "tags": ["Carpool", "User"],
                 "responses": {
                     "200": {
-                        "description": "Success, carpools sent."
+                        "description": "Success, carpool sent.",
+                        "schema": {
+                            "$ref": "#/definitions/Carpool"
+                        }
                     },
                     "404": {
                         "description": "User not found."
@@ -663,6 +666,13 @@
                 "userID" : {"type": "string"},
                 "carpoolName" : {"type": "string"}
             }
+
+        },
+        "userCarpools" : {
+                "type" : "array",
+                "items" : {
+                    "$ref" :"#/definitions/Carpool"
+                }
 
         }
     }
