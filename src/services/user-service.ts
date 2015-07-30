@@ -276,7 +276,6 @@ module UserService {
             resolve(_user.carpools.length >= 1);
           })
           .catch(errors.UserNotFoundException, (err) => {
-            console.log(err.message);
             reject(err);
           });
     }); 
