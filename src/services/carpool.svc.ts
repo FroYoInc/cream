@@ -66,6 +66,13 @@ module CarpoolService {
       return carpool;
     }
 
+    function addCarpoolToUserObject(carpool : models.Carpool){
+      q.run(r.db(db)
+        .table("users")
+        .getAll(owner, {index: 'userName'})
+        .update({carpools : r.row("carpools").append(carpool.id)}))()
+    }
+
     function insertCarpoolModel() {
       var ownerExistQ = userSvc.userExistQuery(owner);
       var campusExistQ = campusSvc.campusExistsQuery(campusName);
@@ -119,7 +126,11 @@ module CarpoolService {
 
     return carpoolNameValidator.isValid(name)
       .then(buildCarpoolModel)
-      .then(insertCarpoolModel);
+      .then(insertCarpoolModel)
+      .then(addCarpoolToUserObject)
+      .then( () => {
+        return carpool;
+      });
   }
 
   export function doesCarpoolExist(carpoolName: string): Promise<boolean> {

@@ -202,6 +202,9 @@
                             "$ref": "#/definitions/Carpool"
                         }
                     },
+                    "403": {
+                        "description": "User already in a carpool."
+                    },
                     "406": {
                         "description": "Carpool owner or campus not found"
                     },
@@ -318,6 +321,9 @@
                     },
                     "400": {
                         "description": "No carpool id provided."
+                    },
+                    "403": {
+                        "description": "User already in a carpool."
                     },
                     "401": {
                         "description": "Unauthorized attempt, user must be logged in to make a request."
@@ -437,6 +443,27 @@
                     "500" : {
                         "description" : "Internal Server error. Unable to make request"
                     }
+                }
+            }
+        },
+        "/api/user/carpools": {
+            "get": {
+                "summary": "Gets all the user's carpools",
+                "description": "\nGets all of the carpools that a user is associated with.",
+                "tags": ["Carpool", "User"],
+                "responses": {
+                    "200": {
+                        "description": "Success, carpool sent.",
+                        "schema": {
+                            "$ref": "#/definitions/Carpool"
+                        }
+                    },
+                    "404": {
+                        "description": "User not found."
+                    },
+                    "500": {
+                        "description": "Internal Server Error."
+                    }    
                 }
             }
         }
@@ -640,6 +667,13 @@
                 "userID" : {"type": "string"},
                 "carpoolName" : {"type": "string"}
             }
+
+        },
+        "userCarpools" : {
+                "type" : "array",
+                "items" : {
+                    "$ref" :"#/definitions/Carpool"
+                }
 
         }
     }
