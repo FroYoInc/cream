@@ -66,7 +66,7 @@ module CarpoolService {
       return carpool;
     }
 
-    function addToUserCarpools(carpool : models.Carpool){
+    function addCarpoolToUserObject(carpool : models.Carpool){
       q.run(r.db(db)
         .table("users")
         .getAll(owner, {index: 'userName'})
@@ -127,7 +127,7 @@ module CarpoolService {
     return carpoolNameValidator.isValid(name)
       .then(buildCarpoolModel)
       .then(insertCarpoolModel)
-      .then(addToUserCarpools)
+      .then(addCarpoolToUserObject)
       .then( () => {
         return carpool;
       });
