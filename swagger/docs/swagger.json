@@ -570,7 +570,8 @@
             "properties": {
                 "name": {"type": "string"},
                 "description": {"type": "string"},
-                "campus": {"type": "string"}
+                "campus": {"type": "string"},
+                "pickupLocation": {"$ref": "#/definitions/Address"}
             }
         },
         "LoginInfo" : {

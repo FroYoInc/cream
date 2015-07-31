@@ -400,10 +400,16 @@ describe('Carpool controller', () => {
 
   it('should update a carpool', (done) => {
     var carpool:models.Carpool;
-    var carpoolUpdate:CarpoolSvc.CarpoolUpdateModel = {
+    var carpoolUpdate = {
       'name': 'name updated',
-      'description': 'description updated'
-      // TODO: Add pickupLocation
+      'description': 'description updated',
+      'pickupLocation': {
+        'address':'Street address updated',
+        'geoCode': {
+          'long':133,
+          'lat':-25
+        }
+      }
     };
 
     function test(status) {
@@ -413,7 +419,7 @@ describe('Carpool controller', () => {
         .then((updatedCarpool) => {
           expect(updatedCarpool['name']).toEqual(carpoolUpdate.name);
           expect(updatedCarpool['description']).toEqual(carpoolUpdate.description);
-      // TODO: Add pickupLocation
+          expect(updatedCarpool['pickupLocation']).toEqual(carpoolUpdate.pickupLocation);
         });
     }
 
@@ -422,8 +428,7 @@ describe('Carpool controller', () => {
     req.body = carpoolUpdate;
 
     CarpoolSvc.createCarpool(
-      'update this name', 'PSU', 'update this description', owner.userName,
-      utils.gra())
+      'update this name', 'PSU', 'update this description', owner.userName, utils.gra())
       .then((_carpool) => {
         carpool = _carpool;
         req.params.carpoolID = _carpool.id;

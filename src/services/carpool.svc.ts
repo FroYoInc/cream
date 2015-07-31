@@ -218,9 +218,10 @@ module CarpoolService {
     name?:string;
     description?:string;
     campus?:string;
+    pickupLocation?:models.Address;
   }
 
-  export function updateCarpool(carpoolID:string, updatedCarpool:CarpoolUpdateModel) : Promise<void> {
+  export function updateCarpool(carpoolID:string, updatedCarpool:CarpoolUpdateModel) : Promise<any> {
     var doesCarpoolExistQuery = doesCarpoolExistGivenID(carpoolID);
     var updateCarpoolQuery = r.db(db).table(table).get(carpoolID).update(updatedCarpool);
 

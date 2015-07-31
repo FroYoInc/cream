@@ -127,6 +127,7 @@ module CarpoolController {
       var carpoolUpdate = {};
       carpoolUpdate = addFieldFromJSON(requestBody, carpoolUpdate, "name");
       carpoolUpdate = addFieldFromJSON(requestBody, carpoolUpdate, "description");
+      carpoolUpdate = addFieldFromJSON(requestBody, carpoolUpdate, "pickupLocation");
       if(requestBody.campus) {
         carpoolUpdate["campus"] = getIDFromHref(requestBody.campus);
       }
