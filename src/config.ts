@@ -28,6 +28,7 @@ export class Config {
     lockoutTime: 30 * 60000 // Num of minutes times ms in a minute
   };
 
+  static activationLock = 5 * 60000; // Num of minutes times ms in a minute
   /**
    * Validator specific configurations, should be moved elsewhere so they can be managed by an administrator.
    */

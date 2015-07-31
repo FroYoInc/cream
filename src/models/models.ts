@@ -43,9 +43,9 @@ module Models {
 
   export interface UserData {
     id: string;
-    activationCode: string;
     numLoginAttempts: number;
     lockoutExpiration: number;
+    activationLockout?: number;
   }
 
   export interface Activation {
