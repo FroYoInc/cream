@@ -541,12 +541,12 @@
         "carpoolDenial" : {
             "required": [
                 "carpoolID",
-                "userToDenyId"
+                "userToDenyID"
 
             ],
             "properties" : {
                 "carpoolID" : { "required": true, "type" :"string"},
-                "userToDenyId" : { "required": true, "type" :"string"}
+                "userToDenyID" : { "required": true, "type" :"string"}
 
             }
         },
