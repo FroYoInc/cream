@@ -446,6 +446,45 @@
                 }
             }
         },
+
+        "/api/activate/resend": {
+            "post": {
+                "summary": "Resend a user's activation email",
+                "description": "\nCheck's if a user is activated and sends them an activation email if they are not.",
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "The email for the user requesting a resend.",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/resend"
+                        }
+                    }
+                ],
+                "tags": ["User"],
+                "responses": {
+                    "200": {
+                        "description": "Success, email sent."
+                    },
+                    "400": {
+                        "description": "Bad request, missing or incorrectly named parameter."
+                    },
+                    "404": {
+                        "description": "Unable to find user data."
+                    },
+                    "409": {
+                        "description": "User is already activated."
+                    },
+                    "423": {
+                        "description": "The account is on a lockout, it will be available to request another email shortly"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
+        },
         "/api/user/carpools": {
             "get": {
                 "summary": "Gets all the user's carpools",
@@ -541,12 +580,12 @@
         "carpoolDenial" : {
             "required": [
                 "carpoolID",
-                "userToDenyId"
+                "userToDenyID"
 
             ],
             "properties" : {
                 "carpoolID" : { "required": true, "type" :"string"},
-                "userToDenyId" : { "required": true, "type" :"string"}
+                "userToDenyID" : { "required": true, "type" :"string"}
 
             }
         },
@@ -669,12 +708,21 @@
             }
 
         },
+        "resend" : {
+            "required":[
+                "email"
+            ],
+            "properties": {
+                "email" : {"type": "string"}
+        },
         "userCarpools" : {
                 "type" : "array",
                 "items" : {
                     "$ref" :"#/definitions/Carpool"
                 }
-
         }
+
     }
+}
+
 }

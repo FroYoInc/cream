@@ -5,7 +5,7 @@ import userSer = require('../services/user-service');
 import models = require('../models/models');
 import Promise = require('bluebird');
 import pv = require('../validation/parameter-validator');
-
+import errors = require('../errors/errors');
 
 module userControllers{
 
@@ -60,7 +60,6 @@ module userControllers{
 
         next();
     }
-
 
 }
 
