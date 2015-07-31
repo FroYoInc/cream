@@ -27,27 +27,38 @@ module carpoolControllers{
           var validReq = pv.verifyParams(req.params.carpoolID);
           if(validReq){
             var s = req.session;
-            carpoolServ.getCarpoolByID(req.params.carpoolID)
-            .then( (_carpool) =>{
-              requestServ.createRequest(s["userID"], req.params.carpoolID,s["firstName"], s["lastName"], _carpool.name)
-                .then( (result) => {
-                  if(result){
-                    sendRequest(_carpool)
-                    .then(()=>{
-                      resolve(201);
-                    })
-                    .catch(errors.CarpoolJoinRequestSendException, (err) =>{
-                      resolve(201);
+            userServ.getUserById(s['userID'])
+            .then( (user) => {
+              if(user.carpools.length >= 1){
+                resolve(403);
+              }
+              else{
+                carpoolServ.getCarpoolByID(req.params.carpoolID)
+                .then( (_carpool) =>{
+                  requestServ.createRequest(s["userID"], req.params.carpoolID,s["firstName"], s["lastName"], _carpool.name)
+                    .then( (result) => {
+                      if(result){
+                        sendRequest(_carpool)
+                        .then(()=>{
+                          resolve(201);
+                        })
+                        .catch(errors.CarpoolJoinRequestSendException, (err) =>{
+                          resolve(201);
+                        });
+                      }
+                      else{
+                        resolve(500);
+                      }
+                    }).catch(errors.CarpoolRequestConflictException, (err) => {
+                      resolve(409);
                     });
-                  }
-                  else{
-                    resolve(500);
-                  }
-                }).catch(errors.CarpoolRequestConflictException, (err) => {
-                  resolve(409);
-                });
+                })
+                .catch(Error, (err) => {resolve(500)});
+              }
             })
-            .catch(Error, (err) => {resolve(500)});
+            .catch(errors.UserNotFoundException, (err) => {
+              resolve(404);
+            })
 
           }
 
@@ -202,5 +213,25 @@ module carpoolControllers{
       })
     }
 
+    export function getUserCarpools(req: Restify.Request, res: Restify.Response, next){
+        userServ.getUserById(req.session["userID"])
+        .then( (user) => {
+          carpoolServ.getUserCarpools(user)
+          .then( (carpools) => {
+            var data = carpools[0] != undefined ? carpools[0] : null;
+            res.send(200, data);
+            next();
+          })
+          .catch(errors.UserNotFoundException, (err) =>{
+            res.send(404, {"message":  "User not found"});
+            next();
+          });
+        })
+        .catch(errors.UserNotFoundException, (err) => {
+          res.send(404, {"message":  "User not found"});
+          next();
+        })
+
+    }
 }
 export = carpoolControllers;

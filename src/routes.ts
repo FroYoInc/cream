@@ -51,7 +51,8 @@ class routes{
         server.post("/api/carpools/addUser", carpoolCtrl.approveRequest);
         server.post("/api/carpools/denyUser", carpoolCtrl.denyRequest);
         server.get('/api/carpools/:carpoolid', CarpoolCtrl.getCarpool); 
-                
+        server.get('/api/user/carpools/', carpoolCtrl.getUserCarpools);
+        
         /*********** Campus routes ************/
         server.post('/api/campuses', CampusCtrl.createCampus);
         server.get('/api/campuses', CampusCtrl.listCampuses);

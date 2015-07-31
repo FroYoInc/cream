@@ -61,9 +61,9 @@ describe('CarpoolService', () => {
         expect(carpool.name).toBe('fropool');
         expect(carpool.description).toBe('carpool');
         expect(carpool.campus).toEqual(campus);
-        expect(carpool.owner).toEqual(owner);
+        expect(carpool.owner.id).toEqual(owner.id);
         expect(carpool.participants.length).toBe(1);
-        expect(carpool.participants[0]).toEqual(owner);
+        expect(carpool.participants[0].id).toEqual(owner.id);
         expect(carpool.id).toBeDefined();
         expect(carpool.pickupLocation).toEqual(addr);
       })
