@@ -355,7 +355,7 @@ describe('Carpool controller', () => {
         good.req.params.carpoolID = _carpool.id;
         member.req.session["userID"] = _carpool.owner.id;
       })
-      // Test a carpool can be retrived by its id
+      // Test a carpool can be retrieved by its id
       .then(() => {
         return getCarpool(req, res);
       })
@@ -380,19 +380,46 @@ describe('Carpool controller', () => {
   it('should retrieve a list of carpools', (done) => {
     var carpoolList:models.Carpool[];
 
+    //add a carpool at the same location as the req (or use the PSU address?)
+    //confirm that it's the first returned
+    //confirm some carpool outside of radius is NOT returned
+
     function test(status, outputJSON) {
       expect(status).toBe(200);
       expect(outputJSON.length > 0).toEqual(true);
       expect(carpoolList.length).toEqual(outputJSON.length);
+      expect(carpoolList[0].name).toEqual('Closest Carpool');
+
+      //console.log(carpoolList.length);
+      //console.log(carpoolList[0].pickupLocation);
+      //console.log(carpoolList[1].pickupLocation);
+      //console.log(carpoolList[2].pickupLocation);
     }
+
     var req = <restify.Request> {params: {}};
     var res = <restify.Response> {send: test};
+    var convenientLocation:models.GeoCode = {
+      "lat": 45.372,
+      "long": -121.292
+    };
+    var closestCarpoolAddress = {
+      "address": "Nexus of the universe",
+      "geoCode": convenientLocation
+    };
 
-    CarpoolSvc.getCarpools(10)
+    CarpoolSvc.createCarpool('Closest Carpool', 'PSU', 'Most convenient location ever.', owner.userName, closestCarpoolAddress)
+      .then(() => {
+        return CarpoolSvc.getCarpools(10);
+      })
       .then((_carpoolList) => {
         carpoolList = _carpoolList;
       })
-      .then(() => {return getCarpools(req, res)})
+      .then(() => {
+        req.body = convenientLocation;
+        req.params.radius = 5;
+        req.params.campus = 'PSU';
+        return getCarpools(req, res)
+      })
       .catch(fail)
       .error(fail)
       .finally(done);
