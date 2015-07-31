@@ -399,8 +399,8 @@ describe('Carpool controller', () => {
     var req = <restify.Request> {params: {}};
     var res = <restify.Response> {send: test};
     var convenientLocation:models.GeoCode = {
-      "lat": 45.372,
-      "long": -121.292
+      "lat": 36.121,
+      "long": -115.174
     };
     var closestCarpoolAddress = {
       "address": "Nexus of the universe",
