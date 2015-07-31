@@ -380,7 +380,7 @@ describe('Carpool controller', () => {
   it('should retrieve a list of carpools', (done) => {
     var carpoolList:models.Carpool[];
 
-    //add a carpool at the same location as the req (or use the PSU address?)
+    //add a carpool at the same location as the req
     //confirm that it's the first returned
     //confirm some carpool outside of radius is NOT returned
 
@@ -409,7 +409,7 @@ describe('Carpool controller', () => {
 
     CarpoolSvc.createCarpool('Closest Carpool', 'PSU', 'Most convenient location ever.', owner.userName, closestCarpoolAddress)
       .then(() => {
-        return CarpoolSvc.getCarpools(10);
+        return CarpoolSvc.getCarpools(10, 5, convenientLocation, 'PSU');
       })
       .then((_carpoolList) => {
         carpoolList = _carpoolList;
@@ -417,7 +417,7 @@ describe('Carpool controller', () => {
       .then(() => {
         req.body = convenientLocation;
         req.params.radius = 5;
-        req.params.campus = 'PSU';
+        req.params.campusName = 'PSU';
         return getCarpools(req, res)
       })
       .catch(fail)

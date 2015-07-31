@@ -29,6 +29,7 @@ declare module "rethinkdb" {
 
   export function row(name:string):Expression<any>;
   export function expr(stuff:any):Expression<any>;
+  export function point(x:number,y:number);
 
   export function now():Expression<any>;
   export function args(list:string[]):Expression<any>;
@@ -142,6 +143,7 @@ declare module "rethinkdb" {
     isEmpty():Expression<boolean>;
     union(sequence:Sequence):Sequence;
     sample(n:number):Sequence;
+    getNearest(point:any,params:any):Sequence;
 
     // Aggregate
     reduce(r:ReduceFunction<any>, base?:any):Expression<any>;
