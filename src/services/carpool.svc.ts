@@ -174,8 +174,8 @@ module CarpoolService {
   export function getCarpools(limit: number, radius: number, location:models.GeoCode, campusName: string) :  Promise<models.Carpool[]> {
     var _db = r.db(db);
     var query = _db.table(table).getNearest(r.point(location.long,location.lat),{
-      index: 'geoPoint', maxDist:radius //todo: need to create a geospatial index from geoCode field....
-    }).limit(limit).merge({
+      index: 'geoPoint', maxDist:radius
+    }).limit(limit).getField('doc').merge({
       'campus': _db.table('campuses').get(r.row('campus')),
       'owner': _db.table('users').get(r.row('owner')),
       'participants': r.row('participants').map((p) => {

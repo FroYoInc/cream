@@ -120,6 +120,7 @@ declare module "rethinkdb" {
     filter(obj:{[key:string]:any}):Sequence;
     merge(any);
     getField(a:string):Expression<any>;
+    getField(a:string):Sequence;
     forEach(a:any):any;
 
     // Join
@@ -220,6 +221,7 @@ declare module "rethinkdb" {
       map(a:any):Expression<any>;
       map(transform:ExpressionFunction<any>):Sequence;
       merge(query:Expression<Object>):Expression<Object>;
+      merge(query:any):any;
       append(prop:string):Expression<Object>;
       contains(prop:string):Expression<boolean>;
       contains(expr:Expression<any>):Expression<boolean>;
