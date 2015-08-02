@@ -1,5 +1,6 @@
-import restify = require('restify')
-import carpoolService = require('../services/carpool.svc')
+import restify = require('restify');
+import r = require('rethinkdb');
+import carpoolService = require('../services/carpool.svc');
 import userCtrl = require('./create-user.ctrl');
 import userService = require('../services/user-service');
 import campusCtrl = require('./campus.ctrl');
@@ -128,6 +129,9 @@ module CarpoolController {
       carpoolUpdate = addFieldFromJSON(requestBody, carpoolUpdate, "name");
       carpoolUpdate = addFieldFromJSON(requestBody, carpoolUpdate, "description");
       carpoolUpdate = addFieldFromJSON(requestBody, carpoolUpdate, "pickupLocation");
+      if(requestBody.pickupLocation) {
+        carpoolUpdate['geoPoint'] = r.point(requestBody.pickupLocation.geoCode.long, requestBody.pickupLocation.geoCode.lat);
+      }
       if(requestBody.campus) {
         carpoolUpdate["campus"] = getIDFromHref(requestBody.campus);
       }

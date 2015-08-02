@@ -21,7 +21,7 @@ var dbShape : Shapes.DBShape = {
   },
   {
     tableName: 'carpools',
-    indices: ['name', 'pickupLocation.geoCode']
+    indices: ['name', 'pickupLocation.geoCode', 'geoPoint']
   },
   {
     tableName: 'campuses',
@@ -73,11 +73,11 @@ describe('Database Migrator', () => {
   var fail = (error) => {expect(error).toBeUndefined();};
   var testTrue = (result) => {expect(result).toBe(true);};
 
-  it('should have the same databse shape as described in this test', () => {
+  it('should have the same database shape as described in this test', () => {
     expect(dbShape).toEqual(Migrator.Migrator.dbShape);
   });
 
-  it('should have created databse ' + dbShape.dbname, (done) => {
+  it('should have created database ' + dbShape.dbname, (done) => {
     r.dbList()
       .contains(dbShape.dbname)
       .run(conn)

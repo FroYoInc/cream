@@ -19,7 +19,7 @@ module DBUtils {
       },
       {
         tableName: 'carpools',
-        indices: ['name', 'pickupLocation.geoCode']
+        indices: ['name', 'pickupLocation.geoCode', 'geoPoint']
       },
       {
         tableName: 'campuses',
@@ -69,7 +69,7 @@ module DBUtils {
         var createIndex = (i: string) => {
           var test = r.db(Migrator.dbShape.dbname).table(table.tableName).indexList().contains(i);
           var trueBranch = r.now();
-          var falseBranch = r.db(Migrator.dbShape.dbname).table(table.tableName).indexCreate(i);
+          var falseBranch = (i == 'geoPoint')? r.db(Migrator.dbShape.dbname).table(table.tableName).indexCreate(i, {geo:true}) : r.db(Migrator.dbShape.dbname).table(table.tableName).indexCreate(i);
           return r.branch(test, trueBranch, falseBranch).run(this._conn);
         };
         return p.map(table.indices, createIndex);
