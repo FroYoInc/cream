@@ -202,6 +202,9 @@
                             "$ref": "#/definitions/Carpool"
                         }
                     },
+                    "403": {
+                        "description": "User already in a carpool."
+                    },
                     "406": {
                         "description": "Carpool owner or campus not found"
                     },
@@ -318,6 +321,9 @@
                     },
                     "400": {
                         "description": "No carpool id provided."
+                    },
+                    "403": {
+                        "description": "User already in a carpool."
                     },
                     "401": {
                         "description": "Unauthorized attempt, user must be logged in to make a request."
@@ -481,6 +487,46 @@
                 }
             }
         },
+
+        "/api/activate/resend": {
+            "post": {
+                "summary": "Resend a user's activation email",
+                "description": "\nCheck's if a user is activated and sends them an activation email if they are not.",
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "The email for the user requesting a resend.",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/resend"
+                        }
+                    }
+                ],
+                "tags": ["User"],
+                "responses": {
+                    "200": {
+                        "description": "Success, email sent."
+                    },
+                    "400": {
+                        "description": "Bad request, missing or incorrectly named parameter."
+                    },
+                    "404": {
+                        "description": "Unable to find user data."
+                    },
+                    "409": {
+                        "description": "User is already activated."
+                    },
+                    "423": {
+                        "description": "The account is on a lockout, it will be available to request another email shortly"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
+        },
+
         "/api/users/password/reset": {
             "put": {
                 "summary": "Resets the user's password",
@@ -503,6 +549,22 @@
                     },
                     "400": {
                         "description": "Invalid request, missing parameter"
+                    }
+                }
+            }
+        },
+        "/api/user/carpools": {
+            "get": {
+                "summary": "Gets all the user's carpools",
+                "description": "\nGets all of the carpools that a user is associated with.",
+                "tags": ["Carpool", "User"],
+                "responses": {
+                    "200": {
+                        "description": "Success, carpool sent.",
+                        "schema": {
+                            "$ref": "#/definitions/Carpool"
+                        }
+
                     },
                     "404": {
                         "description": "User not found."
@@ -513,6 +575,7 @@
                     "500" : {
                         "description" : "Internal Server error. Unable to make request"
                     }
+
                 }
             }
         }
@@ -590,12 +653,12 @@
         "carpoolDenial" : {
             "required": [
                 "carpoolID",
-                "userToDenyId"
+                "userToDenyID"
 
             ],
             "properties" : {
                 "carpoolID" : { "required": true, "type" :"string"},
-                "userToDenyId" : { "required": true, "type" :"string"}
+                "userToDenyID" : { "required": true, "type" :"string"}
 
             }
         },
@@ -619,7 +682,8 @@
             "properties": {
                 "name": {"type": "string"},
                 "description": {"type": "string"},
-                "campus": {"type": "string"}
+                "campus": {"type": "string"},
+                "pickupLocation": {"$ref": "#/definitions/Address"}
             }
         },
         "LoginInfo" : {
@@ -717,6 +781,7 @@
             }
 
         },
+
         "passwordChange": {
             "required" : [
                 "curPassword",
@@ -736,6 +801,24 @@
             "properties": {
                 "email" : {"type":"string"}
             }
+        },
+
+        "resend" : {
+            "required":[
+                "email"
+            ],
+            "properties": {
+                "email" : {"type": "string"}
+        },
+        "userCarpools" : {
+                "type" : "array",
+                "items" : {
+                    "$ref" :"#/definitions/Carpool"
+                }
+
         }
+
     }
+}
+
 }

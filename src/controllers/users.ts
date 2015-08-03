@@ -63,7 +63,6 @@ module userControllers{
 
         next();
     }
-
     export function resetPasswordHandler(req:Restify.Request, res:Restify.Response, next){
         resetPassword(req)
         .then( (status) => {

@@ -191,7 +191,7 @@ module UserService {
       .then(returnUser)
   }
 
-  function updateUser(user:models.User):Promise<models.User> {
+  export function updateUser(user:models.User):Promise<models.User> {
     assert.equal((user.id !== null), true,
       "Trying to update a user that doesn't have an id");
     var updateUserQuery = r.db(db)
@@ -270,6 +270,7 @@ module UserService {
       .then(() => {return userData});
   }
 
+
   export function changeUserPassword(email:string, newPassword: string, 
                                      sendResetEmail?: (u:models.User, p:string) => any)
                                     : Promise<boolean>{
@@ -314,7 +315,110 @@ module UserService {
           });
       });
     }
+  }
 
+  export function resendActivationEmail(email:string) : Promise<boolean>{
+      return new Promise<boolean> ((resolve, reject) => {
+        getUserByEmail(email)
+        .then((_user) => {
+            if(!_user.isAccountActivated){
+              getUserData(_user.id)
+              .then( (userData) => {
+                sendIfNotLocked(userData,true, _user, resolve, reject);
+              })
+              .catch(errors.UserDataNotFound, (err) => {
+                var userData = {
+                  activationLockout:0,
+                  id: _user.id,
+                  numLoginAttempts: 0,
+                  lockoutExpiration: 0,
+                };
+                sendIfNotLocked(userData,false, _user, resolve, reject)
+              })
+            }
+            else{
+              reject(new errors.UserAlreadyActivatedException());
+            }
+          })
+          .catch(errors.UserNotFoundException, (err) => {
+            reject(err);
+          })
+          .catch(errors.EmailValidationException, (err) => {
+            reject(err);
+          })
+
+    });
+
+    function sendIfNotLocked(userData,userDataExists, user, resolve, reject){
+      var now = (new Date()).getTime(); // Get the epoch time
+      if(userData.activationLockout == undefined || userData.activationLockout <= now ){
+        var getActivationQuery = r.db(db)
+          .table(activationTable)
+          .filter({userId: user.id})
+          .coerceTo("array")
+          .limit(1);
+
+        q.run(getActivationQuery)()
+        .then( (activation) => {
+          if(activation[0] != undefined){
+            userData.activationLockout = now + config.Config.activationLock;
+            if(userDataExists){
+              updateExistingUserData(userData,user,activation, resolve, reject);
+            }
+            else{
+              insertUserData(userData,user,activation, resolve, reject);
+            }
+          }
+          else{
+            reject(new errors.ActivationDataNotFoundException());
+          }
+        });
+      }
+      else{
+        reject(new errors.ActivationSendLockException());
+      }
+    }
+    function insertUserData(userData,user,activation, resolve, reject){
+      createUserData(userData)
+      .then( (userData) => {
+        sendActivation(user, activation[0].id);
+        resolve(true);
+      })
+      .catch(Error, (err) => {
+        reject(err);
+      })
+    }
+    function updateExistingUserData(userData,user,activation, resolve, reject){
+      updateUserData(userData)
+      .then( (userData) => {
+        sendActivation(user, activation[0].id);
+        resolve(true);
+      })
+      .catch(Error, (err) => {
+        reject(err);
+      })
+    }
+    function sendActivation(user, activationCode) {
+      var emailService = new EmailService.EmailService();
+
+      if (transportConfig != null) {
+        emailService.transportConfig = transportConfig;
+      }
+      return emailService.sendActivation(user, activationCode);
+    }
+
+  }
+
+  export function userAlreadyHasCarpool(userID:string) : Promise<boolean>{
+    return new Promise<boolean> ( (resolve, reject) => {
+      getUserById(userID)
+          .then( (_user) => {
+            resolve(_user.carpools.length >= 1);
+          })
+          .catch(errors.UserNotFoundException, (err) => {
+            reject(err);
+          });
+    }); 
   }
 
 }

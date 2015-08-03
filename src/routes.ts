@@ -19,6 +19,7 @@ class routes{
         server.post("/api/users", CreateUserCtrl.createUser);
         server.get('/api/activate/:activate', ActivationController.activate);
         server.put("api/users/password/reset", userControllers.resetPasswordHandler);
+        server.post('/api/activate/resend', ActivationController.resendActivation);
 
         /*********** Documentation routes ***********/
 
@@ -54,7 +55,8 @@ class routes{
         server.post("/api/carpools/addUser", carpoolCtrl.approveRequest);
         server.post("/api/carpools/denyUser", carpoolCtrl.denyRequest);
         server.get('/api/carpools/:carpoolid', CarpoolCtrl.getCarpool); 
-                
+        server.get('/api/user/carpools/', carpoolCtrl.getUserCarpools);
+        
         /*********** Campus routes ************/
         server.post('/api/campuses', CampusCtrl.createCampus);
         server.get('/api/campuses', CampusCtrl.listCampuses);
