@@ -96,7 +96,8 @@ module CarpoolController {
   export function getCarpools(
     req:restify.Request, res:restify.Response, next:restify.Next) {
     function getCarpoolList() {
-      return carpoolService.getCarpools(10, req.params.radius, req.body, req.params.campusName);
+
+      return carpoolService.getCarpools(10, req.query.radius, req.query.long, req.query.lat, req.query.campusName);
     }
 
     getCarpoolList()

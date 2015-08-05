@@ -387,7 +387,7 @@ describe('Carpool controller', () => {
       expect(carpoolList[0].name).toEqual('Closest Carpool');
     }
 
-    var req = <restify.Request> {params: {}};
+    var req = <restify.Request> {query: {}};
     var res = <restify.Response> {send: test};
     var convenientLocation:models.GeoCode = {
       "lat": 36.121,
@@ -400,15 +400,16 @@ describe('Carpool controller', () => {
 
     CarpoolSvc.createCarpool('Closest Carpool', 'PSU', 'Most convenient location ever.', owner.userName, closestCarpoolAddress)
       .then(() => {
-        return CarpoolSvc.getCarpools(10, 5000, convenientLocation, 'PSU');
+        return CarpoolSvc.getCarpools(10, 5000, convenientLocation.long, convenientLocation.lat, 'PSU');
       })
       .then((_carpoolList) => {
         carpoolList = _carpoolList;
       })
       .then(() => {
-        req.body = convenientLocation;
-        req.params.radius = 5000;
-        req.params.campusName = 'PSU';
+        req.query.long = convenientLocation.long;
+        req.query.lat = convenientLocation.lat;
+        req.query.radius = 5000;
+        req.query.campusName = 'PSU';
         return getCarpools(req, res)
       })
       .catch(fail)

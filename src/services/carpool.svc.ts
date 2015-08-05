@@ -171,9 +171,9 @@ module CarpoolService {
   }
 
   // This should take a limit as an argument and return no more than that number of carpools.
-  export function getCarpools(limit: number, radius: number, location:models.GeoCode, campusName: string) :  Promise<models.Carpool[]> {
+  export function getCarpools(limit: number, radius: number, long: number, lat: number, campusName: string) :  Promise<models.Carpool[]> {
     var _db = r.db(db);
-    var query = _db.table(table).getNearest(r.point(location.long,location.lat),{
+    var query = _db.table(table).getNearest(r.point(long,lat),{
       index: 'geoPoint', maxResults: limit, maxDist:radius, unit: 'mi'
     }).getField('doc').merge({
       'campus': _db.table('campuses').get(r.row('campus')),
