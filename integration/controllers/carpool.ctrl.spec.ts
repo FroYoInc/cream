@@ -380,20 +380,11 @@ describe('Carpool controller', () => {
   it('should retrieve a list of carpools', (done) => {
     var carpoolList:models.Carpool[];
 
-    //add a carpool at the same location as the req
-    //confirm that it's the first returned
-    //confirm some carpool outside of radius is NOT returned
-
     function test(status, outputJSON) {
       expect(status).toBe(200);
       expect(outputJSON.length > 0).toEqual(true);
       expect(carpoolList.length).toEqual(outputJSON.length);
       expect(carpoolList[0].name).toEqual('Closest Carpool');
-
-      //console.log(carpoolList.length);
-      //console.log(carpoolList[0].pickupLocation);
-      //console.log(carpoolList[1].pickupLocation);
-      //console.log(carpoolList[2].pickupLocation);
     }
 
     var req = <restify.Request> {params: {}};
@@ -409,14 +400,14 @@ describe('Carpool controller', () => {
 
     CarpoolSvc.createCarpool('Closest Carpool', 'PSU', 'Most convenient location ever.', owner.userName, closestCarpoolAddress)
       .then(() => {
-        return CarpoolSvc.getCarpools(10, 5, convenientLocation, 'PSU');
+        return CarpoolSvc.getCarpools(10, 5000, convenientLocation, 'PSU');
       })
       .then((_carpoolList) => {
         carpoolList = _carpoolList;
       })
       .then(() => {
         req.body = convenientLocation;
-        req.params.radius = 5;
+        req.params.radius = 5000;
         req.params.campusName = 'PSU';
         return getCarpools(req, res)
       })
