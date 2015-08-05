@@ -5,15 +5,28 @@ import userSer = require('../services/user-service');
 import models = require('../models/models');
 import Promise = require('bluebird');
 import pv = require('../validation/parameter-validator');
+import admin = require('../services/user-auth');
 
 
 module userControllers{
 
     /**
-     *  The controller for the user login function, verifies the params that it needs 
-     *  to function correctly, and checks that they are all defined.  Sends a 400 if they 
+     *  The controller for the user login function, verifies the params that it needs
+     *  to function correctly, and checks that they are all defined.  Sends a 400 if they
      *  are not.  If the params are all defined, then it attempts to log the user in.
      */
+
+    export function checkAdmin(req:Restify.Request,res:Restify.Response,next) {
+      var p = req.params;
+      var validAdmin = admin.checkAdmin(req);
+
+      if(validAdmin) {
+        res.send(200);
+      } else {
+        res.send(400, {"message" : "Not logged in as admin"});
+      }
+    }
+    
     export function login(req:Restify.Request,res:Restify.Response,next){
         var p = req.params;
         var validReq = pv.verifyParams(p.email, p.password);
@@ -27,7 +40,7 @@ module userControllers{
                            lastName: req.session["lastName"],
                            userName: req.session["userName"],
                            email: req.session["email"]
-                       }); 
+                       });
                     }
                     else{
                         res.send(status);

@@ -23,7 +23,7 @@ module carpoolControllers{
     }
 
     export function joinRequest(req: Restify.Request) : Promise<number> {
-        return new Promise<number>((resolve, reject) => {  
+        return new Promise<number>((resolve, reject) => {
           var validReq = pv.verifyParams(req.params.carpoolID);
           if(validReq){
             auth.checkAuth(req)
@@ -71,7 +71,7 @@ module carpoolControllers{
     }
 
     export function approveUserRequest(req:Restify.Request){
-      return new Promise<number>((resolve, reject) => {      
+      return new Promise<number>((resolve, reject) => {
         var validReq = pv.verifyParams(req.params.carpoolID, req.params.userToAddID);
         if(validReq){
             auth.checkAuth(req)
@@ -145,7 +145,7 @@ module carpoolControllers{
     }
 
     export function denyUserRequest(req:Restify.Request){
-      return new Promise<number>((resolve, reject) => {      
+      return new Promise<number>((resolve, reject) => {
         var validReq = pv.verifyParams(req.params.carpoolID, req.params.userToDenyID);
 
         if(validReq){
@@ -166,7 +166,7 @@ module carpoolControllers{
                     }
                   })
                   .catch(errors.CarpoolNotFoundException, (err) => {
-                    // If the carpool does not exist, remove the request  
+                    // If the carpool does not exist, remove the request
                     removeUserRequest(req.params.userToDenyID, req.params.carpoolID, resolve);
                   })
                   .catch(Error, (err) => {

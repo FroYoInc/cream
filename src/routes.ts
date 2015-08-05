@@ -15,8 +15,10 @@ class routes{
         /*********** User routes ***********/
         server.post("/api/users/login/", userControllers.login);
         server.get("/api/users/logout", userControllers.logout);
+        server.get('/api/users/checkadmin/', userControllers.checkAdmin);
         server.post("/api/users", CreateUserCtrl.createUser);
         server.get('/api/activate/:activate', ActivationController.activate);
+
 
         /*********** Carpool routes ***********/
         server.post('/api/carpools', CarpoolCtrl.createCarpool);

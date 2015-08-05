@@ -14,7 +14,7 @@ module ActivationController {
         //Activation was successfull. Refirect request to
         res.header('Location', '/login');
         res.send(302);
-        
+
       })
       .catch((err) => {
        //Activation was unsuccessful. Redirect request
