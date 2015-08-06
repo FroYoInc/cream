@@ -16,6 +16,7 @@ class routes{
         server.post("/api/users/login/", userControllers.login);
         server.get("/api/users/logout", userControllers.logout);
         server.get('/api/users/checkadmin/', userControllers.checkAdmin);
+        //make sure to put it below block of code that say important
         server.post("/api/users", CreateUserCtrl.createUser);
         server.get('/api/activate/:activate', ActivationController.activate);
 
