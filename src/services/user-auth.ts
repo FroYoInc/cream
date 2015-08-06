@@ -37,7 +37,9 @@ module UserAuth{
             userSer.getUserById(req.session["userID"])
             .then((_user) => {
                 resolve(_user.isAdmin === true);
-            })
+            }).catch(errors.UserNotFoundException, (err) => {
+              reject(err);
+              })
         })
     }
 

@@ -6,6 +6,7 @@ import models = require('../models/models');
 import Promise = require('bluebird');
 import pv = require('../validation/parameter-validator');
 import admin = require('../services/user-auth');
+import errors = require('../errors/errors');
 
 
 module userControllers{
@@ -18,15 +19,17 @@ module userControllers{
 
     export function checkAdmin(req:Restify.Request,res:Restify.Response,next) {
       var p = req.params;
-      var validAdmin = admin.checkAdmin(req);
+      admin.checkAdmin(req).then(  (validAdmin) => {
+        if(validAdmin) {
+          res.send(200);
+        } else {
+          res.send(403, {"message" : "Not logged in as admin"});
+        }
+        }).catch(errors.UserNotFoundException, (err) => {
+          res.send(404);
+          });
+}
 
-      if(validAdmin) {
-        res.send(200);
-      } else {
-        res.send(400, {"message" : "Not logged in as admin"});
-      }
-    }
-    
     export function login(req:Restify.Request,res:Restify.Response,next){
         var p = req.params;
         var validReq = pv.verifyParams(p.email, p.password);

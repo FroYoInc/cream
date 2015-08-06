@@ -22,6 +22,7 @@
         "./integration/controllers/campus.ctrl.spec.ts",
         "./integration/controllers/carpool.ctrl.spec.ts",
         "./integration/controllers/create-user.ctrl.spec.ts",
+        "./integration/controllers/user.spec.ts",
         "./integration/dbutils/migrator.spec.ts",
         "./integration/services/campus.svc.spec.ts",
         "./integration/services/carpool.svc.spec.ts",

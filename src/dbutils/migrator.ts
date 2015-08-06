@@ -107,6 +107,7 @@ module DBUtils {
             userName: 'admin',
             email: 'admin@froyo.com',
             isAccountActivated: true,
+            id: 'thisisadminid',
             isAdmin: true,
             salt: salt,
             passwordHash: hash
