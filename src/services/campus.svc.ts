@@ -5,6 +5,7 @@ import r = require('rethinkdb');
 import q = require('../dbutils/query');
 import assert = require('assert');
 
+
 module CampusService {
 
   var db = 'froyo';
@@ -85,6 +86,20 @@ module CampusService {
             .then(createCampusIfDoesNotExist)
             .then(throwErrorIfCampusExists)
             .then(setCampusID);
+  }
+
+  export function removeCampus(CampusName: string) : Promise<boolean> {
+      return new Promise<boolean> ( (resolve, reject) => {
+        var RemoveCampus = r.db(db).table(table).get(CampusName).delete();
+        q.run(RemoveCampus)().then( (result) => {
+          if(result.deleted !== 1) {
+            throw new errors.CampusNotFoundException;
+          } else {
+            resolve(true);
+          }
+
+        })
+    })
   }
 
   /**

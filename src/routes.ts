@@ -45,6 +45,8 @@ class routes{
 
         /*********** User routes ***********/
         server.put("api/users/password", userControllers.changePasswordHandler);
+        server.get('/api/users/checkadmin/', userControllers.checkAdmin);
+        
 
         /*********** Carpool routes ***********/
         server.post('/api/carpools', CarpoolCtrl.createCarpool);
@@ -54,9 +56,9 @@ class routes{
         server.post("/api/carpools/request", carpoolCtrl.requestToJoin);
         server.post("/api/carpools/addUser", carpoolCtrl.approveRequest);
         server.post("/api/carpools/denyUser", carpoolCtrl.denyRequest);
-        server.get('/api/carpools/:carpoolid', CarpoolCtrl.getCarpool); 
+        server.get('/api/carpools/:carpoolid', CarpoolCtrl.getCarpool);
         server.get('/api/user/carpools/', carpoolCtrl.getUserCarpools);
-        
+
         /*********** Campus routes ************/
         server.post('/api/campuses', CampusCtrl.createCampus);
         server.get('/api/campuses', CampusCtrl.listCampuses);
