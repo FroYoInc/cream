@@ -10,7 +10,7 @@ import models = require('../models/models');
 import errors = require('../errors/errors');
 import config = require('../config');
 import assert = require('assert');
-
+import bcrypt = require('bcrypt');
 
 module UserService {
 
@@ -270,6 +270,53 @@ module UserService {
       .then(() => {return userData});
   }
 
+
+  export function changeUserPassword(email:string, newPassword: string, 
+                                     sendResetEmail?: (u:models.User, p:string) => any)
+                                    : Promise<boolean>{
+    return new Promise<boolean>((resolve, reject) => {
+      var oldSalt;
+      var oldHash;
+      getUserByEmail(email)
+      .then( (user) => {
+        oldSalt = user.salt;
+        oldHash = user.passwordHash;
+
+        createNewSaltAndHash(user, newPassword)
+        .then( (user) => {
+          updateUser(user)
+          .then( (_user) => {
+            if(sendResetEmail){
+              sendResetEmail(_user, newPassword)
+              .catch(errors.PasswordResetSendException, (err) => {});
+            }
+            resolve(_user.salt != oldSalt && _user.passwordHash != oldHash);
+          })
+          .catch(Error, reject);
+        })
+      })
+      .catch(errors.UserNotFoundException, reject)
+    });
+
+    function createNewSaltAndHash(user:models.User, password:string): Promise<models.User>{
+      return new Promise<models.User>((resolve, reject) => {
+          bcrypt.genSalt(config.Config.password.salt.rounds, (err, salt)=>{
+            if(err){
+              throw new errors.BcryptSaltError(err.message);
+            }
+            user.salt = salt;
+            bcrypt.hash(password, user.salt, (err, hash) =>{
+              if(err){
+                throw new errors.BcryptHashError(err.message);
+              }
+              user.passwordHash = hash;
+              resolve(user);
+            });
+          });
+      });
+    }
+  }
+
   export function resendActivationEmail(email:string) : Promise<boolean>{
       return new Promise<boolean> ((resolve, reject) => {
         getUserByEmail(email)
@@ -373,6 +420,7 @@ module UserService {
           });
     }); 
   }
+
 }
 
 export = UserService;

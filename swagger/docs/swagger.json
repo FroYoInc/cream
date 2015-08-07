@@ -446,6 +446,47 @@
                 }
             }
         },
+        "/api/users/password": {
+            "put": {
+                "summary": "Changes the user's password",
+                "description": "\nTakes the user's current password, and the password they would like to change it to, as well as a confirmation of the new password.",
+                "tags": ["User"],
+                "parameters": [
+                    {
+                        "name": "passwordChange",
+                        "in": "body",
+                        "description": "Contains the email of the user wishing to reset their password",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/passwordChange"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success, Password changed."
+                    },
+                    "400": {
+                        "description": "Invalid request, missing parameter"
+                    },
+                    "401": {
+                        "description": "Incorrect password."
+                    },
+                    "404": {
+                        "description": "User not found."
+                    },
+                    "406": {
+                        "description": "Unable to change password."
+                    },
+                    "409": {
+                        "description": "New password and it's confirmation do not match."
+                    },
+                    "500" : {
+                        "description" : "Internal Server error. Unable to make request"
+                    }
+                }
+            }
+        },
 
         "/api/activate/resend": {
             "post": {
@@ -485,6 +526,33 @@
                 }
             }
         },
+
+        "/api/users/password/reset": {
+            "put": {
+                "summary": "Resets the user's password",
+                "description": "\nResets the user's password to a random string and emails it to them.",
+                "tags": ["User"],
+                "parameters": [
+                    {
+                        "name": "passwordReset",
+                        "in": "body",
+                        "description": "Contains the email of the user wishing to reset their password",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/passwordReset"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success, Password reset."
+                    },
+                    "400": {
+                        "description": "Invalid request, missing parameter"
+                    }
+                }
+            }
+        },
         "/api/user/carpools": {
             "get": {
                 "summary": "Gets all the user's carpools",
@@ -496,13 +564,18 @@
                         "schema": {
                             "$ref": "#/definitions/Carpool"
                         }
+
                     },
                     "404": {
                         "description": "User not found."
                     },
-                    "500": {
-                        "description": "Internal Server Error."
-                    }    
+                    "406": {
+                        "description": "Unable to change password."
+                    },
+                    "500" : {
+                        "description" : "Internal Server error. Unable to make request"
+                    }
+
                 }
             }
         }
@@ -708,6 +781,28 @@
             }
 
         },
+
+        "passwordChange": {
+            "required" : [
+                "curPassword",
+                "newPassword",
+                "confirmPassword"
+            ],
+            "properties": {
+                "curPassword" : {"type":"string"},
+                "newPassword" : {"type":"string"},
+                "confirmPassword" : {"type":"string"}
+            }
+        },
+        "passwordReset": {
+            "required" : [
+                "email"
+            ],
+            "properties": {
+                "email" : {"type":"string"}
+            }
+        },
+
         "resend" : {
             "required":[
                 "email"
@@ -720,6 +815,7 @@
                 "items" : {
                     "$ref" :"#/definitions/Carpool"
                 }
+
         }
 
     }
