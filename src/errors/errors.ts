@@ -182,7 +182,7 @@ module Errors {
 
   export class CarpoolJoinRequestSendException extends Exception {
     constructor(message){
-      super(message, 'UserAlreadyInCarpool');
+      super(message, 'CarpoolJoinRequestSendException');
     } 
   }
 
@@ -192,5 +192,10 @@ module Errors {
     }
   }
 
+  export class PasswordResetSendException extends Exception {
+    constructor(message){
+      super(message, 'PasswordResetSendException');
+    } 
+  }
 }
 export = Errors
