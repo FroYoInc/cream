@@ -41,7 +41,8 @@ module CampusController {
    */
 
   export function createCampus(req: restify.Request, res: restify.Response, next: restify.Next) {
-    auth.checkAdmin(req).then( (isAdmin) => {
+    auth.checkAdmin(req)
+      .then( (isAdmin) => {
         if(isAdmin == true) {
           var campusInfo = req.body;
           var requestValid = pv.verifyParams(
