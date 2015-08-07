@@ -236,22 +236,53 @@
                     }
                 }
             },
-          "get": {
-            "summary": "\n Returns all Carpools.",
-            "description": "\n This end point returns an array of Carpools.",
-            "tags": ["Carpool"],
-            "responses": {
-                "200": {
-                    "description": "Retrieves list of carpools",
-                    "schema": {
-                        "$ref": "#/definitions/Carpool"
+
+            "get": {
+                "summary": "\n Returns all Carpools.",
+                "description": "\n This end point returns an array of Carpools.",
+                "parameters": [
+                    {
+                        "name": "radius",
+                        "in": "query",
+                        "description": "Max distance from user's location to return carpools",
+                        "required": true,
+                        "type": "number"
+                    },
+                    {
+                        "name": "campusName",
+                        "in": "query",
+                        "description": "Campus that user belongs to",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "long",
+                        "in": "query",
+                        "description": "Longitude coordinate for user's location",
+                        "required": true,
+                        "type": "number"
+                    },
+                    {
+                        "name": "lat",
+                        "in": "query",
+                        "description": "Latitude coordinate for user's location",
+                        "required": true,
+                        "type": "number"
                     }
-                },
-                "500": {
-                    "description": "Internal server error."
+                ],
+                "tags": ["Carpool"],
+                "responses": {
+                    "200": {
+                        "description": "Retrieves list of carpools",
+                        "schema": {
+                            "$ref": "#/definitions/Carpool"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error."
+                    }
                 }
-            }
-          }
+                }
         },
         "/api/carpools/{carpoolid}": {
             "get": {
@@ -466,6 +497,47 @@
                 }
             }
         },
+        "/api/users/password": {
+            "put": {
+                "summary": "Changes the user's password",
+                "description": "\nTakes the user's current password, and the password they would like to change it to, as well as a confirmation of the new password.",
+                "tags": ["User"],
+                "parameters": [
+                    {
+                        "name": "passwordChange",
+                        "in": "body",
+                        "description": "Contains the email of the user wishing to reset their password",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/passwordChange"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success, Password changed."
+                    },
+                    "400": {
+                        "description": "Invalid request, missing parameter"
+                    },
+                    "401": {
+                        "description": "Incorrect password."
+                    },
+                    "404": {
+                        "description": "User not found."
+                    },
+                    "406": {
+                        "description": "Unable to change password."
+                    },
+                    "409": {
+                        "description": "New password and it's confirmation do not match."
+                    },
+                    "500" : {
+                        "description" : "Internal Server error. Unable to make request"
+                    }
+                }
+            }
+        },
 
         "/api/activate/resend": {
             "post": {
@@ -505,6 +577,33 @@
                 }
             }
         },
+
+        "/api/users/password/reset": {
+            "put": {
+                "summary": "Resets the user's password",
+                "description": "\nResets the user's password to a random string and emails it to them.",
+                "tags": ["User"],
+                "parameters": [
+                    {
+                        "name": "passwordReset",
+                        "in": "body",
+                        "description": "Contains the email of the user wishing to reset their password",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/passwordReset"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success, Password reset."
+                    },
+                    "400": {
+                        "description": "Invalid request, missing parameter"
+                    }
+                }
+            }
+        },
         "/api/user/carpools": {
             "get": {
                 "summary": "Gets all the user's carpools",
@@ -516,13 +615,18 @@
                         "schema": {
                             "$ref": "#/definitions/Carpool"
                         }
+
                     },
                     "404": {
                         "description": "User not found."
                     },
-                    "500": {
-                        "description": "Internal Server Error."
+                    "406": {
+                        "description": "Unable to change password."
+                    },
+                    "500" : {
+                        "description" : "Internal Server error. Unable to make request"
                     }
+
                 }
             }
         }
@@ -601,7 +705,6 @@
             "required": [
                 "carpoolID",
                 "userToDenyID"
-
             ],
             "properties" : {
                 "carpoolID" : { "required": true, "type" :"string"},
@@ -728,6 +831,28 @@
             }
 
         },
+
+        "passwordChange": {
+            "required" : [
+                "curPassword",
+                "newPassword",
+                "confirmPassword"
+            ],
+            "properties": {
+                "curPassword" : {"type":"string"},
+                "newPassword" : {"type":"string"},
+                "confirmPassword" : {"type":"string"}
+            }
+        },
+        "passwordReset": {
+            "required" : [
+                "email"
+            ],
+            "properties": {
+                "email" : {"type":"string"}
+            }
+        },
+
         "resend" : {
             "required":[
                 "email"
@@ -740,6 +865,7 @@
                 "items" : {
                     "$ref" :"#/definitions/Carpool"
                 }
+
         }
 
     }

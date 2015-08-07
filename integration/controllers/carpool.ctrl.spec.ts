@@ -355,7 +355,7 @@ describe('Carpool controller', () => {
         good.req.params.carpoolID = _carpool.id;
         member.req.session["userID"] = _carpool.owner.id;
       })
-      // Test a carpool can be retrived by its id
+      // Test a carpool can be retrieved by its id
       .then(() => {
         return getCarpool(req, res);
       })
@@ -384,15 +384,34 @@ describe('Carpool controller', () => {
       expect(status).toBe(200);
       expect(outputJSON.length > 0).toEqual(true);
       expect(carpoolList.length).toEqual(outputJSON.length);
+      expect(carpoolList[0].name).toEqual('Closest Carpool');
     }
-    var req = <restify.Request> {params: {}};
-    var res = <restify.Response> {send: test};
 
-    CarpoolSvc.getCarpools(10)
+    var req = <restify.Request> {query: {}};
+    var res = <restify.Response> {send: test};
+    var convenientLocation:models.GeoCode = {
+      "lat": 36.121,
+      "long": -115.174
+    };
+    var closestCarpoolAddress = {
+      "address": "Nexus of the universe",
+      "geoCode": convenientLocation
+    };
+
+    CarpoolSvc.createCarpool('Closest Carpool', 'PSU', 'Most convenient location ever.', owner.userName, closestCarpoolAddress)
+      .then(() => {
+        return CarpoolSvc.getCarpools(10, 5000, convenientLocation.long, convenientLocation.lat, 'PSU');
+      })
       .then((_carpoolList) => {
         carpoolList = _carpoolList;
       })
-      .then(() => {return getCarpools(req, res)})
+      .then(() => {
+        req.query.long = convenientLocation.long;
+        req.query.lat = convenientLocation.lat;
+        req.query.radius = 5000;
+        req.query.campusName = 'PSU';
+        return getCarpools(req, res)
+      })
       .catch(fail)
       .error(fail)
       .finally(done);

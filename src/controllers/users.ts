@@ -5,8 +5,10 @@ import userSer = require('../services/user-service');
 import models = require('../models/models');
 import Promise = require('bluebird');
 import pv = require('../validation/parameter-validator');
-import admin = require('../services/user-auth');
-import errors = require('../errors/errors');
+import utils = require('../utils/utils');
+import uuid = require('uuid');
+import errors = require("../errors/errors");
+import EmailService = require('../services/email-service');
 
 
 module userControllers{
@@ -19,7 +21,7 @@ module userControllers{
 
     export function checkAdmin(req:Restify.Request,res:Restify.Response,next) {
       var p = req.params;
-      admin.checkAdmin(req).then(  (validAdmin) => {
+      auth.checkAdmin(req).then(  (validAdmin) => {
         if(validAdmin) {
           res.send(200);
         } else {
@@ -76,7 +78,85 @@ module userControllers{
 
         next();
     }
+    export function resetPasswordHandler(req:Restify.Request, res:Restify.Response, next){
+        resetPassword(req)
+        .then( (status) => {
+            res.send(status);
+        })
+        .catch(Error, (err) => {
+            res.send(500);
+        })
+    }
 
+    export function resetPassword(req:Restify.Request) : Promise<number>{
+        return new Promise<number> ( (resolve, reject) => {
+            var p = req.params;
+            var validReq = pv.verifyParams(p.email);
+            if(!validReq){
+                resolve(400);
+            }
+            userSer.changeUserPassword(p.email, uuid.v4().replace(/-/g, ''), sendReset)
+            .then((result) => {
+                result? resolve(200) : resolve(406);
+            })
+            .catch(errors.UserNotFoundException, (err) => {
+                resolve(404);    
+            })
+            .catch(Error, (err) => {
+                resolve(500);
+            })
+        })
+
+          function sendReset(user:models.User, password:string) {
+            var emailService = new EmailService.EmailService();
+            return emailService.sendPassReset(user, password);
+          }
+    }
+
+    export function changePasswordHandler(req:Restify.Request, res:Restify.Response, next){
+        changePassword(req)
+        .then( (status) => {
+            res.send(status);
+        })
+        .catch(Error, (err) => {
+            res.send(500);
+        })
+    }
+
+    export function changePassword(req:Restify.Request) : Promise<number>{
+        return new Promise<number> ( (resolve, reject) => {
+            var p = req.params;
+            var validReq = pv.verifyParams(p.curPassword, p.newPassword, p.confirmPassword);
+            if(!validReq){
+                resolve(400);
+            }
+            if(p.newPassword !== p.confirmPassword){
+                resolve(409);
+            }
+            auth.authenticateUser(req, req.session["email"], p.curPassword)
+                .then( (status) => {
+                    if(status === 200){
+                        userSer.changeUserPassword(req.session["email"], p.newPassword)
+                        .then((result) => {
+                            result ? resolve(200) : resolve(406);
+                        })
+                        .catch(errors.UserNotFoundException, (err) => {
+                            resolve(404);    
+                        })
+                        .catch(Error, (err) => {
+                            resolve(500);
+                        })
+                    }
+                    else{
+                        resolve(status);
+                    }
+
+                }).catch(Error, (err)=> {
+                    resolve(500);
+                });
+
+        })
+    }
 
 }
 
