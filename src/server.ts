@@ -56,6 +56,7 @@ server.use(sessions({
 // Restify body parser provides all of the info sent to the route
 // in a JSON object.
 server.use(restify.bodyParser());
+server.use(restify.queryParser());
 
 var routes = new (require('./routes'))(server);
 

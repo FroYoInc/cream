@@ -29,6 +29,7 @@ declare module "rethinkdb" {
 
   export function row(name:string):Expression<any>;
   export function expr(stuff:any):Expression<any>;
+  export function point(longitude:number,latitude:number):Point;
 
   export function now():Expression<any>;
   export function args(list:string[]):Expression<any>;
@@ -94,6 +95,7 @@ declare module "rethinkdb" {
 
   interface Table extends Sequence {
     indexCreate(name:string, index?:ExpressionFunction<any>):Expression<any>;
+    indexCreate(name:string, options:{multi?:boolean;geo?:boolean}):Expression<any>;
     indexDrop(name:string):Operation<DropResult>;
     indexList():Expression<any>;
 
@@ -118,6 +120,7 @@ declare module "rethinkdb" {
     filter(obj:{[key:string]:any}):Sequence;
     merge(any);
     getField(a:string):Expression<any>;
+    getField(a:string):Sequence;
     forEach(a:any):any;
 
     // Join
@@ -142,6 +145,7 @@ declare module "rethinkdb" {
     isEmpty():Expression<boolean>;
     union(sequence:Sequence):Sequence;
     sample(n:number):Sequence;
+    getNearest(point:any,params:any):Sequence;
 
     // Aggregate
     reduce(r:ReduceFunction<any>, base?:any):Expression<any>;
@@ -217,6 +221,7 @@ declare module "rethinkdb" {
       map(a:any):Expression<any>;
       map(transform:ExpressionFunction<any>):Sequence;
       merge(query:Expression<Object>):Expression<Object>;
+      merge(query:any):any;
       append(prop:string):Expression<Object>;
       contains(prop:string):Expression<boolean>;
       contains(expr:Expression<any>):Expression<boolean>;
@@ -255,6 +260,11 @@ declare module "rethinkdb" {
   interface Sort {}
 
   interface Time {}
+
+  interface Point {
+    longitude: number;
+    latitude: number;
+  }
 
 
   // http://www.rethinkdb.com/api/#js

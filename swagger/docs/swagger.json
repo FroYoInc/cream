@@ -216,22 +216,53 @@
                     }
                 }
             },
-          "get": {
-            "summary": "\n Returns all Carpools.",
-            "description": "\n This end point returns an array of Carpools.",
-            "tags": ["Carpool"],
-            "responses": {
-                "200": {
-                    "description": "Retrieves list of carpools",
-                    "schema": {
-                        "$ref": "#/definitions/Carpool"
+
+            "get": {
+                "summary": "\n Returns all Carpools.",
+                "description": "\n This end point returns an array of Carpools.",
+                "parameters": [
+                    {
+                        "name": "radius",
+                        "in": "query",
+                        "description": "Max distance from user's location to return carpools",
+                        "required": true,
+                        "type": "number"
+                    },
+                    {
+                        "name": "campusName",
+                        "in": "query",
+                        "description": "Campus that user belongs to",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "long",
+                        "in": "query",
+                        "description": "Longitude coordinate for user's location",
+                        "required": true,
+                        "type": "number"
+                    },
+                    {
+                        "name": "lat",
+                        "in": "query",
+                        "description": "Latitude coordinate for user's location",
+                        "required": true,
+                        "type": "number"
                     }
-                },
-                "500": {
-                    "description": "Internal server error."
+                ],
+                "tags": ["Carpool"],
+                "responses": {
+                    "200": {
+                        "description": "Retrieves list of carpools",
+                        "schema": {
+                            "$ref": "#/definitions/Carpool"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error."
+                    }
                 }
-            }
-          }
+                }
         },
         "/api/carpools/{carpoolid}": {
             "get": {
@@ -654,7 +685,6 @@
             "required": [
                 "carpoolID",
                 "userToDenyID"
-
             ],
             "properties" : {
                 "carpoolID" : { "required": true, "type" :"string"},
