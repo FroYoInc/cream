@@ -112,7 +112,7 @@ module DBUtils {
             salt: salt,
             passwordHash: hash
           };
-          q.run(r.db(this.database).table("users").insert(user))();
+          q.run(r.db(this.database).table("users").insert(user, {conflict:"replace"}))();
         })
 
 

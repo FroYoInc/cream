@@ -16,8 +16,6 @@ class routes{
         /*********** User routes ***********/
         server.post("/api/users/login/", userControllers.login);
         server.get("/api/users/logout", userControllers.logout);
-        server.get('/api/users/checkadmin/', userControllers.checkAdmin);
-        //make sure to put it below block of code that say important
         server.post("/api/users", CreateUserCtrl.createUser);
         server.get('/api/activate/:activate', ActivationController.activate);
         server.post('/api/activate/resend', ActivationController.resendActivation);
@@ -44,6 +42,9 @@ class routes{
             auth.checkAuthMiddle(req, res, next);
         })
 
+        /*********** User routes ***********/
+        server.get('/api/users/checkadmin/', userControllers.checkAdmin);
+
         /*********** Carpool routes ***********/
         server.post('/api/carpools', CarpoolCtrl.createCarpool);
         server.get('/api/carpools', CarpoolCtrl.getCarpools);
@@ -52,9 +53,9 @@ class routes{
         server.post("/api/carpools/request", carpoolCtrl.requestToJoin);
         server.post("/api/carpools/addUser", carpoolCtrl.approveRequest);
         server.post("/api/carpools/denyUser", carpoolCtrl.denyRequest);
-        server.get('/api/carpools/:carpoolid', CarpoolCtrl.getCarpool); 
+        server.get('/api/carpools/:carpoolid', CarpoolCtrl.getCarpool);
         server.get('/api/user/carpools/', carpoolCtrl.getUserCarpools);
-        
+
         /*********** Campus routes ************/
         server.post('/api/campuses', CampusCtrl.createCampus);
         server.get('/api/campuses', CampusCtrl.listCampuses);

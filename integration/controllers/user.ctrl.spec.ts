@@ -1,18 +1,7 @@
-import restify = require('restify');
+
 import Promise = require('bluebird');
 import utils = require('../utils');
-import campusSvc = require('../../src/services/campus.svc');
-import userSvc = require('../../src/services/user-service');
-import models = require('../../src/models/models');
 import userService = require('../../src/services/user-service');
-import CarpoolSvc = require('../../src/services/carpool.svc');
-import CarpoolCtrl = require('../../src/controllers/carpool.ctrl');
-import UserCtrl = require('../../src/controllers/create-user.ctrl');
-import CampusCtrl = require('../../src/controllers/campus.ctrl');
-import errors = require('../../src/errors/errors');
-import r = require('rethinkdb');
-import carpoolCtrl = require('../../src/controllers/carpools');
-import query = require('../../src/dbutils/query');
 import users = require('../../src/controllers/users');
 
 class Session {
