@@ -118,6 +118,26 @@
                 }
             }
         },
+        "/api/users/checkadmin/": {
+            "get": {
+                "summary": "User Admin .",
+                "description": "\nChecks if logged in user is admin",
+                "tags": [
+                    "User"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User is admin."
+                    },
+                    "403" : {
+                        "description" : "User not admin."
+                    },
+                    "404" : {
+                        "description" : "User does not exist."
+                    }
+                }
+            }
+        },
         "/api/users": {
             "post": {
                 "summary": "Creates a user account.",
@@ -502,7 +522,7 @@
                     },
                     "500": {
                         "description": "Internal Server Error."
-                    }    
+                    }
                 }
             }
         }
