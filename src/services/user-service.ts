@@ -52,7 +52,7 @@ module UserService {
   }
 
   export function doesUserExist(userName: string):Promise<boolean> {
-    return q.run(userExistQuery(userName))()
+    return q.run(userExistQuery(userName), 'doesUserExist')()
       .then((result) => {
         return result === true
       });
@@ -93,7 +93,7 @@ module UserService {
     }
 
     var createUserIfUserOrEmailDoesNotExist =
-      q.run(createUserIfUserOrEmailDoesNotExistQuery);
+      q.run(createUserIfUserOrEmailDoesNotExistQuery, 'createUser');
 
     function setUserID(result) {
       assert.equal(result.generated_keys.length, 1,
@@ -123,7 +123,8 @@ module UserService {
         .table(activationTable)
         .insert(activation);
 
-      return q.run(saveActivationQuery)().then(sendActivation).return(user);
+      return q.run(saveActivationQuery,
+        'saveActivation')().then(sendActivation).return(user);
     }
 
     function isValidUserName() {
@@ -155,7 +156,7 @@ module UserService {
       return <models.User> _user;
     }
 
-    return q.run(getUserByIdQuery)()
+    return q.run(getUserByIdQuery, 'getUserById')()
       .then(throwErrorIfUserNotFound)
       .then(returnUser)
   }
@@ -177,7 +178,7 @@ module UserService {
       .getAll(email, {index: emailIndex})
       .coerceTo('array');
     return emailValidator.isValid(email)
-      .then(q.run(getUserByEmailQuery))
+      .then(q.run(getUserByEmailQuery, 'getUserByEmail'))
       .then(returnUser);
   }
 
@@ -186,18 +187,18 @@ module UserService {
       .table(table)
       .getAll(userName, {index: userNameIndex})
       .coerceTo('array');
-    return q.run(getUserByUserNameQuery)()
+    return q.run(getUserByUserNameQuery, 'getUserByUserName')()
       .then(returnUser)
   }
 
-  function updateUser(user:models.User):Promise<models.User> {
+  export function updateUser(user:models.User):Promise<models.User> {
     assert.equal((user.id !== null), true,
       "Trying to update a user that doesn't have an id");
     var updateUserQuery = r.db(db)
       .table(table)
       .get(user.id)
       .update(user, {durability: 'hard'});
-    return q.run(updateUserQuery)().then(() => {return user});
+    return q.run(updateUserQuery, 'updateUser')().then(() => {return user});
   }
 
   export function activateUser(activationCode: string):Promise<models.User> {
@@ -210,7 +211,7 @@ module UserService {
       var getActivationQuery = r.db(db)
         .table(activationTable)
         .get(activationCode);
-      return q.run(getActivationQuery)()
+      return q.run(getActivationQuery, 'getUserIdByActivationCode')()
         .then((_result) => {
           var activation:models.Activation = _result;
           if (_result === null) {
@@ -238,7 +239,7 @@ module UserService {
     var getUserDataQuery = r.db(db)
       .table(userDataTable)
       .get(userID);
-    return q.run(getUserDataQuery)()
+    return q.run(getUserDataQuery, 'getUserData')()
       .then((_result) => {
         var userData:models.UserData = _result;
 
@@ -258,13 +259,119 @@ module UserService {
       .table(userDataTable)
       .get(userData.id)
       .update(userData, {durability: 'hard'});
-    return q.run(updateUserDataQuery)().then(() => {return userData});
+    return q.run(updateUserDataQuery, 'updateUserData')()
+      .then(() => {return userData});
   }
 
   export function createUserData(userData:models.UserData):
   Promise<models.UserData> {
     var insertUserData = r.db(db).table(userDataTable).insert(userData);
-    return q.run(insertUserData)().then(() => {return userData});
+    return q.run(insertUserData, 'createUserData')()
+      .then(() => {return userData});
+  }
+
+  export function resendActivationEmail(email:string) : Promise<boolean>{
+      return new Promise<boolean> ((resolve, reject) => {
+        getUserByEmail(email)
+        .then((_user) => {
+            if(!_user.isAccountActivated){
+              getUserData(_user.id)
+              .then( (userData) => {
+                sendIfNotLocked(userData,true, _user, resolve, reject);
+              })
+              .catch(errors.UserDataNotFound, (err) => {
+                var userData = {
+                  activationLockout:0,
+                  id: _user.id,
+                  numLoginAttempts: 0,
+                  lockoutExpiration: 0,
+                };
+                sendIfNotLocked(userData,false, _user, resolve, reject)
+              })
+            }
+            else{
+              reject(new errors.UserAlreadyActivatedException());
+            }
+          })
+          .catch(errors.UserNotFoundException, (err) => {
+            reject(err);
+          })
+          .catch(errors.EmailValidationException, (err) => {
+            reject(err);
+          })
+
+    });
+
+    function sendIfNotLocked(userData,userDataExists, user, resolve, reject){
+      var now = (new Date()).getTime(); // Get the epoch time
+      if(userData.activationLockout == undefined || userData.activationLockout <= now ){
+        var getActivationQuery = r.db(db)
+          .table(activationTable)
+          .filter({userId: user.id})
+          .coerceTo("array")
+          .limit(1);
+
+        q.run(getActivationQuery)()
+        .then( (activation) => {
+          if(activation[0] != undefined){
+            userData.activationLockout = now + config.Config.activationLock;
+            if(userDataExists){
+              updateExistingUserData(userData,user,activation, resolve, reject);
+            }
+            else{
+              insertUserData(userData,user,activation, resolve, reject);
+            }
+          }
+          else{
+            reject(new errors.ActivationDataNotFoundException());
+          }
+        });
+      }
+      else{
+        reject(new errors.ActivationSendLockException());
+      }
+    }
+    function insertUserData(userData,user,activation, resolve, reject){
+      createUserData(userData)
+      .then( (userData) => {
+        sendActivation(user, activation[0].id);
+        resolve(true);
+      })
+      .catch(Error, (err) => {
+        reject(err);
+      })
+    }
+    function updateExistingUserData(userData,user,activation, resolve, reject){
+      updateUserData(userData)
+      .then( (userData) => {
+        sendActivation(user, activation[0].id);
+        resolve(true);
+      })
+      .catch(Error, (err) => {
+        reject(err);
+      })
+    }
+    function sendActivation(user, activationCode) {
+      var emailService = new EmailService.EmailService();
+
+      if (transportConfig != null) {
+        emailService.transportConfig = transportConfig;
+      }
+      return emailService.sendActivation(user, activationCode);
+    }
+
+  }
+
+  export function userAlreadyHasCarpool(userID:string) : Promise<boolean>{
+    return new Promise<boolean> ( (resolve, reject) => {
+      getUserById(userID)
+          .then( (_user) => {
+            resolve(_user.carpools.length >= 1);
+          })
+          .catch(errors.UserNotFoundException, (err) => {
+            reject(err);
+          });
+    }); 
   }
 }
 

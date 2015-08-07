@@ -29,8 +29,12 @@ module CarpoolService {
       .isEmpty().not();
   }
 
-  export function createCarpool(name: string,
-    campusName: string, description: string, owner: string)
+  export function createCarpool(
+    name: string,
+    campusName: string,
+    description: string,
+    owner: string,
+    pickupLocation: models.Address)
     :Promise<models.Carpool> {
 
     var carpool:models.Carpool = <models.Carpool>{};
@@ -47,6 +51,7 @@ module CarpoolService {
           carpool.description = description;
           carpool.campus = campus;
           carpool.owner = user;
+          carpool.pickupLocation = pickupLocation;
           carpool.participants = [user];
         })
         .catch(errors.UserNotFoundException, () => {
@@ -61,6 +66,13 @@ module CarpoolService {
       return carpool;
     }
 
+    function addCarpoolToUserObject(carpool : models.Carpool){
+      q.run(r.db(db)
+        .table("users")
+        .getAll(owner, {index: 'userName'})
+        .update({carpools : r.row("carpools").append(carpool.id)}))()
+    }
+
     function insertCarpoolModel() {
       var ownerExistQ = userSvc.userExistQuery(owner);
       var campusExistQ = campusSvc.campusExistsQuery(campusName);
@@ -72,7 +84,8 @@ module CarpoolService {
           'owner': carpool.owner.id,
           'participants': [carpool.owner.id],
           'campus': carpool.campus.id,
-          'description': carpool.description
+          'description': carpool.description,
+          'pickupLocation': carpool.pickupLocation
         });
 
       // Note: Even though buildCarpoolModel ensure campus and user exist,
@@ -95,7 +108,8 @@ module CarpoolService {
         );
 
       return q.run(
-        createCarpoolIfOwnerExistAndCampusExistAndCarpoolDoesNotExist)()
+        createCarpoolIfOwnerExistAndCampusExistAndCarpoolDoesNotExist,
+        'createCarpool')()
         .then((result) => {
           if (result == 'owner not found') {
             throw new errors.CarpoolOwnerNotFoundException();
@@ -112,11 +126,15 @@ module CarpoolService {
 
     return carpoolNameValidator.isValid(name)
       .then(buildCarpoolModel)
-      .then(insertCarpoolModel);
+      .then(insertCarpoolModel)
+      .then(addCarpoolToUserObject)
+      .then( () => {
+        return carpool;
+      });
   }
 
   export function doesCarpoolExist(carpoolName: string): Promise<boolean> {
-    return q.run(getCarpoolExistQuery(carpoolName))()
+    return q.run(getCarpoolExistQuery(carpoolName), 'doesCarpoolExist')()
       .then((result) => {
         return result === true
       });
@@ -139,15 +157,14 @@ module CarpoolService {
         getCarpoolQuery,
         r.expr('carpool not found')
       );
-    return q.run(query)()
+    return q.run(query, 'getCarpoolByID')()
       .then((_carpool) => {
         if (_carpool == 'carpool not found') {
           throw new errors.CarpoolNotFoundException()
         } else {
           assert.equal(true, (_carpool.id == carpoolID),
-          'retrived object should have same id');
-          var carpool:models.Carpool = _carpool;
-          return carpool;
+          'retrieved object should have same id');
+          return _carpool;
         }
       });
   }
@@ -163,14 +180,13 @@ module CarpoolService {
       })
     }).coerceTo('array');
 
-    return q.run(query)()
+    return q.run(query, 'getCarpools')()
       .then((_carpools) => {
         return <Array<models.Carpool>> _carpools;
       });
   }
 
-  export function getUserCarpools(user:models.User)
-  :Promise<Array<models.Carpool>> {
+  export function getUserCarpools(user:models.User) : Promise<Array<models.Carpool>> {
     var userExistQuery = userSvc.userExistQuery(user.userName);
     var getUserCarpoolsQuery = r.db(db)
       .table('users')
@@ -188,7 +204,7 @@ module CarpoolService {
         r.expr('user not found')
       );
 
-    return q.run(getUserCarpoolsIfUserExistQuery)()
+    return q.run(getUserCarpoolsIfUserExistQuery, 'getUserCarpools')()
       .then((result) => {
         if (result == 'user not found') {
           throw new errors.UserNotFoundException()
@@ -196,6 +212,47 @@ module CarpoolService {
           return result;
         }
       })
+  }
+
+  export interface CarpoolUpdateModel {
+    name?:string;
+    description?:string;
+    campus?:string;
+    pickupLocation?:models.Address;
+  }
+
+  export function updateCarpool(carpoolID:string, updatedCarpool:CarpoolUpdateModel) : Promise<any> {
+    var doesCarpoolExistQuery = doesCarpoolExistGivenID(carpoolID);
+    var updateCarpoolQuery = r.db(db).table(table).get(carpoolID).update(updatedCarpool);
+
+    function getCarpoolUpdateQuery() : r.Expression<any> {
+      if (updatedCarpool.campus) {
+        return r.branch(
+          doesCarpoolExistQuery,
+          r.branch(
+            campusSvc.campusExistsGivenIDQuery(updatedCarpool.campus),
+            updateCarpoolQuery,
+            r.expr('campus does not exist')
+          ),
+          r.expr('carpool does not exist')
+          );
+      } else {
+        return r.branch(
+          doesCarpoolExistQuery,
+          updateCarpoolQuery,
+          r.expr('carpool does not exist')
+        );
+      }
+    }
+
+    return q.run(getCarpoolUpdateQuery())()
+      .then((result) => {
+        if (result == 'carpool does not exist') {
+          throw new errors.CarpoolNotFoundException();
+        } else if (result == 'campus does not exist') {
+          throw new errors.CampusNotFoundException();
+        }
+      });
   }
 
   export function addUserToCarpool(carpoolID:string, participant:models.User)
@@ -229,7 +286,7 @@ module CarpoolService {
       r.expr('participant does not exist')
     );
 
-    return q.run(query)()
+    return q.run(query, 'addUserToCarpool')()
       .then((result) => {
         if (result == 'carpool does not exist') {
           throw new errors.CarpoolNotFoundException();

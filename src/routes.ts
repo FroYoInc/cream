@@ -6,6 +6,7 @@ import carpoolCtrl = require('./controllers/carpools');
 import CarpoolCtrl = require('./controllers/carpool.ctrl');
 import CampusCtrl = require('./controllers/campus.ctrl');
 import c = require("./config");
+import auth = require('./services/user-auth');
 
 class routes{
 
@@ -19,23 +20,9 @@ class routes{
         //make sure to put it below block of code that say important
         server.post("/api/users", CreateUserCtrl.createUser);
         server.get('/api/activate/:activate', ActivationController.activate);
-
-
-        /*********** Carpool routes ***********/
-        server.post('/api/carpools', CarpoolCtrl.createCarpool);
-        server.get('/api/carpools', CarpoolCtrl.getCarpools);
-        server.get('/api/carpools/:carpoolid', CarpoolCtrl.getCarpool);
-        server.post("/api/carpools/request", carpoolCtrl.requestToJoin);
-        server.post("/api/carpools/addUser", carpoolCtrl.approveRequest);
-        server.post("/api/carpools/denyUser", carpoolCtrl.denyRequest);
-
-        /*********** Campus routes ************/
-        server.post('/api/campuses', CampusCtrl.createCampus);
-        server.get('/api/campuses', CampusCtrl.listCampuses);
-
+        server.post('/api/activate/resend', ActivationController.resendActivation);
 
         /*********** Documentation routes ***********/
-
 
         // /docs does not render the css correctly, so redirect to /docs/
         server.get('/docs', function(req, res, next){
@@ -47,6 +34,33 @@ class routes{
           directory: c.Config.docs.dir,
           default: c.Config.docs.defaultFile
         }));
+
+        /**********************************/
+        /***********  IMPORTANT ***********/
+        /**********************************/
+        // All routes that go after this middleware will require user authorization
+        // If your route does not require user authorization, place it above this middleware
+        server.use( (req, res, next) => {
+            auth.checkAuthMiddle(req, res, next);
+        })
+
+        /*********** Carpool routes ***********/
+        server.post('/api/carpools', CarpoolCtrl.createCarpool);
+        server.get('/api/carpools', CarpoolCtrl.getCarpools);
+        server.get("/api/carpools/requests", carpoolCtrl.getNotifications);
+        server.put('/api/carpools/:carpoolID', CarpoolCtrl.updateCarpool);
+        server.post("/api/carpools/request", carpoolCtrl.requestToJoin);
+        server.post("/api/carpools/addUser", carpoolCtrl.approveRequest);
+        server.post("/api/carpools/denyUser", carpoolCtrl.denyRequest);
+        server.get('/api/carpools/:carpoolid', CarpoolCtrl.getCarpool); 
+        server.get('/api/user/carpools/', carpoolCtrl.getUserCarpools);
+        
+        /*********** Campus routes ************/
+        server.post('/api/campuses', CampusCtrl.createCampus);
+        server.get('/api/campuses', CampusCtrl.listCampuses);
+
+
+
     }
 }
 

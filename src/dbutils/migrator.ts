@@ -23,7 +23,7 @@ module DBUtils {
       },
       {
         tableName: 'carpools',
-        indices: ['name']
+        indices: ['name', 'pickupLocation.geoCode']
       },
       {
         tableName: 'campuses',
@@ -35,7 +35,7 @@ module DBUtils {
       },
       {
         tableName : "requests",
-        indices: ["userID"]
+        indices: ["carpoolID"]
       }]
     };
 

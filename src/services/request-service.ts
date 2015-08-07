@@ -8,18 +8,27 @@ import models = require('../models/models');
 import errors = require('../errors/errors');
 import config = require('../config');
 
-
 module RequestService {
     var db = "froyo";
     var table = "requests";
 
-    export function createRequest(userID:string, carpoolID:string) : Promise<boolean> {
+    export function createRequest(userID:string, carpoolID:string, firstName:string, 
+                                  lastName:string, carpoolName: string) : Promise<boolean> {
 
         var createRequestIfItDoesNotExist =
-        r.db(db).table(table).insert({id: userID + carpoolID, userID: userID,carpoolID: carpoolID}, {conflict: "error"});
+            r.db(db)
+            .table(table)
+            .insert({
+                id: userID + carpoolID, 
+                userID: userID, 
+                firstName: firstName,
+                lastName: lastName,
+                carpoolID: carpoolID,
+                carpoolName: carpoolName
+            },{conflict:"error"});
 
         return q.run(
-          createRequestIfItDoesNotExist)()
+          createRequestIfItDoesNotExist, 'createRequest')()
           .then((result) => {
             if (result.errors > 0) {
                 throw new errors.CarpoolRequestConflictException();
@@ -36,7 +45,7 @@ module RequestService {
         var removeRequestQuery = r.db(db).table(table).get(userID + carpoolID).delete();
 
         return q.run(
-          removeRequestQuery)()
+          removeRequestQuery, 'removeRequest')()
           .then((result) => {
             if (result.deleted === 0) {
                 throw new errors.CarpoolRequestNotFoundException();
@@ -53,15 +62,40 @@ module RequestService {
 
         var getByUserID = r.db(db).table(table).filter({userID: userID}).coerceTo('array');
 
-        return q.run(getByUserID)();
+        return q.run(getByUserID, 'getRequestByUserID')();
     }
 
-    export function getRequestByCarpoolID(carpoolID:string){
+    export function getRequestByCarpoolID(carpoolID:any){
+        
+        var getByCarpoolID = r.db(db).table(table).filter({carpoolID: carpoolID})
+                             .pluck("carpoolID", "carpoolName", "firstName", "lastName", "userID")
+                             .coerceTo('array');
+        
+        return q.run(getByCarpoolID, 'getRequestByCarpoolID')();
 
-        var getByCarpoolID = r.db(db).table(table).filter({carpoolID: carpoolID}).coerceTo('array');
-
-        return q.run(getByCarpoolID)();
     }
+
+    export function getAllRequestsForUser(user: models.User): Promise<Array<any>>{
+        
+        var requests = [];
+        var numFinished = 0;
+        return new Promise<Array<any>>((resolve, reject) => {
+            user.carpools.map((obj, index) => {
+                getRequestByCarpoolID(obj)
+                .then((_requests) =>{
+                    requests = requests.concat(_requests);
+                    ++numFinished;
+                    if(numFinished === user.carpools.length){
+                      resolve(requests);
+                    }
+                })
+            });
+            if(user.carpools.length === 0){
+                resolve([]);
+            }
+        });
+
+    } 
 }
 
 export = RequestService;

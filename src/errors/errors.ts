@@ -134,6 +134,20 @@ module Errors {
     }
   }
 
+  export class ActivationDataNotFoundException extends Exception {
+    constructor(){
+      super("No actiation data for the user was found",
+      'ActivationDataNotFoundException');
+    }
+  }
+
+  export class ActivationSendLockException extends Exception {
+    constructor(){
+      super("The user account is still in lockout for a recent activation resend",
+      'ActivationSendLockException');
+    }
+  }
+
   export class BcryptSaltError extends Exception {
     constructor(message: string){
       super(message, 'BcryptSaltError');
@@ -170,6 +184,12 @@ module Errors {
     constructor(message){
       super(message, 'UserAlreadyInCarpool');
     } 
+  }
+
+  export class UserNotInCarpool extends Exception {
+    constructor(){
+      super("User must be a member to update carpool.", 'UserNotInCarpool');
+    }
   }
 
 }

@@ -24,6 +24,7 @@ module Models {
     participants: [User]; // An array of user ids
     campus: Campus;
     description: string;
+    pickupLocation: Address;
     id?: string;
   }
 
@@ -43,9 +44,9 @@ module Models {
 
   export interface UserData {
     id: string;
-    activationCode: string;
     numLoginAttempts: number;
     lockoutExpiration: number;
+    activationLockout?: number;
   }
 
   export interface Activation {

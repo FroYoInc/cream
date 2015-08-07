@@ -1,6 +1,7 @@
 import restify = require('restify')
 import carpoolService = require('../services/carpool.svc')
 import userCtrl = require('./create-user.ctrl');
+import userService = require('../services/user-service');
 import campusCtrl = require('./campus.ctrl');
 import models = require('../models/models');
 import errors = require('../errors/errors');
@@ -12,6 +13,7 @@ module CarpoolController {
     owner: userCtrl.OutputJSON;
     campus: any; // This should be of type CampusController.OutputJSON
     participants: Array<userCtrl.OutputJSON>;
+    pickupLocation: models.Address;
     href: string;
   }
 
@@ -22,6 +24,7 @@ module CarpoolController {
       'owner': userCtrl.toOutputJSON(carpool.owner),
       'campus': campusCtrl.toOutputJSON(carpool.campus),
       'participants': carpool.participants.map(userCtrl.toOutputJSON),
+      'pickupLocation': carpool.pickupLocation,
       'href': '/carpools/' + carpool.id
     };
   }
@@ -31,26 +34,42 @@ module CarpoolController {
       var campusName:string = req.body.campus;
       var description:string = req.body.description;
       var owner:string = req.body.owner;
+      var pickupLocation:models.Address = req.body.pickupLocation;
 
-      carpoolService.createCarpool(
-        carpoolName, campusName, description, owner)
-        .then((carpool) => {
-          res.send(201, toOutputJSON(carpool));
-        })
-        .catch(errors.CarpoolOwnerNotFoundException,
-          errors.CampusNotFoundException, (err) => {
-          next(new restify.NotAcceptableError(err.message));
-        })
-        .catch(errors.CarpoolExistException, (err) => {
-          next(new restify.ConflictError(err.message));
-        })
-        .catch((err) => {
-          next(new restify.InternalServerError(err.message));
-        })
-        .error((err) => {
-          next(new restify.InternalServerError(err.message));
-        })
-        .then(next);
+      userService.userAlreadyHasCarpool(req.session["userID"])
+      .then( (result) => {
+        if(!result){
+          carpoolService.createCarpool(
+            carpoolName, campusName, description, owner, pickupLocation)
+            .then((carpool) => {
+              res.send(201, toOutputJSON(carpool));
+            })
+            .catch(errors.CarpoolOwnerNotFoundException,
+              errors.CampusNotFoundException, (err) => {
+              next(new restify.NotAcceptableError(err.message));
+            })
+            .catch(errors.CarpoolExistException, (err) => {
+              next(new restify.ConflictError(err.message));
+            })
+            .catch((err) => {
+              next(new restify.InternalServerError(err.message));
+            })
+            .error((err) => {
+              next(new restify.InternalServerError(err.message));
+            })
+            .then(next);
+        }
+        else{
+          next(new restify.ForbiddenError("User alredy in a carpool."));
+        }
+      })
+      .catch(errors.UserNotFoundException, (err) => {
+        next(new restify.InternalServerError(err.message));
+      })
+
+
+
+
   }
 
   export function getCarpool(
@@ -87,6 +106,45 @@ module CarpoolController {
       .catch((err) => {
         next(new restify.InternalServerError(err.message))
       });
+  }
+
+  export function updateCarpool(req:restify.Request, res:restify.Response, next:restify.Next) {
+    var carpoolID = req.params.carpoolID;
+
+    function getIDFromHref(href:string) : string {
+      var hrefComponents = href.split('/');
+      return hrefComponents[hrefComponents.length - 1];
+    }
+
+    function addFieldFromJSON(JSONObject, newObject, fieldName:string) {
+      if (JSONObject[fieldName]) {
+        newObject[fieldName] = JSONObject[fieldName];
+      }
+      return newObject;
+    }
+
+    function getCarpoolUpdate(requestBody) {
+      var carpoolUpdate = {};
+      carpoolUpdate = addFieldFromJSON(requestBody, carpoolUpdate, "name");
+      carpoolUpdate = addFieldFromJSON(requestBody, carpoolUpdate, "description");
+      carpoolUpdate = addFieldFromJSON(requestBody, carpoolUpdate, "pickupLocation");
+      if(requestBody.campus) {
+        carpoolUpdate["campus"] = getIDFromHref(requestBody.campus);
+      }
+      return carpoolUpdate;
+    }
+
+    carpoolService.updateCarpool(carpoolID, getCarpoolUpdate(req.body))
+      .then(() => {
+        res.send(204);
+      })
+      .catch(errors.CarpoolNotFoundException, (err) => {
+        next(new restify.NotFoundError(err.message));
+      })
+      .catch((err) => {
+        next(new restify.InternalServerError(err.message));
+      })
+      .then(next);
   }
 }
 

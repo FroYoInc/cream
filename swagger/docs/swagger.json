@@ -202,6 +202,9 @@
                             "$ref": "#/definitions/Carpool"
                         }
                     },
+                    "403": {
+                        "description": "User already in a carpool."
+                    },
                     "406": {
                         "description": "Carpool owner or campus not found"
                     },
@@ -233,7 +236,7 @@
         "/api/carpools/{carpoolid}": {
             "get": {
                 "summary" : "Get Carpool by id",
-                "description" : "\nThis endpoint retrives a single Carpool given its id",
+                "description" : "\nThis endpoint retrieves a single Carpool given its id",
                 "parameters": [
                     {
                         "name": "carpoolid",
@@ -256,6 +259,40 @@
                         "schema": {
                             "$ref": "#/definitions/Carpool"
                         }
+                    }
+                }
+            },
+            "put": {
+                "summary" : "Update Carpool by id",
+                "description" : "\nThis endpoint updates a Carpool given the carpool ID and a JSON object containing any updated fields.",
+                "parameters": [
+                    {
+                        "name": "carpoolID",
+                        "in": "path",
+                        "description": "Carpool ID",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "UpdatedCarpool",
+                        "in": "body",
+                        "description": "JSON object containing new Carpool name, campus name, and/or description.",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/UpdatedCarpool"
+                        }
+                    }
+                ],
+                "tags" : ["Carpool"],
+                "responses" : {
+                    "500" : {
+                        "description" : "Internal server error"
+                    },
+                    "404" : {
+                        "description" : "Carpool with given ID not found"
+                    },
+                    "204": {
+                        "description" : "Carpool updated"
                     }
                 }
             }
@@ -284,6 +321,9 @@
                     },
                     "400": {
                         "description": "No carpool id provided."
+                    },
+                    "403": {
+                        "description": "User already in a carpool."
                     },
                     "401": {
                         "description": "Unauthorized attempt, user must be logged in to make a request."
@@ -381,6 +421,90 @@
                     }
                 }
             }
+        },
+        "/api/carpools/requests": {
+            "get": {
+                "summary": "Gets carpool join requests",
+                "description": "\nGets all of the join requests for all the carpools that a user is a member of.",
+                "tags": ["Carpool"],
+                "responses": {
+                    "200": {
+                        "description": "Success, notifications sent.",
+                        "schema": {
+                            "$ref": "#/definitions/notifications"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized attempt, user must be logged in."
+                    },
+                    "404": {
+                        "description": "User not found."
+                    },
+                    "500" : {
+                        "description" : "Internal Server error. Unable to make request"
+                    }
+                }
+            }
+        },
+
+        "/api/activate/resend": {
+            "post": {
+                "summary": "Resend a user's activation email",
+                "description": "\nCheck's if a user is activated and sends them an activation email if they are not.",
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "The email for the user requesting a resend.",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/resend"
+                        }
+                    }
+                ],
+                "tags": ["User"],
+                "responses": {
+                    "200": {
+                        "description": "Success, email sent."
+                    },
+                    "400": {
+                        "description": "Bad request, missing or incorrectly named parameter."
+                    },
+                    "404": {
+                        "description": "Unable to find user data."
+                    },
+                    "409": {
+                        "description": "User is already activated."
+                    },
+                    "423": {
+                        "description": "The account is on a lockout, it will be available to request another email shortly"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
+        },
+        "/api/user/carpools": {
+            "get": {
+                "summary": "Gets all the user's carpools",
+                "description": "\nGets all of the carpools that a user is associated with.",
+                "tags": ["Carpool", "User"],
+                "responses": {
+                    "200": {
+                        "description": "Success, carpool sent.",
+                        "schema": {
+                            "$ref": "#/definitions/Carpool"
+                        }
+                    },
+                    "404": {
+                        "description": "User not found."
+                    },
+                    "500": {
+                        "description": "Internal Server Error."
+                    }    
+                }
+            }
         }
 
     },
@@ -456,12 +580,12 @@
         "carpoolDenial" : {
             "required": [
                 "carpoolID",
-                "userToDenyId"
+                "userToDenyID"
 
             ],
             "properties" : {
                 "carpoolID" : { "required": true, "type" :"string"},
-                "userToDenyId" : { "required": true, "type" :"string"}
+                "userToDenyID" : { "required": true, "type" :"string"}
 
             }
         },
@@ -470,13 +594,23 @@
                 "name",
                 "description",
                 "campus",
+                "pickupLocation",
                 "owner"
             ],
             "properties": {
                 "name": {"required": true, "type": "string"},
                 "description": {"required": true, "type": "string"},
                 "campus": {"required": true, "type": "string"},
-                "owner": {"required": true, "type": "string"}
+                "owner": {"required": true, "type": "string"},
+                "pickupLocation": {"$ref": "#/definitions/Address"}
+            }
+        },
+        "UpdatedCarpool": {
+            "properties": {
+                "name": {"type": "string"},
+                "description": {"type": "string"},
+                "campus": {"type": "string"},
+                "pickupLocation": {"$ref": "#/definitions/Address"}
             }
         },
         "LoginInfo" : {
@@ -514,6 +648,7 @@
                 "participants",
                 "campus",
                 "description",
+                "pickupLocation",
                 "href"
 
             ],
@@ -528,6 +663,7 @@
                 },
                 "campus" : { "$ref": "#/definitions/Campus" },
                 "description" : {"type" : "string"},
+                "pickupLocation" : {"$ref" : "#/definitions/Address"},
                 "href" : {"type" :"string"}
             }
         },
@@ -554,6 +690,39 @@
                     "type": "string"
                 }
             }
+        },
+        "notifications" : {
+                "type" : "array",
+                "items" : {
+                    "$ref" :"#/definitions/notification"
+                }
+
+        },
+        "notification" : {
+            "properties": {
+                "carpoolID" : {"type": "string"},
+                "firstName" : {"type": "string"},
+                "lastName" : {"type": "string"},
+                "userID" : {"type": "string"},
+                "carpoolName" : {"type": "string"}
+            }
+
+        },
+        "resend" : {
+            "required":[
+                "email"
+            ],
+            "properties": {
+                "email" : {"type": "string"}
+        },
+        "userCarpools" : {
+                "type" : "array",
+                "items" : {
+                    "$ref" :"#/definitions/Carpool"
+                }
         }
+
     }
+}
+
 }

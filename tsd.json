@@ -31,6 +31,9 @@
     },
     "nodemailer-direct-transport/nodemailer-direct-transport.d.ts": {
       "commit": "faff1866df10486a4c50904236183edc62ca841e"
+    },
+    "statsd-client/statsd-client.d.ts": {
+      "commit": "f6c8ca47193fb67947944a3170912672ac3e908e"
     }
   }
 }

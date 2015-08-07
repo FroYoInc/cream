@@ -23,20 +23,28 @@ module carpoolControllers{
     }
 
     export function joinRequest(req: Restify.Request) : Promise<number> {
-        return new Promise<number>((resolve, reject) => {
+        return new Promise<number>((resolve, reject) => {  
           var validReq = pv.verifyParams(req.params.carpoolID);
           if(validReq){
-            auth.checkAuth(req)
-              .then( (isAuth) => {
-                if(isAuth){
-                  requestServ.createRequest(req.session["userID"], req.params.carpoolID)
+            var s = req.session;
+            userServ.getUserById(s['userID'])
+            .then( (user) => {
+              if(user.carpools.length >= 1){
+                resolve(403);
+              }
+              else{
+                carpoolServ.getCarpoolByID(req.params.carpoolID)
+                .then( (_carpool) =>{
+                  requestServ.createRequest(s["userID"], req.params.carpoolID,s["firstName"], s["lastName"], _carpool.name)
                     .then( (result) => {
                       if(result){
-                        // Notify the members of the carpool that someone wises to join
-                        carpoolServ.getCarpoolByID(req.params.carpoolID)
-                          .then(sendRequest)
-                          .catch(Error, (err) => {resolve(500)});
-                        resolve(201);
+                        sendRequest(_carpool)
+                        .then(()=>{
+                          resolve(201);
+                        })
+                        .catch(errors.CarpoolJoinRequestSendException, (err) =>{
+                          resolve(201);
+                        });
                       }
                       else{
                         resolve(500);
@@ -44,11 +52,14 @@ module carpoolControllers{
                     }).catch(errors.CarpoolRequestConflictException, (err) => {
                       resolve(409);
                     });
-                }
-                else{
-                  resolve(401);
-                }
-              });
+                })
+                .catch(Error, (err) => {resolve(500)});
+              }
+            })
+            .catch(errors.UserNotFoundException, (err) => {
+              resolve(404);
+            })
+
           }
 
           else {
@@ -71,33 +82,25 @@ module carpoolControllers{
     }
 
     export function approveUserRequest(req:Restify.Request){
-      return new Promise<number>((resolve, reject) => {
+      return new Promise<number>((resolve, reject) => {      
         var validReq = pv.verifyParams(req.params.carpoolID, req.params.userToAddID);
         if(validReq){
-            auth.checkAuth(req)
-              .then( (isAuth) => {
-                if(isAuth){
-                  carpoolServ.getCarpoolByID(req.params.carpoolID)
-                    .then((_carpool) => {
-                      var participants = [];
-                      _carpool.participants.map((obj) => {
-                        participants.push(obj.id);
-                      });
-                      if(participants.indexOf(req.session["userID"]) >= 0){
-                        addUser(req.params.userToAddID, req.params.carpoolID, resolve)
-                      }
-                      else{
-                        resolve(403);
-                      }
-                    })
-                    .catch(errors.CarpoolNotFoundException, (err) => {
-                      resolve(404)
-                    });
-                }
-                else{
-                  resolve(401);
-                }
+          carpoolServ.getCarpoolByID(req.params.carpoolID)
+            .then((_carpool) => {
+              var participants = [];
+              _carpool.participants.map((obj) => {
+                participants.push(obj.id);
               });
+              if(participants.indexOf(req.session["userID"]) >= 0){
+                addUser(req.params.userToAddID, req.params.carpoolID, resolve)
+              }
+              else{
+                resolve(403);
+              }
+            })
+            .catch(errors.CarpoolNotFoundException, (err) => {
+              resolve(404)
+            });
         }
         else {
           resolve(400);
@@ -145,38 +148,30 @@ module carpoolControllers{
     }
 
     export function denyUserRequest(req:Restify.Request){
-      return new Promise<number>((resolve, reject) => {
+      return new Promise<number>((resolve, reject) => {      
         var validReq = pv.verifyParams(req.params.carpoolID, req.params.userToDenyID);
 
         if(validReq){
-          auth.checkAuth(req)
-            .then( (isAuth) => {
-              if(isAuth){
-                carpoolServ.getCarpoolByID(req.params.carpoolID)
-                  .then((_carpool) => {
-                    var participants = [];
-                    _carpool.participants.map((obj) => {
-                      participants.push(obj.id);
-                    });
-                    if(participants.indexOf(req.session["userID"]) >= 0){
-                      removeUserRequest(req.params.userToDenyID, req.params.carpoolID, resolve);
-                    }
-                    else {
-                      resolve(403);
-                    }
-                  })
-                  .catch(errors.CarpoolNotFoundException, (err) => {
-                    // If the carpool does not exist, remove the request
-                    removeUserRequest(req.params.userToDenyID, req.params.carpoolID, resolve);
-                  })
-                  .catch(Error, (err) => {
-                    resolve(500);
-                  })
-              }
-              else{
-                resolve(401)
-              }
-            })
+            carpoolServ.getCarpoolByID(req.params.carpoolID)
+              .then((_carpool) => {
+                var participants = [];
+                _carpool.participants.map((obj) => {
+                  participants.push(obj.id);
+                });
+                if(participants.indexOf(req.session["userID"]) >= 0){
+                  removeUserRequest(req.params.userToDenyID, req.params.carpoolID, resolve);
+                }
+                else {
+                  resolve(403);
+                }
+              })
+              .catch(errors.CarpoolNotFoundException, (err) => {
+                // If the carpool does not exist, remove the request  
+                removeUserRequest(req.params.userToDenyID, req.params.carpoolID, resolve);
+              })
+              .catch(Error, (err) => {
+                resolve(500);
+              });
         }
         else {
           resolve(400);
@@ -192,6 +187,50 @@ module carpoolControllers{
             resolve(404);
           })
       }
+
+    }
+
+    export function getNotificationsHelper(req: Restify.Request) : Promise<any>{
+      return new Promise<any>((resolve, reject) => {
+        userServ.getUserById(req.session["userID"])
+        .then( (_user)=>{
+          requestServ.getAllRequestsForUser(_user)
+          .then( (notifications) => {
+            resolve({status: 200, data : notifications ? notifications : []});
+          })
+        })
+        .catch(errors.UserNotFoundException, (err) => {
+          resolve({status: 404, data : "User not found"});
+        })
+
+      });
+    }
+
+    export function getNotifications(req: Restify.Request, res: Restify.Response, next) {
+      getNotificationsHelper(req)
+      .then((result) => {
+        res.send(result.status, result.data);
+      })
+    }
+
+    export function getUserCarpools(req: Restify.Request, res: Restify.Response, next){
+        userServ.getUserById(req.session["userID"])
+        .then( (user) => {
+          carpoolServ.getUserCarpools(user)
+          .then( (carpools) => {
+            var data = carpools[0] != undefined ? carpools[0] : null;
+            res.send(200, data);
+            next();
+          })
+          .catch(errors.UserNotFoundException, (err) =>{
+            res.send(404, {"message":  "User not found"});
+            next();
+          });
+        })
+        .catch(errors.UserNotFoundException, (err) => {
+          res.send(404, {"message":  "User not found"});
+          next();
+        })
 
     }
 }

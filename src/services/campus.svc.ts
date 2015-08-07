@@ -37,6 +37,19 @@ module CampusService {
       .isEmpty().not();
   }
 
+
+  /**
+   * Checks if a campus exists, by ID.
+   * @param  {string} campusID   [description]
+   * @return {[type]}            [description]
+   */
+  export function campusExistsGivenIDQuery(campusID: string) {
+    return r.db(db)
+      .table(table)
+      .get(campusID)
+      .eq(null).not();
+  }
+
   /**
    * Creates a campus.
    * @param  {string}                 campusName [description]
@@ -51,7 +64,7 @@ module CampusService {
     };
 
     var createCampusIfDoesNotExistQuery = r.branch(campusExistsQuery(campusName), r.expr('campus exists'), createCampusQuery(campus));
-    var createCampusIfDoesNotExist = q.run(createCampusIfDoesNotExistQuery);
+    var createCampusIfDoesNotExist = q.run(createCampusIfDoesNotExistQuery, "createCampus");
 
     function throwErrorIfCampusExists(result) {
         if (result == 'campus exists') {
@@ -119,7 +132,7 @@ module CampusService {
       }
     }
 
-    return q.run(getCampusByNameQuery)()
+    return q.run(getCampusByNameQuery, 'getCampusByName')()
       .then(throwErrorIfCampusNotFound)
       .then(returnCampus);
   }
@@ -147,7 +160,7 @@ module CampusService {
       return <models.Campus> _campus;
     }
 
-    return q.run(getCampusByIdQuery)()
+    return q.run(getCampusByIdQuery, "getCampusById")()
       .then(throwErrorIfCampusNotFound)
       .then(returnCampus);
   }
@@ -166,7 +179,7 @@ module CampusService {
       return <models.Campus[]> _campusList;
     }
 
-    return q.run(getAllCampusesQuery)()
+    return q.run(getAllCampusesQuery, 'getCampusList')()
       .then(returnCampusList);
   }
 }
