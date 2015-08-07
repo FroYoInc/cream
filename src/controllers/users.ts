@@ -21,14 +21,15 @@ module userControllers{
 
     export function checkAdmin(req:Restify.Request,res:Restify.Response,next) {
       var p = req.params;
-      auth.checkAdmin(req).then(  (validAdmin) => {
-        if(validAdmin) {
-          res.send(200);
-        } else {
-          res.send(403, {"message" : "Not logged in as admin"});
-        }
-        }).catch(errors.UserNotFoundException, (err) => {
-          res.send(404);
+      auth.checkAdmin(req)
+        .then((validAdmin) => {
+          if(validAdmin) {
+                  res.send(200);
+          } else {
+                  res.send(403, {"message" : "Not logged in as admin"});
+          }
+          }).catch(errors.UserNotFoundException, (err) => {
+                  res.send(404);
           });
 }
 
@@ -100,7 +101,7 @@ module userControllers{
                 result? resolve(200) : resolve(406);
             })
             .catch(errors.UserNotFoundException, (err) => {
-                resolve(404);    
+                resolve(404);
             })
             .catch(Error, (err) => {
                 resolve(500);
@@ -141,7 +142,7 @@ module userControllers{
                             result ? resolve(200) : resolve(406);
                         })
                         .catch(errors.UserNotFoundException, (err) => {
-                            resolve(404);    
+                            resolve(404);
                         })
                         .catch(Error, (err) => {
                             resolve(500);
