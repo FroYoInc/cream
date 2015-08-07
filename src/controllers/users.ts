@@ -10,13 +10,29 @@ import uuid = require('uuid');
 import errors = require("../errors/errors");
 import EmailService = require('../services/email-service');
 
+
 module userControllers{
 
     /**
-     *  The controller for the user login function, verifies the params that it needs 
-     *  to function correctly, and checks that they are all defined.  Sends a 400 if they 
+     *  The controller for the user login function, verifies the params that it needs
+     *  to function correctly, and checks that they are all defined.  Sends a 400 if they
      *  are not.  If the params are all defined, then it attempts to log the user in.
      */
+
+    export function checkAdmin(req:Restify.Request,res:Restify.Response,next) {
+      var p = req.params;
+      auth.checkAdmin(req)
+        .then((validAdmin) => {
+          if(validAdmin) {
+                  res.send(200);
+          } else {
+                  res.send(403, {"message" : "Not logged in as admin"});
+          }
+          }).catch(errors.UserNotFoundException, (err) => {
+                  res.send(404);
+          });
+}
+
     export function login(req:Restify.Request,res:Restify.Response,next){
         var p = req.params;
         var validReq = pv.verifyParams(p.email, p.password);
@@ -30,7 +46,7 @@ module userControllers{
                            lastName: req.session["lastName"],
                            userName: req.session["userName"],
                            email: req.session["email"]
-                       }); 
+                       });
                     }
                     else{
                         res.send(status);
@@ -41,7 +57,7 @@ module userControllers{
                 });
         }
         else{
-            res.send(400,{"message": "Bad Request: invalid or missing paramters"});
+            res.send(400,{"message": "Bad Request: invalid or missing parameters"});
         }
         next();
     }
@@ -85,7 +101,7 @@ module userControllers{
                 result? resolve(200) : resolve(406);
             })
             .catch(errors.UserNotFoundException, (err) => {
-                resolve(404);    
+                resolve(404);
             })
             .catch(Error, (err) => {
                 resolve(500);
@@ -126,7 +142,7 @@ module userControllers{
                             result ? resolve(200) : resolve(406);
                         })
                         .catch(errors.UserNotFoundException, (err) => {
-                            resolve(404);    
+                            resolve(404);
                         })
                         .catch(Error, (err) => {
                             resolve(500);
