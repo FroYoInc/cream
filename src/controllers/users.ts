@@ -54,7 +54,7 @@ module userControllers{
                 });
         }
         else{
-            res.send(400,{"message": "Bad Request: invalid or missing paramters"});
+            res.send(400,{"message": "Bad Request: invalid or missing parameters"});
         }
         next();
     }
