@@ -400,7 +400,7 @@ describe('Carpool controller', () => {
 
     CarpoolSvc.createCarpool('Closest Carpool', 'PSU', 'Most convenient location ever.', owner.userName, closestCarpoolAddress)
       .then(() => {
-        return CarpoolSvc.getCarpools(10, 5000, convenientLocation.long, convenientLocation.lat, 'PSU');
+        return CarpoolSvc.getNearestCarpools(10, 'PSU', 5000, convenientLocation.long, convenientLocation.lat);
       })
       .then((_carpoolList) => {
         carpoolList = _carpoolList;

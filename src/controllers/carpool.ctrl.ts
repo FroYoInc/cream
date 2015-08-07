@@ -96,12 +96,16 @@ module CarpoolController {
   export function getCarpools(
     req:restify.Request, res:restify.Response, next:restify.Next) {
     function getCarpoolList() {
-      var radius:number = parseFloat(req.query.radius);
-      var long:number = parseFloat(req.query.long);
-      var lat:number = parseFloat(req.query.lat);
       var campusName:string = req.query.campusName;
 
-      return carpoolService.getCarpools(10, radius, long, lat, campusName);
+      if(req.query.radius && req.query.long && req.query.lat) {
+        var radius:number = parseFloat(req.query.radius);
+        var long:number = parseFloat(req.query.long);
+        var lat:number = parseFloat(req.query.lat);
+
+        return carpoolService.getNearestCarpools(10, campusName, radius, long, lat);
+      }
+      return carpoolService.getCarpools(10, campusName);
     }
 
     getCarpoolList()

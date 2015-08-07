@@ -170,19 +170,41 @@ module CarpoolService {
       });
   }
 
-  // This should take a limit as an argument and return no more than that number of carpools.
-  export function getCarpools(
+  // This should take a limit as an argument and return no more than that number of carpools. todo update comments
+  export function getNearestCarpools(
     limit: number,
+    campusName: string,
     radius: number,
     long: number,
-    lat: number,
-    campusName: string
+    lat: number
   ) :  Promise<models.Carpool[]> {
 
     var _db = r.db(db);
     var query = _db.table(table).getNearest(r.point(long,lat),{
       index: 'geoPoint', maxResults: limit, maxDist:radius, unit: 'mi'
     }).getField('doc').merge({
+      'campus': _db.table('campuses').get(r.row('campus')),
+      'owner': _db.table('users').get(r.row('owner')),
+      'participants': r.row('participants').map((p) => {
+        return _db.table('users').get(p);
+      })
+    }).filter({
+      campus: {
+        name: campusName
+      }
+    }).coerceTo('array');
+
+    return q.run(query, 'getCarpools')()
+      .then((_carpools) => {
+        return <Array<models.Carpool>> _carpools;
+      });
+  }
+
+  // This should take a limit as an argument and return no more than that number of carpools. todo update comments
+  export function getCarpools(limit: number, campusName: string) :  Promise<models.Carpool[]> {
+
+    var _db = r.db(db);
+    var query = _db.table(table).limit(limit).merge({
       'campus': _db.table('campuses').get(r.row('campus')),
       'owner': _db.table('users').get(r.row('owner')),
       'participants': r.row('participants').map((p) => {
