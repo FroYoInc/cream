@@ -35,8 +35,8 @@ class Params{
 class Body{
   name: string;
   campus: string;
-  pickupLocation: any;
   description: string;
+  pickupLocation: any;
   owner: any;
 }
 
@@ -86,7 +86,7 @@ function getCarpools(req:restify.Request, res:restify.Response)
       } else {
         resolve(null)
       }
-    };
+    }
     CarpoolCtrl.getCarpools(req, res, next)
   });
 }
@@ -377,7 +377,7 @@ describe('Carpool controller', () => {
 
   });
 
-  it('should retrieve a list of carpools', (done) => {
+  it('should retrieve a list of nearest carpools', (done) => {
     var carpoolList:models.Carpool[];
 
     function test(status, outputJSON) {
@@ -409,6 +409,31 @@ describe('Carpool controller', () => {
         req.query.long = convenientLocation.long;
         req.query.lat = convenientLocation.lat;
         req.query.radius = 5000;
+        req.query.campusName = 'PSU';
+        return getCarpools(req, res)
+      })
+      .catch(fail)
+      .error(fail)
+      .finally(done);
+  });
+
+  it('should retrieve a list of all carpools', (done) => {
+    var carpoolList:models.Carpool[];
+
+    function test(status, outputJSON) {
+      expect(status).toBe(200);
+      expect(outputJSON.length > 0).toEqual(true);
+      expect(carpoolList.length).toEqual(outputJSON.length);
+    }
+
+    var req = <restify.Request> {query: {}};
+    var res = <restify.Response> {send: test};
+
+    CarpoolSvc.getCarpools(10, 'PSU')
+      .then((_carpoolList) => {
+        carpoolList = _carpoolList;
+      })
+      .then(() => {
         req.query.campusName = 'PSU';
         return getCarpools(req, res)
       })
