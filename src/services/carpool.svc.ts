@@ -170,7 +170,10 @@ module CarpoolService {
       });
   }
 
-  // This should take a limit as an argument and return no more than that number of carpools. todo update comments
+  // This takes a limit for how many carpools to return,
+  // a campus name for filtering which carpools are returned,
+  // a radius in miles, and the lat and long for the user location
+  // as arguments and return a list carpools.
   export function getNearestCarpools(
     limit: number,
     campusName: string,
@@ -200,7 +203,9 @@ module CarpoolService {
       });
   }
 
-  // This should take a limit as an argument and return no more than that number of carpools. todo update comments
+  // This should take a limit of how many carpools to return,
+  // and a campus name as a filter for which carpools are returned
+  // as arguments and return a list of carpools.
   export function getCarpools(limit: number, campusName: string) :  Promise<models.Carpool[]> {
 
     var _db = r.db(db);
