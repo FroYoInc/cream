@@ -98,7 +98,7 @@ module CarpoolController {
     function getCarpoolList() {
       var campusName:string = req.query.campusName;
 
-      if(req.query.radius && req.query.long && req.query.lat) {
+      if(req.query.radius != undefined && req.query.long != undefined && req.query.lat != undefined) {
         var radius:number = parseFloat(req.query.radius);
         var long:number = parseFloat(req.query.long);
         var lat:number = parseFloat(req.query.lat);
