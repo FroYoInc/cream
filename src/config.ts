@@ -6,13 +6,17 @@ export class Config {
 
   static app = {
     'port': 8080,
-    'baseurl' : 'http://localhost'
+    'baseurl' : 'http://localhost',
+    'activationUrl': 'http://localhost:8080/activate/',
+    'loginPath': '/',
+    'invalidActivationPath': '/#/invalidActivation'
   };
 
   static statsd = {
     'host': '107.170.251.172',
     'port': 8125
   };
+
 
   static password = {
     salt: {

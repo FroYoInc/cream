@@ -6,6 +6,7 @@ import models = require('../models/models');
 import Promise = require('bluebird');
 import errors = require('../errors/errors');
 import pv = require('../validation/parameter-validator');
+import c = require('../config');
 
 module ActivationController {
   export function activate (req:Restify.Request,res:Restify.Response,next){
@@ -14,13 +15,13 @@ module ActivationController {
      userService.activateUser(activate)
       .then((user) => {
         //Activation was successfull. Refirect request to
-        res.header('Location', '/login');
+        res.header('Location', c.Config.app.loginPath);
         res.send(302);
 
       })
       .catch((err) => {
        //Activation was unsuccessful. Redirect request
-        res.header ('Location', '/invalid-activation');
+        res.header ('Location', c.Config.app.invalidActivationPath);
         res.send(302);
 
       });
