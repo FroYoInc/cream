@@ -3,16 +3,19 @@ export class Config {
     'host': 'localhost',
     'port': 28015
   };
-
   static app = {
     'port': 8080,
-    'baseurl' : 'http://localhost'
+    'baseurl' : 'http://localhost',
+    'activationUrl': 'http://localhost:3000/api/activate/',
+    'loginPath': '/',
+    'invalidActivationPath': '/#/invalidActivation'
   };
 
   static statsd = {
     'host': '107.170.251.172',
     'port': 8125
   };
+
 
   static password = {
     salt: {
