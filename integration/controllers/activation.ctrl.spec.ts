@@ -34,12 +34,12 @@ describe('Activation controller', () => {
 
    function test1(header, location) {
      expect(header).toBe('Location');
-     expect(location).toBe('/login');
+     expect(location).toBe('/');
    }
 
    function test2(header,location) {
      expect(header).toBe('Location');
-     expect(location).toBe('/invalid-activation');
+     expect(location).toBe('/#/invalidActivation');
    }
 
    function test3(statusCode){
@@ -76,7 +76,7 @@ describe('Activation controller', () => {
   })
 
   it('should resend an activation email', (done) => {
-    
+
     var test200 =  (result) => {expect(result).toBe(200)};
     var test400 =  (result) => {expect(result).toBe(400)};
     var test404 =  (result) => {expect(result).toBe(404)};
@@ -123,7 +123,7 @@ describe('Activation controller', () => {
                 ActivationCtrl.resendActivationHelper(req)
                 .then(test409)
                 .catch(fail)
-                .finally(done)               
+                .finally(done)
                 })
 
             })
