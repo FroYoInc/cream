@@ -93,7 +93,7 @@ There you will find various settings such as:
 
 The domain whitelist and SMTP settings are those of special interest -- as the whitelist tells the backend which email address domains to allow to be registered. The SMTP settings are important too, as if not properly configured users will not be able to receive activation emails.
 
-__Warning:__ If you modify SMTP settings, the backend application will have to be restarted for the changes to take effect.
+__Warning:__ If you modify SMTP settings (among others), the backend application will have to be restarted for the changes to take effect.
 
 ### 10) Start the backend
 Now, within the `wafflecone` root directory, run:
@@ -103,6 +103,49 @@ gulp &
 
 This will execute the unit tests and start up the backend, it should continue running in the background. The API should also be accessible at `{APPLICATION_URL_HERE}/api/`.
 
-### 11) To be continued
+### 11) Clone `sprinkles`
+The front end of Corpool now needs to be setup, which first requires cloning the project locally:
+```
+git clone https://github.com/FroYoInc/sprinkles.git
+cd sprinkles/
+```
 
-The front end setup still has to be written.
+### 12) Install `sprinkles` dependencies
+There are a few utilities which are required to install the dependencies of the front end.
+Run these commands first:
+```
+npm install bower -g
+npm install tsd -g
+```
+
+Now run all of the following:
+```
+npm install
+tsd reinstall
+bower install
+```
+
+The first installs any npm packages required by the front end to build (which we will do soon).
+The next downloads some TypeScript definition files (also required for the build to work),
+the last downloads things such as AngularJS's source.
+
+### 13) Build `sprinkles`
+Simply run, within the `sprinkles` directory:
+```
+gulp build
+```
+
+This transpiles the TypeScript into JavaScript, among other tasks.
+
+### 14) Move `dist` to `public_html`
+In the previous step we ran `gulp build`, which not only transpiled TypeScript to
+JavaScript, but it also moved anything required for the front end to work within the `dist` folder.
+
+If you cloned `sprinkles` locally, upload the `dist` folder and it's contents into the `public_html`
+folder (the index.html should be at the root of `public_html`). However, if you
+cloned `sprinkles` on the server itself, copy those to the `public_html` directory
+(the `cp -r [SRC] [DEST]` command might be useful).
+
+### 15) Enjoy!
+If all went well, you should now be able to point your browser to wherever the
+`public_html` directory is accessible and everything should be up and running.
