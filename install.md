@@ -84,7 +84,8 @@ Open up the `config.ts` file found within `src/config.ts` in your favorite text 
 
 There you will find various settings such as:
 - Database configuration for RethinkDB (defaults should be just fine)
-- The application port and baseurl (the port should be left alone, as modifying it requires a change to the nginx `virtual.conf` file -- however the baseurl should match the application base URL).
+- The application port and baseurl (the port should be left alone, as modifying it requires a change to the nginx `virtual.conf` file -- however the baseurl should match the application base URL). There is also an activationUrl,
+which simply needs to be in the format of: `htp://[BASEURL]/api/activate/`.
 - The number of rounds the salt is passed through before completing.
 - Login lockout settings (number of tries and the lockout time).
 - Minimum and maximum user name lengths.
