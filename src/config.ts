@@ -3,11 +3,10 @@ export class Config {
     'host': 'localhost',
     'port': 28015
   };
-
   static app = {
     'port': 8080,
     'baseurl' : 'http://localhost',
-    'activationUrl': 'http://localhost:8080/activate/',
+    'activationUrl': 'http://localhost:3000/api/activate/',
     'loginPath': '/',
     'invalidActivationPath': '/#/invalidActivation'
   };
