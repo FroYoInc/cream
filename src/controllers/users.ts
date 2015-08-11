@@ -100,7 +100,7 @@ module userControllers{
             .then((result) => {
                 result? resolve(200) : resolve(406);
             })
-            .catch(errors.UserNotFoundException, (err) => {
+            .catch(errors.UserNotFoundException, errors.EmailValidationException, (err) => {
                 resolve(404);
             })
             .catch(Error, (err) => {
@@ -141,7 +141,7 @@ module userControllers{
                         .then((result) => {
                             result ? resolve(200) : resolve(406);
                         })
-                        .catch(errors.UserNotFoundException, (err) => {
+                        .catch(errors.UserNotFoundException, errors.EmailValidationException, (err) => {
                             resolve(404);
                         })
                         .catch(Error, (err) => {
