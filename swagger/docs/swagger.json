@@ -118,6 +118,26 @@
                 }
             }
         },
+        "/api/users/checkadmin/": {
+            "get": {
+                "summary": "User Admin .",
+                "description": "\nChecks if logged in user is admin",
+                "tags": [
+                    "User"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User is admin."
+                    },
+                    "403" : {
+                        "description" : "User not admin."
+                    },
+                    "404" : {
+                        "description" : "User does not exist."
+                    }
+                }
+            }
+        },
         "/api/users": {
             "post": {
                 "summary": "Creates a user account.",
@@ -218,16 +238,9 @@
             },
 
             "get": {
-                "summary": "\n Returns all Carpools.",
+                "summary": "\n Returns a list of carpools.",
                 "description": "\n This end point returns an array of Carpools.",
                 "parameters": [
-                    {
-                        "name": "radius",
-                        "in": "query",
-                        "description": "Max distance from user's location to return carpools",
-                        "required": true,
-                        "type": "number"
-                    },
                     {
                         "name": "campusName",
                         "in": "query",
@@ -236,17 +249,24 @@
                         "type": "string"
                     },
                     {
+                        "name": "radius",
+                        "in": "query",
+                        "description": "Max distance from user's location to return carpools",
+                        "required": false,
+                        "type": "number"
+                    },
+                    {
                         "name": "long",
                         "in": "query",
                         "description": "Longitude coordinate for user's location",
-                        "required": true,
+                        "required": false,
                         "type": "number"
                     },
                     {
                         "name": "lat",
                         "in": "query",
                         "description": "Latitude coordinate for user's location",
-                        "required": true,
+                        "required": false,
                         "type": "number"
                     }
                 ],

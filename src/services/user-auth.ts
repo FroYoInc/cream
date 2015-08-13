@@ -9,6 +9,7 @@ import errors = require('../errors/errors');
 import c = require('../config');
 import pv = require('../validation/parameter-validator');
 
+
 module UserAuth{
 
     /**
@@ -30,6 +31,17 @@ module UserAuth{
          }
 
      }
+
+    export function checkAdmin(req: Restify.Request) : Promise<boolean>{
+        return new Promise<boolean>((resolve, reject) => {
+            userSer.getUserById(req.session["userID"])
+            .then((_user) => {
+                resolve(_user.isAdmin === true);
+            }).catch(errors.UserNotFoundException, (err) => {
+              reject(err);
+              })
+        })
+    }
 
     /**
      * Checks if the user is in the database. If they are in the database, it hashes

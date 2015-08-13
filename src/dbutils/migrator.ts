@@ -4,9 +4,13 @@
 import r = require('rethinkdb');
 import p = require('bluebird');
 import shapes = require('./shapes');
+import bcrypt = require("bcrypt");
+import utils = require("../utils/utils");
+import q = require('../dbutils/query');
 
 module DBUtils {
   export class Migrator {
+    private database ="froyo";
     static dbShape : shapes.DBShape = {
       dbname: 'froyo',
       tables: [{
@@ -34,6 +38,7 @@ module DBUtils {
         indices: ["carpoolID"]
       }]
     };
+
     private _conn : r.Connection;
 
     private setConnection(conn : r.Connection) {
@@ -78,8 +83,39 @@ module DBUtils {
     }
 
     private createAdminAccount() {
-      // User userService to create an admin
-      console.error("TODO")
+      var password = "welovefroyo";
+      var salt:string;
+      var user;
+
+      function generateAndSetSalt() {
+        return utils.genSalt()
+          .then((_salt) => {
+            salt = _salt;
+          });
+      }
+
+      function getPasswordHash() {
+        return utils.hash(password, salt);
+      }
+
+      generateAndSetSalt()
+        .then(getPasswordHash)
+        .then((hash) => {
+          user = {
+            firstName: 'Ad',
+            lastName: 'Min',
+            userName: 'admin',
+            email: 'admin@froyo.com',
+            isAccountActivated: true,
+            id: 'thisisadminid',
+            isAdmin: true,
+            salt: salt,
+            passwordHash: hash
+          };
+          q.run(r.db(this.database).table("users").insert(user, {conflict:"replace"}))();
+        })
+
+
     }
 
     migrate (connOpts : r.ConnectionOptions)  {
@@ -89,6 +125,9 @@ module DBUtils {
         .then(this.createTables)
         .then(this.createIndices)
         .then(this.closeConnection)
+        .then(()=> {
+          this.createAdminAccount();
+        })
     }
   }
 }
