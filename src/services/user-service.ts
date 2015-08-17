@@ -67,7 +67,7 @@ module UserService {
        firstName: firstName,
        lastName: lastName,
        userName: userName,
-       email: email,
+       email: email.toLowerCase(),
        isAccountActivated: false,
        carpools: [],
        passwordHash: passwordHash,

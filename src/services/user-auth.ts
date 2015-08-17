@@ -54,7 +54,7 @@ module UserAuth{
     export function authenticateUser(req:Restify.Request, em:string, pass:string) : Promise<number> {
 
         return new Promise<number>((resolve, reject) => {
-            userSer.getUserByEmail(em)
+            userSer.getUserByEmail(em.toLowerCase())
               .then( (user) => {
                 if(user.isAccountActivated === false){
                     resolve(403);
