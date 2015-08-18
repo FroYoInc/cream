@@ -115,31 +115,31 @@ describe('Database Migrator', () => {
     return last.concat(next);
   });
 
-  //it('should have created following indices: ' + JSON.stringify(indices), (done) => {
-  //  function checkIndices(i: Shapes.TableShape) {
-  //    return r.db(dbShape.dbname)
-  //      .table(i.tableName)
-  //      .indexList()
-  //      .contains(r.args(i.indices))
-  //      .run<Boolean>(conn)
-  //      .then((result) => {
-  //        if (result === false) {
-  //          var msg = "Table " + i.tableName + ' missing indices in ' +
-  //          JSON.stringify(i.indices);
-  //          throw new Error(msg);
-  //        } else {
-  //          return result;
-  //        }
-  //      })
-  //  }
-  //  var checks = dbShape.tables
-  //  .filter((t) => {
-  //    return t.indices.length !== 0;
-  //  })
-  //  .map(checkIndices);
-  //  Promise.all(checks)
-  //    .catch(fail)
-  //    .error(fail)
-  //    .finally(done);
-  //});
+  it('should have created following indices: ' + JSON.stringify(indices), (done) => {
+    function checkIndices(i: Shapes.TableShape) {
+      return r.db(dbShape.dbname)
+        .table(i.tableName)
+        .indexList()
+        .contains(r.args(i.indices))
+        .run<Boolean>(conn)
+        .then((result) => {
+          if (result === false) {
+            var msg = "Table " + i.tableName + ' missing indices in ' +
+            JSON.stringify(i.indices);
+            throw new Error(msg);
+          } else {
+            return result;
+          }
+        })
+    }
+    var checks = dbShape.tables
+    .filter((t) => {
+      return t.indices.length !== 0;
+    })
+    .map(checkIndices);
+    Promise.all(checks)
+      .catch(fail)
+      .error(fail)
+      .finally(done);
+  });
 });
