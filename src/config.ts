@@ -69,7 +69,7 @@ export class Config {
     firstName: 'Ad',
     lastName: 'Min',
     userName: 'admin',
-    email: 'admin3@' + Config.validator.domainWhitelist[0],
+    email: 'admin@' + Config.validator.domainWhitelist[0],
     password: 'welovefroyo'
   }
 }
