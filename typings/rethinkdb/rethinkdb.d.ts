@@ -247,6 +247,8 @@ declare module "rethinkdb" {
 
       hasFields(...fields:string[]):Expression<boolean>;
 
+      getField(a:string):Expression<any>;
+
       default(value:T):Expression<T>;
   }
 
