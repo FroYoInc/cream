@@ -7,7 +7,7 @@ import Shapes = require('../../src/dbutils/shapes');
 var migrator = new Migrator.Migrator();
 var conn : r.Connection;
 
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 20000;
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
 
 var dbShape : Shapes.DBShape = {
   dbname: 'froyo',
