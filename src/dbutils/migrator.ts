@@ -15,7 +15,7 @@ module DBUtils {
       dbname: 'froyo',
       tables: [{
         tableName: 'users',
-        indices: ['userName', 'email']
+        indices: [{name: 'userName'}, {name:'email'}]
       },
       {
         tableName: 'userData',
@@ -23,11 +23,11 @@ module DBUtils {
       },
       {
         tableName: 'carpools',
-        indices: ['name', 'pickupLocation.geoCode', 'geoPoint']
+        indices: [{name:'name'}, {name: 'pickupLocation.geoCode'}, {name: 'geoPoint', options: {geo: true}}]
       },
       {
         tableName: 'campuses',
-        indices: ['name']
+        indices: [{name:'name'}]
       },
       {
         tableName: 'activation',
@@ -35,7 +35,7 @@ module DBUtils {
       },
       {
         tableName : "requests",
-        indices: ["carpoolID"]
+        indices: [{name: "carpoolID"}]
       }]
     };
 
@@ -71,10 +71,10 @@ module DBUtils {
 
     private createIndices() {
       var forEachTable = (table: shapes.TableShape) => {
-        var createIndex = (i: string) => {
-          var test = r.db(Migrator.dbShape.dbname).table(table.tableName).indexList().contains(i);
+        var createIndex = (i: shapes.Index) => {
+          var test = r.db(Migrator.dbShape.dbname).table(table.tableName).indexList().contains(i.name);
           var trueBranch = r.now();
-          var falseBranch = (i == 'geoPoint')? r.db(Migrator.dbShape.dbname).table(table.tableName).indexCreate(i, {geo:true}) : r.db(Migrator.dbShape.dbname).table(table.tableName).indexCreate(i);
+          var falseBranch = r.db(Migrator.dbShape.dbname).table(table.tableName).indexCreate(i.name, i.options);
           return r.branch(test, trueBranch, falseBranch).run(this._conn);
         };
         return p.map(table.indices, createIndex);

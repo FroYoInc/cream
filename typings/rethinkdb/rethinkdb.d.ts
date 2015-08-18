@@ -178,6 +178,7 @@ declare module "rethinkdb" {
     durability?: string;  // 'soft'
     return_vals?: boolean; // false
     returnChanges?: boolean;
+    conflict?: string;
   }
 
   interface UpdateOptions {

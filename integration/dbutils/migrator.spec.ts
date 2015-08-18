@@ -13,7 +13,7 @@ var dbShape : Shapes.DBShape = {
   dbname: 'froyo',
   tables: [{
     tableName: 'users',
-    indices: ['userName', 'email']
+    indices: [{name: 'userName'}, {name:'email'}]
   },
   {
     tableName: 'userData',
@@ -21,11 +21,11 @@ var dbShape : Shapes.DBShape = {
   },
   {
     tableName: 'carpools',
-    indices: ['name', 'pickupLocation.geoCode', 'geoPoint']
+    indices: [{name:'name'}, {name:'pickupLocation.geoCode'}, {name:'geoPoint',options: {geo: true}}]
   },
   {
     tableName: 'campuses',
-    indices: ['name']
+    indices: [{name:'name'}]
   },
   {
     tableName: 'activation',
@@ -33,7 +33,7 @@ var dbShape : Shapes.DBShape = {
   },
   {
     tableName : "requests",
-    indices: ["carpoolID"]
+    indices: [{name: "carpoolID"}]
   }]
 };
 
@@ -120,7 +120,7 @@ describe('Database Migrator', () => {
       return r.db(dbShape.dbname)
         .table(i.tableName)
         .indexList()
-        .contains(r.args(i.indices))
+        .contains(r.args(i.indices.map((_) => {return _.name})))
         .run<Boolean>(conn)
         .then((result) => {
           if (result === false) {
