@@ -64,4 +64,12 @@ export class Config {
     dir:"./swagger",
     defaultFile:"index.html"
   }
+
+  static admin = {
+    firstName: 'Ad',
+    lastName: 'Min',
+    userName: 'admin',
+    email: 'admin3@' + Config.validator.domainWhitelist[0],
+    password: 'welovefroyo'
+  }
 }

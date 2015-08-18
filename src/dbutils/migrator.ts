@@ -7,6 +7,7 @@ import shapes = require('./shapes');
 import bcrypt = require("bcrypt");
 import utils = require("../utils/utils");
 import q = require('../dbutils/query');
+import c = require('../config');
 
 module DBUtils {
   export class Migrator {
@@ -83,7 +84,6 @@ module DBUtils {
     }
 
     private createAdminAccount() {
-      var password = "welovefroyo";
       var salt:string;
       var user;
 
@@ -95,19 +95,18 @@ module DBUtils {
       }
 
       function getPasswordHash() {
-        return utils.hash(password, salt);
+        return utils.hash(c.Config.admin.password, salt);
       }
 
       generateAndSetSalt()
         .then(getPasswordHash)
         .then((hash) => {
           user = {
-            firstName: 'Ad',
-            lastName: 'Min',
-            userName: 'admin',
-            email: 'admin@froyo.com',
+            firstName: c.Config.admin.firstName,
+            lastName: c.Config.admin.lastName,
+            userName: c.Config.admin.userName,
+            email: c.Config.admin.email,
             isAccountActivated: true,
-            id: 'thisisadminid',
             isAdmin: true,
             salt: salt,
             passwordHash: hash
