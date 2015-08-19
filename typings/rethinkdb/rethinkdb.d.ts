@@ -96,7 +96,8 @@ declare module "rethinkdb" {
   interface Table extends Sequence {
     indexCreate(name:string, index?:ExpressionFunction<any>):Expression<any>;
     indexCreate(name:string, options:{multi?:boolean;geo?:boolean}):Expression<any>;
-    indexWait(name:string, options?:{multi?:boolean;geo?:boolean}):Expression<any>;
+    indexStatus(name:string):Expression<any>;
+    indexWait(name?:string, options?:{multi?:boolean;geo?:boolean}):Expression<any>;
     indexDrop(name:string):Operation<DropResult>;
     indexList():Expression<any>;
 

@@ -77,10 +77,10 @@ module DBUtils {
           console.log(i.name, i.options);
           var falseBranch = r.db(Migrator.dbShape.dbname).table(table.tableName).indexCreate(i.name, i.options);
           return r.branch(test, trueBranch, falseBranch).run(this._conn)
-            .delay(1000)
             .then(() => {
-              return r.db(Migrator.dbShape.dbname).table(table.tableName).indexWait(i.name).run(this._conn)
-            });
+              return r.db(Migrator.dbShape.dbname).table(table.tableName).indexWait().run(this._conn);
+            })
+            .tap(console.log);
         };
         return p.map(table.indices, createIndex);
       };
