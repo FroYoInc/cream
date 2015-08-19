@@ -34,7 +34,7 @@ describe('Activation controller', () => {
 
    function test1(header, location) {
      expect(header).toBe('Location');
-     expect(location).toBe('/');
+     expect(location).toBe('/#/validActivation');
    }
 
    function test2(header,location) {
