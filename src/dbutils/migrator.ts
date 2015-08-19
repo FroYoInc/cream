@@ -66,7 +66,7 @@ module DBUtils {
           .tableCreate(t.tableName);
         return r.branch(test, trueBranch, falseBranch).run(this._conn)
           .then(() => {
-            return r.db(Migrator.dbShape.dbname).table(t.tableName).indexList().run(this._conn)
+            return r.db(Migrator.dbShape.dbname).table(t.tableName).indexWait().run(this._conn)
           }).tap(console.log);
       };
       return p.map(Migrator.dbShape.tables, createTable);
@@ -80,7 +80,7 @@ module DBUtils {
           var falseBranch = r.db(Migrator.dbShape.dbname).table(table.tableName).indexCreate(i.name, i.options);
           return r.branch(test, trueBranch, falseBranch).run(this._conn)
             .then(() => {
-              return r.db(Migrator.dbShape.dbname).table(table.tableName).indexWait().run(this._conn);
+              return r.db(Migrator.dbShape.dbname).table(table.tableName).indexList().run(this._conn);
             })
             .tap((d) => {
               console.log(table.tableName, d)
