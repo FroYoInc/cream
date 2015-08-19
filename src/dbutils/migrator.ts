@@ -85,7 +85,10 @@ module DBUtils {
             })
             .tap(console.log);
         };
-        return p.map(table.indices, createIndex);
+        return r.db(Migrator.dbShape.dbname).table(table.tableName).wait().run(this._conn)
+          .then(() => {
+            return p.map(table.indices, createIndex);
+          });
       };
       return p.map(Migrator.dbShape.tables, forEachTable);
     }
