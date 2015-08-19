@@ -76,7 +76,10 @@ module DBUtils {
           var test = r.db(Migrator.dbShape.dbname).table(table.tableName).indexList().contains(i.name);
           var trueBranch = r.now();
           var falseBranch = r.db(Migrator.dbShape.dbname).table(table.tableName).indexCreate(i.name, i.options);
-          return r.branch(test, trueBranch, falseBranch).run(this._conn);
+          return r.branch(test, trueBranch, falseBranch).run(this._conn)
+            .then(() => {
+              return r.db(Migrator.dbShape.dbname).table(table.tableName).indexWait(i.name).run(this._conn)
+            });
         };
         return p.map(table.indices, createIndex);
       };
