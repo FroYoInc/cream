@@ -123,6 +123,7 @@ describe('Database Migrator', () => {
         .contains(r.args(i.indices.map((_) => {return _.name})))
         .run<Boolean>(conn)
         .then((result) => {
+          console.log(result);
           if (result === false) {
             var msg = "Table " + i.tableName + ' missing indices in ' +
             JSON.stringify(i.indices);
@@ -130,14 +131,13 @@ describe('Database Migrator', () => {
           } else {
             return result;
           }
-        })
+        });
     }
     var checks = dbShape.tables
-    .filter((t) => {
-      return t.indices.length !== 0;
-    })
-    .map(checkIndices);
-    Promise.all(checks)
+      .filter((t) => {
+        return t.indices.length !== 0;
+      });
+    Promise.map(checks, checkIndices)
       .catch(fail)
       .error(fail)
       .finally(done);
