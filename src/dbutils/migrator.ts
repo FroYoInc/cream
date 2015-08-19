@@ -74,8 +74,10 @@ module DBUtils {
         var createIndex = (i: shapes.Index) => {
           var test = r.db(Migrator.dbShape.dbname).table(table.tableName).indexList().contains(i.name);
           var trueBranch = r.now();
+          console.log(i.name, i.options);
           var falseBranch = r.db(Migrator.dbShape.dbname).table(table.tableName).indexCreate(i.name, i.options);
           return r.branch(test, trueBranch, falseBranch).run(this._conn)
+            .delay(50)
             .then(() => {
               return r.db(Migrator.dbShape.dbname).table(table.tableName).indexWait(i.name).run(this._conn)
             });
