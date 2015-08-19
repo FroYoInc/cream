@@ -27,7 +27,7 @@ module CarpoolController {
       'participants': carpool.participants.map(userCtrl.toOutputJSON),
       'pickupLocation': carpool.pickupLocation,
       'href': '/carpools/' + carpool.id,
-      'dist': carpool['dist'] ? carpool['dist'] : 0
+      'dist': carpool['dist'] != undefined ? carpool['dist'] : -1
     };
   }
   export function createCarpool(
