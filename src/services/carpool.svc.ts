@@ -190,6 +190,7 @@ module CarpoolService {
       'id': r.row('doc').getField('id'),
       'description': r.row('doc').getField('description'),
       'pickupLocation': r.row('doc').getField('pickupLocation'),
+      'dist': r.row('dist'),
       'campus': _db.table('campuses').get(r.row('doc').getField('campus')),
       'owner': _db.table('users').get(r.row('doc').getField('owner')),
       'participants': r.row('doc').getField('participants').map((p) => {
