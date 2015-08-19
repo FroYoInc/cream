@@ -590,8 +590,8 @@ describe('Carpool controller', () => {
 
   it('should deny a request', (done) => {
     goodUser.id = "01234";
-    goodUser.email = utils.validEmail("bobLobLaw");
-    goodUser.userName = "bobLobLaw";
+    goodUser.email = utils.validEmail("somerandomemailaddressthatnoonehas");
+    goodUser.userName = "ok";
     member.req.params.userToDenyID  = goodUser.id;
     good.req.params.userToDenyID = goodUser.id;
     good.req.session["userID"] = goodUser.id;

@@ -7,7 +7,7 @@ export class Config {
     'port': 8080,
     'baseurl' : 'http://localhost',
     'activationUrl': 'http://localhost:3000/api/activate/',
-    'loginPath': '/',
+    'loginPath': '/#/validActivation',
     'invalidActivationPath': '/#/invalidActivation'
   };
 
