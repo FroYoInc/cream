@@ -385,6 +385,8 @@ describe('Carpool controller', () => {
       expect(outputJSON.length > 0).toEqual(true);
       expect(carpoolList.length).toEqual(outputJSON.length);
       expect(carpoolList[0].name).toEqual('Closest Carpool');
+      expect(carpoolList[0]['dist']).toBeDefined();
+      expect(carpoolList[0]['dist']).toEqual(0);
     }
 
     var req = <restify.Request> {query: {}};
