@@ -100,6 +100,7 @@ declare module "rethinkdb" {
     indexWait(name?:string, options?:{multi?:boolean;geo?:boolean}):Expression<any>;
     indexDrop(name:string):Operation<DropResult>;
     indexList():Expression<any>;
+    wait():Expression<any>;
 
     insert(obj:any[], options?:InsertOptions):Operation<WriteResult>;
     //insert(obj:any, options?:InsertOptions):Operation<WriteResult>;

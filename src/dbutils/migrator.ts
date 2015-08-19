@@ -64,7 +64,10 @@ module DBUtils {
         var trueBranch = r.now();
         var falseBranch = r.db(Migrator.dbShape.dbname)
           .tableCreate(t.tableName);
-        return r.branch(test, trueBranch, falseBranch).run(this._conn);
+        return r.branch(test, trueBranch, falseBranch).run(this._conn)
+          .then(() => {
+            return r.db(Migrator.dbShape.dbname).table(t.tableName).wait().run(this._conn);
+          }).tap(console.log);
       };
       return p.map(Migrator.dbShape.tables, createTable);
     }
