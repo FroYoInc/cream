@@ -114,7 +114,7 @@ module DBUtils {
             salt: salt,
             passwordHash: hash
           };
-          q.run(r.db(this.database).table("users").insert(user, {conflict:"replace"}))();
+          return q.run(r.db(this.database).table("users").insert(user, {conflict:"replace"}))();
         })
 
 
@@ -127,9 +127,7 @@ module DBUtils {
         .then(this.createTables)
         .then(this.createIndices)
         .then(this.closeConnection)
-        .then(()=> {
-          this.createAdminAccount();
-        })
+        .then(this.createAdminAccount)
     }
   }
 }
