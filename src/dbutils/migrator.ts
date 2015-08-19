@@ -11,7 +11,6 @@ import c = require('../config');
 
 module DBUtils {
   export class Migrator {
-    private database ="froyo";
     static dbShape : shapes.DBShape = {
       dbname: 'froyo',
       tables: [{
@@ -101,7 +100,7 @@ module DBUtils {
         return utils.hash(c.Config.admin.password, salt);
       }
 
-      generateAndSetSalt()
+      return generateAndSetSalt()
         .then(getPasswordHash)
         .then((hash) => {
           user = {
@@ -114,7 +113,7 @@ module DBUtils {
             salt: salt,
             passwordHash: hash
           };
-          return q.run(r.db(this.database).table("users").insert(user, {conflict:"replace"}))();
+          return q.run(r.db(Migrator.dbShape.dbname).table("users").insert(user, {conflict:"replace"}))();
         })
 
 
@@ -126,8 +125,8 @@ module DBUtils {
         .then(this.createDatabase)
         .then(this.createTables)
         .then(this.createIndices)
-        .then(this.closeConnection)
         .then(this.createAdminAccount)
+        .then(this.closeConnection)
     }
   }
 }
