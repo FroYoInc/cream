@@ -296,6 +296,7 @@ module UserService {
         })
       })
       .catch(errors.UserNotFoundException, reject)
+      .catch(errors.EmailValidationException, reject)
     });
 
     function createNewSaltAndHash(user:models.User, password:string): Promise<models.User>{
