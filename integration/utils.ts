@@ -37,7 +37,7 @@ module Utils {
   }
   export function em() {return rs() + '@' + vem();}
   export function validEmail(userName) {
-    return userName + '@' + vem();
+    return (userName + '@' + vem()).toLowerCase();
   }
 
   export function createRandomUser():Promise<models.User> {

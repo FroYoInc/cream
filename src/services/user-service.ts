@@ -67,7 +67,7 @@ module UserService {
        firstName: firstName,
        lastName: lastName,
        userName: userName,
-       email: email,
+       email: email.toLowerCase(),
        isAccountActivated: false,
        carpools: [],
        passwordHash: passwordHash,
@@ -175,7 +175,7 @@ module UserService {
   export function getUserByEmail(email: string):Promise<models.User> {
     var getUserByEmailQuery = r.db(db)
       .table(table)
-      .getAll(email, {index: emailIndex})
+      .getAll(email.toLowerCase(), {index: emailIndex})
       .coerceTo('array');
     return emailValidator.isValid(email)
       .then(q.run(getUserByEmailQuery, 'getUserByEmail'))

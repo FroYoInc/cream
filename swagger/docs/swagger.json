@@ -773,7 +773,6 @@
                 "description",
                 "pickupLocation",
                 "href"
-
             ],
             "properties" : {
                 "name" : {"type" : "string"},
@@ -787,7 +786,9 @@
                 "campus" : { "$ref": "#/definitions/Campus" },
                 "description" : {"type" : "string"},
                 "pickupLocation" : {"$ref" : "#/definitions/Address"},
-                "href" : {"type" :"string"}
+                "href" : {"type" :"string"},
+                "dist" : {"type" : "number"}
+
             }
         },
         "GeoCode": {

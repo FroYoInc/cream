@@ -385,6 +385,8 @@ describe('Carpool controller', () => {
       expect(outputJSON.length > 0).toEqual(true);
       expect(carpoolList.length).toEqual(outputJSON.length);
       expect(carpoolList[0].name).toEqual('Closest Carpool');
+      expect(carpoolList[0]['dist']).toBeDefined();
+      expect(carpoolList[0]['dist']).toEqual(0);
     }
 
     var req = <restify.Request> {query: {}};
@@ -588,8 +590,8 @@ describe('Carpool controller', () => {
 
   it('should deny a request', (done) => {
     goodUser.id = "01234";
-    goodUser.email = utils.validEmail("bobLobLaw");
-    goodUser.userName = "bobLobLaw";
+    goodUser.email = utils.validEmail("somerandomemailaddressthatnoonehas");
+    goodUser.userName = "ok";
     member.req.params.userToDenyID  = goodUser.id;
     good.req.params.userToDenyID = goodUser.id;
     good.req.session["userID"] = goodUser.id;

@@ -185,13 +185,18 @@ module CarpoolService {
     var _db = r.db(db);
     var query = _db.table(table).getNearest(r.point(long,lat),{
       index: 'geoPoint', maxResults: limit, maxDist:radius, unit: 'mi'
-    }).getField('doc').merge({
-      'campus': _db.table('campuses').get(r.row('campus')),
-      'owner': _db.table('users').get(r.row('owner')),
-      'participants': r.row('participants').map((p) => {
+    }).merge({
+      'name': r.row('doc').getField('name'),
+      'id': r.row('doc').getField('id'),
+      'description': r.row('doc').getField('description'),
+      'pickupLocation': r.row('doc').getField('pickupLocation'),
+      'dist': r.row('dist'),
+      'campus': _db.table('campuses').get(r.row('doc').getField('campus')),
+      'owner': _db.table('users').get(r.row('doc').getField('owner')),
+      'participants': r.row('doc').getField('participants').map((p) => {
         return _db.table('users').get(p);
       })
-    }).filter({
+    }).without('doc').filter({
       campus: {
         name: campusName
       }
