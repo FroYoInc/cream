@@ -82,9 +82,12 @@ gulp.task('integration-test-stg0', ['transpile-ts2js'], function() {
 
 gulp.task('integration-test-stg1', ['integration-test-stg0',
 'transpile-ts2js'], function() {
-  return gulp.src(config.integrationFiles.stg1)
-    .pipe($.jasmine())
-    .on('error', handleError);
+  setTimeout(function () {
+    return gulp.src(config.integrationFiles.stg1)
+      .pipe($.jasmine())
+      .on('error', handleError);
+  }, 5000);
+
 });
 
 gulp.task('integration-tests', ['integration-test-stg0',

@@ -71,11 +71,15 @@ module DBUtils {
 
     private createIndices() {
       var forEachTable = (table: shapes.TableShape) => {
-        var createIndex = (i: string) => {
+        var commandArray = [];
+        var createIndex = (i: string, notUsed, index) => {
           var test = r.db(Migrator.dbShape.dbname).table(table.tableName).indexList().contains(i);
           var trueBranch = r.now();
-          var falseBranch = (i == 'geoPoint')? r.db(Migrator.dbShape.dbname).table(table.tableName).indexCreate(i, {geo:true}) : r.db(Migrator.dbShape.dbname).table(table.tableName).indexCreate(i);
-          return r.branch(test, trueBranch, falseBranch).run(this._conn);
+          commandArray.push((i == 'geoPoint')? r.db(Migrator.dbShape.dbname).table(table.tableName).indexCreate(i, {geo:true}) : r.db(Migrator.dbShape.dbname).table(table.tableName).indexCreate(i));
+          if( index == table.indices.length){
+            var falseBranch = r.expr(commandArray);
+            return r.branch(test, trueBranch, falseBranch).run(this._conn);
+          }
         };
         return p.map(table.indices, createIndex);
       };
