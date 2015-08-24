@@ -130,7 +130,22 @@ The first installs any npm packages required by the front end to build (which we
 The next downloads some TypeScript definition files (also required for the build to work),
 the last downloads things such as AngularJS's source.
 
-### 13) Build `sprinkles`
+### 13) Obtain a Google Maps API Key / Update Configuration
+
+Because Corpool uses the Google Maps API, an API key is required. You can obtain free API keys from the [Google Developers Console](https://console.developers.google.com/). There are daily limits to the free API key, however. You can see more about the [Google Maps API here](https://developers.google.com/maps/?hl=en).
+
+Once you have obtained a Google Maps API key, go open up `app.ts` which is located in the `app/scripts` directory of `sprinkles`. Near the bottom of the file you should see a factory called `ConfigService`, which requires a host (the full URL to where the `public_html` directory is accessible to the world) and any port (though the port option can be left blank if it is 80). The API key must be set as well, by replacing `API_KEY` with the Google Maps API key.
+
+Additionally, open the `index.html` file located in the `app` directory of `sprinkles`. You should see something like this:
+```html
+<script async defer
+     src="https://maps.googleapis.com/maps/api/js?v=3&key=API_KEY&callback=initialize">
+</script>
+```
+
+Replace `API_KEY` with the Google Maps API key here, as well.
+
+### 14) Build `sprinkles`
 Simply run, within the `sprinkles` directory:
 ```
 gulp build
@@ -138,7 +153,7 @@ gulp build
 
 This transpiles the TypeScript into JavaScript, among other tasks.
 
-### 14) Move `dist` to `public_html`
+### 15) Move `dist` to `public_html`
 In the previous step we ran `gulp build`, which not only transpiled TypeScript to
 JavaScript, but it also moved anything required for the front end to work within the `dist` folder.
 
@@ -147,6 +162,6 @@ folder (the index.html should be at the root of `public_html`). However, if you
 cloned `sprinkles` on the server itself, copy those to the `public_html` directory
 (the `cp -r [SRC] [DEST]` command might be useful).
 
-### 15) Enjoy!
+### 16) Enjoy!
 If all went well, you should now be able to point your browser to wherever the
 `public_html` directory is accessible and everything should be up and running.
