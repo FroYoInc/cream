@@ -85,22 +85,34 @@ module carpoolControllers{
       return new Promise<number>((resolve, reject) => {      
         var validReq = pv.verifyParams(req.params.carpoolID, req.params.userToAddID);
         if(validReq){
-          carpoolServ.getCarpoolByID(req.params.carpoolID)
-            .then((_carpool) => {
-              var participants = [];
-              _carpool.participants.map((obj) => {
-                participants.push(obj.id);
-              });
-              if(participants.indexOf(req.session["userID"]) >= 0){
-                addUser(req.params.userToAddID, req.params.carpoolID, resolve)
-              }
-              else{
-                resolve(403);
-              }
-            })
-            .catch(errors.CarpoolNotFoundException, (err) => {
-              resolve(404)
-            });
+          userServ.getUserById(req.params.userToAddID)
+          .then( (user) => {
+            if(user.carpools.length > 0){
+              requestServ.deleteUserRequests(user.id)
+              .then( () => {
+                resolve(409);
+              })
+            }
+            else{
+              carpoolServ.getCarpoolByID(req.params.carpoolID)
+                .then((_carpool) => {
+                  var participants = [];
+                  _carpool.participants.map((obj) => {
+                    participants.push(obj.id);
+                  });
+                  if(participants.indexOf(req.session["userID"]) >= 0){
+                    addUser(req.params.userToAddID, req.params.carpoolID, resolve)
+                  }
+                  else{
+                    resolve(403);
+                  }
+                })
+                .catch(errors.CarpoolNotFoundException, (err) => {
+                  resolve(404)
+                });
+            }
+          })
+
         }
         else {
           resolve(400);
@@ -110,7 +122,7 @@ module carpoolControllers{
       function addUser(userID, carpoolID, resolve){
         userServ.getUserById(userID)
           .then( (_user) => {
-            requestServ.removeRequest(userID, carpoolID)
+            requestServ.deleteUserRequests(userID)
               .then( (result) => {
                 carpoolServ.addUserToCarpool(carpoolID, _user)
                   .then( (_carpool) => {

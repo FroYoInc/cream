@@ -65,6 +65,13 @@ module RequestService {
         return q.run(getByUserID, 'getRequestByUserID')();
     }
 
+    export function deleteUserRequests(userID:string){
+
+        var deleteUserRequest = r.db(db).table(table).filter({userID: userID}).delete();
+
+        return q.run(deleteUserRequest, 'deleteUserRequests')();
+    }
+
     export function getRequestByCarpoolID(carpoolID:any){
         
         var getByCarpoolID = r.db(db).table(table).filter({carpoolID: carpoolID})
