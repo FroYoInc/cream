@@ -102,6 +102,7 @@ module DBUtils {
         .then(getPasswordHash)
         .then((hash) => {
           user = {
+            carpools: [ ],
             firstName: 'Ad',
             lastName: 'Min',
             userName: 'admin',
